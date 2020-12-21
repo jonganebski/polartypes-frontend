@@ -2,6 +2,7 @@
 
 styles.css
 *.jpg
+*.webp
 
 # dependencies
 /node_modules

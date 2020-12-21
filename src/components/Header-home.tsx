@@ -1,8 +1,6 @@
-import { faCompass } from '@fortawesome/free-regular-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from './Button';
+import { Logo } from './Logo';
 
 interface IHomepageHeaderProps {
   setIsSignup: React.Dispatch<React.SetStateAction<boolean | null>>;
@@ -20,15 +18,7 @@ export const HomepageHeader: React.FC<IHomepageHeaderProps> = ({
       }`}
     >
       <div className="w-full max-w-4xl py-7 flex items-center justify-between">
-        <Link
-          to="/"
-          className={`flex items-center font-medium font-headFont  ${
-            isAlterHeader ? 'text-myGreen-darkest' : 'text-white'
-          }`}
-        >
-          <FontAwesomeIcon icon={faCompass} className="text-4xl mr-1" />
-          <span className="text-3xl font-black">polartypes</span>
-        </Link>
+        <Logo isAlterHeader={isAlterHeader} usage="home" />
         <div>
           <Button
             onClick={() => {

@@ -38,6 +38,9 @@ module.exports = {
       height: {
         homepageCover: '90vh',
       },
+      gridTemplateColumns: {
+        tripsPage: '400px auto',
+      },
     },
   },
   variants: {

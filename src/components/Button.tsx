@@ -3,7 +3,7 @@ import { Spinner } from './Loading-spinner';
 
 interface IButtonProps {
   text: string;
-  type: 'red-solid' | 'void';
+  type: 'red-solid' | 'blue-regular' | 'void';
   fontColorClass?: string;
   disabled?: boolean;
   loading?: boolean;
@@ -21,11 +21,13 @@ export const Button: React.FC<IButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className={`relative focus:outline-none font-semibold px-5 py-3 rounded-full mr-1 ${
+      className={`relative focus:outline-none font-semibold px-5 py-3 rounded-full ${
         disabled
           ? 'pointer-events-none bg-myGray text-myGray-light'
           : type === 'red-solid'
           ? 'bg-myRed text-white'
+          : type === 'blue-regular'
+          ? 'border border-myBlue text-myBlue'
           : type === 'void'
           ? `bg-transparent ${fontColorClass}`
           : ''
