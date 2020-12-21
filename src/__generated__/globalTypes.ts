@@ -17,6 +17,7 @@ export interface CreateAccountInput {
 export interface LoginInput {
   password: string;
   usernameOrEmail: string;
+  rememberMe: boolean;
 }
 
 //==============================================================

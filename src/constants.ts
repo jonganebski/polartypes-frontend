@@ -3,3 +3,5 @@ export const EMAIL_PATTERN = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*
 export const AZ_NUM_PATTERN = /^[a-zA-Z0-9]*$/;
 
 export const PW_MIN_LENGTH = 6;
+
+export const TOKEN = 'polartypes-jwt';

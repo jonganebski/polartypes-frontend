@@ -3,7 +3,13 @@ import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { AZ_NUM_PATTERN, EMAIL_PATTERN, PW_MIN_LENGTH } from '../constants';
+import { authTokenVar, isLoggedInVar } from '../apollo';
+import {
+  AZ_NUM_PATTERN,
+  EMAIL_PATTERN,
+  PW_MIN_LENGTH,
+  TOKEN,
+} from '../constants';
 import {
   createAccountMutation,
   createAccountMutationVariables,
@@ -16,6 +22,7 @@ const CREATE_ACCOUNT_MUTAION = gql`
     createAccount(input: $input) {
       ok
       error
+      token
     }
   }
 `;
@@ -39,10 +46,15 @@ export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
     handleSubmit,
     errors,
   } = useForm<IFormProps>({ mode: 'onChange' });
-  const onCompleted = ({
-    createAccount: { ok, error },
-  }: createAccountMutation) => {
-    console.log(ok, error);
+  const onCompleted = (data: createAccountMutation) => {
+    const {
+      createAccount: { ok, error, token },
+    } = data;
+    if (ok && token && !error) {
+      localStorage.setItem(TOKEN, token);
+      authTokenVar(token);
+      isLoggedInVar(true);
+    }
   };
   const [
     createAccountMutation,
@@ -58,7 +70,7 @@ export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
     <>
       <div
         onClick={() => setIsSignup(null)}
-        className="fixed z-50 w-screen h-screen bg-myGreen-darkest opacity-80"
+        className="fixed z-50 top-0 w-screen h-screen bg-myGreen-darkest opacity-80"
       />
       <div className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-2xl">
         <div

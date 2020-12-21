@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { HomepageHeader } from '../components/Header-home';
 import { SigninModal } from '../components/Modal-signin';
 import { SignupModal } from '../components/Modal-signup';
 
 export const Home = () => {
   const [isSignup, setIsSignup] = useState<boolean | null>(null);
+  const [isAlterHeader, setIsAlterHeader] = useState(false);
+  const x = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const alterHeader = () => {
+      if (
+        x.current?.offsetHeight &&
+        x.current.offsetHeight - window.pageYOffset < 450
+      ) {
+        setIsAlterHeader(true);
+      } else {
+        setIsAlterHeader(false);
+      }
+    };
+    window.addEventListener('scroll', alterHeader);
+    return () => window.removeEventListener('scroll', alterHeader);
+  }, []);
   return (
     <div>
-      <HomepageHeader setIsSignup={setIsSignup} />
+      <HomepageHeader setIsSignup={setIsSignup} isAlterHeader={isAlterHeader} />
       {isSignup === false && <SigninModal setIsSignup={setIsSignup} />}
       {isSignup === true && <SignupModal setIsSignup={setIsSignup} />}
       <div
-        className="fixed w-full h-96 bg-cover bg-right"
+        className="fixed top-0 w-full h-homepageCover bg-cover bg-right"
         style={{
           backgroundImage: `url("andreas-gucklhorn-mawU2PoJWfU-unsplash.jpg")`,
         }}
@@ -23,9 +39,33 @@ export const Home = () => {
               'linear-gradient(0.25turn, #001f29 60%, rgba(0, 31, 41, 0.9), rgba(0, 31, 41, 0.7), transparent)',
           }}
         ></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 grid grid-cols-2 gap-8 w-full max-w-4xl">
+          <div>
+            <h2 className="text-6xl text-white font-black mb-2 leading-tight">
+              Adventure starts&nbsp;with&nbsp;a
+            </h2>
+            <h2 className="text-6xl text-white font-black mb-10">
+              single step
+            </h2>
+            <h5 className="text-3xl text-white font-light">
+              Plan, track and relive your trips in a smart and beautiful way
+            </h5>
+          </div>
+          <div></div>
+        </div>
       </div>
-      <div className="w-full h-screen bg-cover"></div>
-      <div className="relative z-10 bg-white w-full h-screen"></div>;
+      <div
+        ref={x}
+        className="relative z-10 mt-homepageCover w-full h-screen bg-white"
+      >
+        <div
+          style={{ backgroundImage: 'url("splatter-white.png")' }}
+          className="absolute -top-10 w-full h-10 bg-cover"
+        />
+        <div className="bg-white w-full max-w-4xl mx-auto h-full pt-32">
+          Welcome to Polartypes!
+        </div>
+      </div>
     </div>
   );
 };

@@ -5,8 +5,9 @@ import {
   makeVar,
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import { TOKEN } from './constants';
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem(TOKEN);
 
 export const isLoggedInVar = makeVar(Boolean(token));
 

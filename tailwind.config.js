@@ -32,6 +32,12 @@ module.exports = {
         headFont: ['Lato', 'Montserrat', 'sans-serif'],
         bodyFont: ['Noto Serif', 'Georgia', 'serif'],
       },
+      margin: {
+        homepageCover: '90vh',
+      },
+      height: {
+        homepageCover: '90vh',
+      },
     },
   },
   variants: {

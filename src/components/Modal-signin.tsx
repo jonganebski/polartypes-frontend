@@ -3,7 +3,8 @@ import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { PW_MIN_LENGTH } from '../constants';
+import { authTokenVar, isLoggedInVar } from '../apollo';
+import { PW_MIN_LENGTH, TOKEN } from '../constants';
 import {
   signInMutation,
   signInMutationVariables,
@@ -40,21 +41,27 @@ export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
     errors,
   } = useForm<IFormProps>({ mode: 'onChange' });
   const onCompleted = (data: signInMutation) => {
-    console.log(data);
+    const {
+      login: { ok, error, token },
+    } = data;
+    if (ok && token && !error) {
+      localStorage.setItem(TOKEN, token);
+      authTokenVar(token);
+      isLoggedInVar(true);
+    }
   };
   const [signInMutation, { loading, data: MutationResult }] = useMutation<
     signInMutation,
     signInMutationVariables
   >(SIGN_IN_MUTATION, { onCompleted });
   const onSubmit = () => {
-    const { usernameOrEmail, password } = getValues();
-    signInMutation({ variables: { input: { usernameOrEmail, password } } });
+    signInMutation({ variables: { input: { ...getValues() } } });
   };
   return (
     <>
       <div
         onClick={() => setIsSignup(null)}
-        className="fixed z-50 w-screen h-screen bg-myGreen-darkest opacity-80"
+        className="fixed z-50 top-0 w-screen h-screen bg-myGreen-darkest opacity-80"
       />
       <div className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-2xl">
         <div
