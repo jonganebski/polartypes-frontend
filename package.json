@@ -15,6 +15,7 @@
     "@types/node": "^12.19.9",
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
+    "apollo": "^2.32.0",
     "autoprefixer": "^10.1.0",
     "graphql": "^15.4.0",
     "postcss": "^8.2.1",
@@ -29,6 +30,7 @@
   },
   "scripts": {
     "tailwind:build": "tailwind build ./src/styles/tailwind.css -o ./src/styles/styles.css",
+    "apollo:codegen": "rm -rf src/__generated__ & apollo client:codegen src/__generated__ --target=typescript --outputFlat",
     "start": "npm run tailwind:build & react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
