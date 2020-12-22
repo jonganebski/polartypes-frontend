@@ -6,6 +6,7 @@ const WHO_AM_I_QUERY = gql`
     whoAmI {
       firstName
       slug
+      timeZone
     }
   }
 `;

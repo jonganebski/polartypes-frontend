@@ -43,9 +43,8 @@ interface IPrams {
 }
 
 export const Trips = () => {
-  const [isCreateTrip, setIsCreateTrip] = useState(true);
+  const [isCreateTrip, setIsCreateTrip] = useState(false);
   const { username: targetUsername } = useParams<IPrams>();
-  console.log(targetUsername);
   const { data: whoAmIResult } = useWhoAmI();
   const { data, loading } = useQuery<readTripsQuery, readTripsQueryVariables>(
     READ_TRIPS_QUERY,
@@ -118,7 +117,9 @@ export const Trips = () => {
                 text="Add a past, current or future trip"
                 type="blue-regular"
                 size="sm"
-                onClick={() => setIsCreateTrip(true)}
+                onClick={() => {
+                  setIsCreateTrip(true);
+                }}
               />
             </div>
             <ul className="grid gap-y-3">

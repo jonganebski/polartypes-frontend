@@ -12,6 +12,7 @@ import {
 import { Button } from './Button';
 import { FormError } from './Form-error';
 import { ModalCloseIcon } from './Icon-close-modal';
+import { ModalBackground } from './Modal-background';
 
 const SIGN_IN_MUTATION = gql`
   mutation signInMutation($input: LoginInput!) {
@@ -64,11 +65,8 @@ export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
   };
   return (
     <>
-      <div
-        onClick={() => setIsSignup(null)}
-        className="fixed z-50 top-0 w-screen h-screen bg-myGreen-darkest opacity-80"
-      />
-      <div className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-2xl">
+      <ModalBackground onClick={() => setIsSignup(null)} />
+      <div className="modal">
         <ModalCloseIcon onClick={() => setIsSignup(null)} />
         <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
           Sign in to Polartypes

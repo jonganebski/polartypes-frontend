@@ -15,6 +15,9 @@ import { Button } from './Button';
 import { FormError } from './Form-error';
 import { ModalCloseIcon } from './Icon-close-modal';
 import { Calendar } from './Calendar';
+import { ModalBackground } from './Modal-background';
+import { useForm } from 'react-hook-form';
+import { Availability } from '../__generated__/globalTypes';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
@@ -35,6 +38,14 @@ interface ICreateTripModal {
   setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface IFormProps {
+  name: string;
+  summary: string;
+  startDate: Date;
+  endDate: Date;
+  availability: Availability;
+}
+
 export const CreateTripModal: React.FC<ICreateTripModal> = ({
   setIsCreateTrip,
 }) => {
@@ -48,38 +59,62 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
       setEndDate(startDate);
     }
   }, [endDate, startDate]);
-  const [createTripMutation, {}] = useMutation<
+  const {
+    register,
+    getValues,
+    formState,
+    handleSubmit,
+    errors,
+  } = useForm<IFormProps>({
+    mode: 'onChange',
+  });
+  const onCompleted = (data: createTripMutation) => {
+    const {
+      createTrip: { ok, error },
+    } = data;
+    console.log(ok, error);
+  };
+  const [createTripMutation, { loading }] = useMutation<
     createTripMutation,
     createTripMutationVariables
-  >(CREATE_TRIP_MUTATION);
+  >(CREATE_TRIP_MUTATION, { onCompleted });
+  const onSubmit = () => {
+    const { name, summary, startDate, endDate, availability } = getValues();
+    console.log(getValues());
+    // createTripMutation({
+    //   variables: { input: { name, summary, startDate, endDate, availability } },
+    // });
+  };
   return (
     <>
-      <div
-        className="fixed z-50 top-0 w-screen h-screen bg-myGreen-darkest opacity-80"
-        onClick={() => setIsCreateTrip(false)}
-      ></div>
-      <div className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-2xl overflow-hidden">
+      <ModalBackground onClick={() => setIsCreateTrip(false)} />
+      <div className="modal overflow-hidden">
         <ModalCloseIcon onClick={() => setIsCreateTrip(false)} />
         <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
           New Trip
         </div>
-        <form className="relative grid gap-y-5 max-h-screen80 overflow-y-scroll">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="relative grid gap-y-5 max-h-screen80 overflow-y-scroll"
+        >
           <div className="p-6 text-xl text-myGreen-darkest font-semibold border-b bg-myGray-lightest">
             Trip details
           </div>
           <div className="grid gap-y-1 px-6">
             <h6 className="font-semibold text-myGreen-darkest">Trip name</h6>
             <input
+              ref={register({ required: 'Please enter a name for the trip' })}
               name="name"
               type="text"
               placeholder="e.g. South American Trip"
               className="input"
             />
-            <FormError err="Please enter a name for the trip." />
+            {errors.name?.message && <FormError err={errors.name.message} />}
           </div>
           <div className="grid gap-y-1 px-6">
             <h6 className="font-semibold text-myGreen-darkest">Trip summary</h6>
             <textarea
+              ref={register({ maxLength: 80 })}
               name="summary"
               maxLength={80}
               placeholder="e.g. An awesome roadtrip through the deserts of Africa with my best friends"
@@ -95,6 +130,18 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <h6 className="font-semibold text-myGreen-darkest">Start date</h6>
             <div className="relative">
               <input
+                ref={register({
+                  required: true,
+                  setValueAs: (value) => {
+                    const y = new Date(value);
+                    const x = Date.UTC(
+                      y.getUTCFullYear(),
+                      y.getUTCMonth(),
+                      y.getUTCDate(),
+                    );
+                    console.log(new Date(x));
+                  },
+                })}
                 name="startDate"
                 readOnly
                 value={startDate?.toLocaleDateString('en-GB', {
@@ -125,6 +172,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <h6 className="font-semibold text-myGreen-darkest">End date</h6>
             <div className="relative">
               <input
+                ref={register({ valueAsDate: true })}
                 name="endDate"
                 readOnly
                 value={
@@ -168,7 +216,9 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           <div className="grid">
             <label className="px-6 pb-6 flex items-center border-b border-myGray-light cursor-pointer">
               <input
+                ref={register({ required: true })}
                 name="availability"
+                value={Availability.Private}
                 type="radio"
                 className="mr-6 w-6 h-6"
               />
@@ -184,7 +234,9 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             </label>
             <label className="p-6 flex items-center cursor-pointer">
               <input
+                ref={register({ required: true })}
                 name="availability"
+                value={Availability.Followers}
                 type="radio"
                 className="mr-6 w-6 h-6"
               />
@@ -200,7 +252,9 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             </label>
             <label className="p-6 flex items-center border-t border-myGray-light cursor-pointer">
               <input
+                ref={register({ required: true })}
                 name="availability"
+                value={Availability.Public}
                 type="radio"
                 className="mr-6 w-6 h-6"
               />
@@ -216,7 +270,12 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             </label>
           </div>
           <div className="p-6 grid bg-myGray-lightest border-t border-myGray-light rounded-bl-2xl">
-            <Button text="Sign in" type="red-solid" />
+            <Button
+              text="Sign in"
+              disabled={!formState.isValid}
+              loading={loading}
+              type="red-solid"
+            />
           </div>
         </form>
       </div>
