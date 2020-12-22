@@ -6,6 +6,7 @@ import {
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { TOKEN } from './constants';
+import { useWhoAmI } from './hooks/useWhoAmI';
 
 const token = localStorage.getItem(TOKEN);
 

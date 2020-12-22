@@ -13,6 +13,7 @@ module.exports = {
           DEFAULT: '#de2b52',
         },
         myBlue: {
+          light: '#0bc',
           DEFAULT: '#09c',
           dark: '#007399',
         },
@@ -38,13 +39,20 @@ module.exports = {
       height: {
         homepageCover: '90vh',
       },
+      maxHeight: {
+        screen70: '70vh',
+        screen80: '80vh',
+        screen90: '90vh',
+      },
       gridTemplateColumns: {
         tripsPage: '400px auto',
       },
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      scale: ['group-hover'],
+    },
   },
   plugins: [],
 };

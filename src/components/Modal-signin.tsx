@@ -1,8 +1,8 @@
 import { gql, useMutation } from '@apollo/client';
-import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useHistory } from 'react-router-dom';
 import { authTokenVar, isLoggedInVar } from '../apollo';
 import { PW_MIN_LENGTH, TOKEN } from '../constants';
 import {
@@ -11,6 +11,7 @@ import {
 } from '../__generated__/signInMutation';
 import { Button } from './Button';
 import { FormError } from './Form-error';
+import { ModalCloseIcon } from './Icon-close-modal';
 
 const SIGN_IN_MUTATION = gql`
   mutation signInMutation($input: LoginInput!) {
@@ -18,6 +19,7 @@ const SIGN_IN_MUTATION = gql`
       ok
       error
       token
+      username
     }
   }
 `;
@@ -33,6 +35,7 @@ interface ISigninModalProps {
 }
 
 export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
+  const history = useHistory();
   const {
     register,
     getValues,
@@ -42,12 +45,14 @@ export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
   } = useForm<IFormProps>({ mode: 'onChange' });
   const onCompleted = (data: signInMutation) => {
     const {
-      login: { ok, error, token },
+      login: { ok, error, token, username },
     } = data;
-    if (ok && token && !error) {
+    console.log(data);
+    if (ok && token && username && !error) {
       localStorage.setItem(TOKEN, token);
       authTokenVar(token);
       isLoggedInVar(true);
+      history.push(`/${username}`);
     }
   };
   const [signInMutation, { loading, data: MutationResult }] = useMutation<
@@ -64,15 +69,7 @@ export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
         className="fixed z-50 top-0 w-screen h-screen bg-myGreen-darkest opacity-80"
       />
       <div className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-2xl">
-        <div
-          onClick={() => setIsSignup(null)}
-          className="absolute top-1 right-1 p-2 group cursor-pointer"
-        >
-          <FontAwesomeIcon
-            icon={faTimesCircle}
-            className="text-xl text-myGreen-darkest group-hover:text-opacity-80"
-          />
-        </div>
+        <ModalCloseIcon onClick={() => setIsSignup(null)} />
         <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
           Sign in to Polartypes
         </div>

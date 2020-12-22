@@ -14,6 +14,7 @@ export interface signInMutation_login {
   ok: boolean;
   error: string | null;
   token: string | null;
+  username: string | null;
 }
 
 export interface signInMutation {

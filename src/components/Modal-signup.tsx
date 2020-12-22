@@ -3,6 +3,7 @@ import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useHistory } from 'react-router-dom';
 import { authTokenVar, isLoggedInVar } from '../apollo';
 import {
   AZ_NUM_PATTERN,
@@ -16,6 +17,7 @@ import {
 } from '../__generated__/createAccountMutation';
 import { Button } from './Button';
 import { FormError } from './Form-error';
+import { ModalCloseIcon } from './Icon-close-modal';
 
 const CREATE_ACCOUNT_MUTAION = gql`
   mutation createAccountMutation($input: CreateAccountInput!) {
@@ -23,6 +25,7 @@ const CREATE_ACCOUNT_MUTAION = gql`
       ok
       error
       token
+      username
     }
   }
 `;
@@ -39,6 +42,7 @@ interface IFormProps {
 }
 
 export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
+  const history = useHistory();
   const {
     register,
     getValues,
@@ -48,12 +52,13 @@ export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
   } = useForm<IFormProps>({ mode: 'onChange' });
   const onCompleted = (data: createAccountMutation) => {
     const {
-      createAccount: { ok, error, token },
+      createAccount: { ok, error, token, username },
     } = data;
-    if (ok && token && !error) {
+    if (ok && token && username && !error) {
       localStorage.setItem(TOKEN, token);
       authTokenVar(token);
       isLoggedInVar(true);
+      history.push(`/${username}`);
     }
   };
   const [
@@ -73,15 +78,7 @@ export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
         className="fixed z-50 top-0 w-screen h-screen bg-myGreen-darkest opacity-80"
       />
       <div className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-2xl">
-        <div
-          onClick={() => setIsSignup(null)}
-          className="absolute top-1 right-1 p-2 group cursor-pointer"
-        >
-          <FontAwesomeIcon
-            icon={faTimesCircle}
-            className="text-xl text-myGreen-darkest group-hover:text-opacity-80"
-          />
-        </div>
+        <ModalCloseIcon onClick={() => setIsSignup(null)} />
         <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
           New account
         </div>

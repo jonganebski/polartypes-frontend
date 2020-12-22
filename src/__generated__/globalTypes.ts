@@ -7,6 +7,12 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum Availability {
+  Followers = "Followers",
+  Private = "Private",
+  Public = "Public",
+}
+
 export interface CreateAccountInput {
   email: string;
   password: string;
@@ -14,10 +20,22 @@ export interface CreateAccountInput {
   lastName: string;
 }
 
+export interface CreateTripInput {
+  startDate: any;
+  name: string;
+  availability: Availability;
+  summary?: string | null;
+  endDate?: any | null;
+}
+
 export interface LoginInput {
   password: string;
   usernameOrEmail: string;
   rememberMe: boolean;
+}
+
+export interface ReadTripsInput {
+  targetUsername: string;
 }
 
 //==============================================================

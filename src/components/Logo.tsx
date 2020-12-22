@@ -29,7 +29,7 @@ export const Logo: React.FC<ILogoProps> = ({
         usage === 'home'
           ? 'text-3xl font-bold'
           : usage === 'common'
-          ? 'text-2xl font-medium'
+          ? 'text-2xl font-semibold'
           : ''
       }`}
     >
