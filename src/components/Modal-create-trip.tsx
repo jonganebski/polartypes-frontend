@@ -5,7 +5,8 @@ import {
   faUserFriends,
   faGlobe,
 } from '@fortawesome/free-solid-svg-icons';
-import React from 'react';
+import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
+import React, { useEffect, useState } from 'react';
 import {
   createTripMutation,
   createTripMutationVariables,
@@ -13,6 +14,7 @@ import {
 import { Button } from './Button';
 import { FormError } from './Form-error';
 import { ModalCloseIcon } from './Icon-close-modal';
+import { Calendar } from './Calendar';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
@@ -22,6 +24,12 @@ const CREATE_TRIP_MUTATION = gql`
     }
   }
 `;
+const dateObj = new Date();
+const INITIAL_DATE_STATE = new Date(
+  dateObj.getFullYear(),
+  dateObj.getMonth(),
+  dateObj.getDate(),
+);
 
 interface ICreateTripModal {
   setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,6 +38,16 @@ interface ICreateTripModal {
 export const CreateTripModal: React.FC<ICreateTripModal> = ({
   setIsCreateTrip,
 }) => {
+  const [startDate, setStartDate] = useState<Date | null>(INITIAL_DATE_STATE);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [isStartDateCalendar, setIsStartDateCalendar] = useState<
+    boolean | null
+  >(null);
+  useEffect(() => {
+    if (startDate && endDate && endDate.getTime() < startDate.getTime()) {
+      setEndDate(startDate);
+    }
+  }, [endDate, startDate]);
   const [createTripMutation, {}] = useMutation<
     createTripMutation,
     createTripMutationVariables
@@ -75,11 +93,71 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           </div>
           <div className="grid gap-y-1 px-6">
             <h6 className="font-semibold text-myGreen-darkest">Start date</h6>
-            <input name="startDate" type="text" className="input" />
+            <div className="relative">
+              <input
+                name="startDate"
+                readOnly
+                value={startDate?.toLocaleDateString('en-GB', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+                onClick={() =>
+                  setIsStartDateCalendar((prev) => (prev ? null : true))
+                }
+                type="text"
+                className="input w-full bg-white cursor-pointer"
+              />
+              <FontAwesomeIcon
+                icon={faCalendarAlt}
+                className="absolute top-1/2 right-5 transform -translate-y-1/2 text-myBlue text-lg"
+              />
+              {isStartDateCalendar && (
+                <Calendar
+                  selectedDate={startDate}
+                  setSelectedDate={setStartDate}
+                  initialDateState={INITIAL_DATE_STATE}
+                />
+              )}
+            </div>
           </div>
           <div className="grid gap-y-1 px-6">
             <h6 className="font-semibold text-myGreen-darkest">End date</h6>
-            <input name="endDate" type="text" className="input" />
+            <div className="relative">
+              <input
+                name="endDate"
+                readOnly
+                value={
+                  endDate
+                    ? endDate.toLocaleDateString('en-GB', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    : "I don't know"
+                }
+                onClick={() =>
+                  setIsStartDateCalendar((prev) =>
+                    prev === false ? null : false,
+                  )
+                }
+                type="text"
+                className="input w-full bg-white cursor-pointer"
+              />
+              <FontAwesomeIcon
+                icon={faCalendarAlt}
+                className="absolute top-1/2 right-5 transform -translate-y-1/2 text-myBlue text-lg"
+              />
+              {isStartDateCalendar === false && (
+                <Calendar
+                  selectedDate={endDate}
+                  setSelectedDate={setEndDate}
+                  initialDateState={INITIAL_DATE_STATE}
+                  effectiveSince={startDate}
+                  nullable={true}
+                />
+              )}
+            </div>
           </div>
           <div className="px-6">
             <FormError err='This trip overlaps with "future trip". Select a different date.' />

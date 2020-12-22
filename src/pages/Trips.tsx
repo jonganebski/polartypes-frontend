@@ -45,10 +45,11 @@ interface IPrams {
 export const Trips = () => {
   const [isCreateTrip, setIsCreateTrip] = useState(true);
   const { username: targetUsername } = useParams<IPrams>();
+  console.log(targetUsername);
   const { data: whoAmIResult } = useWhoAmI();
   const { data, loading } = useQuery<readTripsQuery, readTripsQueryVariables>(
     READ_TRIPS_QUERY,
-    { variables: { input: { targetUsername } } },
+    { variables: { input: { targetUsername: targetUsername.toLowerCase() } } },
   );
   const isSelf = targetUsername.toLowerCase() === whoAmIResult?.whoAmI.slug;
   return (
