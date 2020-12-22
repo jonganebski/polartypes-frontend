@@ -3,6 +3,7 @@
 styles.css
 *.jpg
 *.webp
+*.env
 
 # dependencies
 /node_modules

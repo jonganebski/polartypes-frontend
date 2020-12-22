@@ -6,6 +6,7 @@ import { Button } from '../components/Button';
 import { TripCard } from '../components/Card-trip';
 import { CommonHeader } from '../components/Header-common';
 import { CreateTripModal } from '../components/Modal-create-trip';
+import { SetTimeZoneModal } from '../components/Modal-set-time-zone';
 import { useWhoAmI } from '../hooks/useWhoAmI';
 import {
   readTripsQuery,
@@ -43,17 +44,21 @@ interface IPrams {
 }
 
 export const Trips = () => {
+  const { data: userData } = useWhoAmI();
   const [isCreateTrip, setIsCreateTrip] = useState(false);
+  const [isAskTimeZone, setIsAskTimeZone] = useState(false);
   const { username: targetUsername } = useParams<IPrams>();
-  const { data: whoAmIResult } = useWhoAmI();
-  const { data, loading } = useQuery<readTripsQuery, readTripsQueryVariables>(
+  const { data } = useQuery<readTripsQuery, readTripsQueryVariables>(
     READ_TRIPS_QUERY,
     { variables: { input: { targetUsername: targetUsername.toLowerCase() } } },
   );
-  const isSelf = targetUsername.toLowerCase() === whoAmIResult?.whoAmI.slug;
+  // const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
   return (
     <div>
       {isCreateTrip && <CreateTripModal setIsCreateTrip={setIsCreateTrip} />}
+      {isAskTimeZone && (
+        <SetTimeZoneModal setIsAskTimeZone={setIsAskTimeZone} />
+      )}
       <CommonHeader />
       <div className="grid grid-cols-tripsPage">
         <section className="grid overflow-y-scroll">
@@ -118,7 +123,9 @@ export const Trips = () => {
                 type="blue-regular"
                 size="sm"
                 onClick={() => {
-                  setIsCreateTrip(true);
+                  userData?.whoAmI.timeZone
+                    ? setIsCreateTrip(true)
+                    : setIsAskTimeZone(true);
                 }}
               />
             </div>
