@@ -13,7 +13,7 @@ import {
   readTripsQueryVariables,
 } from '../__generated__/readTripsQuery';
 
-const READ_TRIPS_QUERY = gql`
+export const READ_TRIPS_QUERY = gql`
   query readTripsQuery($input: ReadTripsInput!) {
     readTrips(input: $input) {
       ok
@@ -33,6 +33,7 @@ const READ_TRIPS_QUERY = gql`
         trips {
           name
           startDate
+          endDate
         }
       }
     }
@@ -55,7 +56,13 @@ export const Trips = () => {
   // const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
   return (
     <div>
-      {isCreateTrip && <CreateTripModal setIsCreateTrip={setIsCreateTrip} />}
+      {isCreateTrip && (
+        <CreateTripModal
+          targetUsername={targetUsername}
+          setIsCreateTrip={setIsCreateTrip}
+          trips={data?.readTrips.targetUser?.trips}
+        />
+      )}
       {isAskTimeZone && (
         <SetTimeZoneModal
           setIsAskTimeZone={setIsAskTimeZone}
@@ -133,9 +140,16 @@ export const Trips = () => {
               />
             </div>
             <ul className="grid gap-y-3">
-              {data?.readTrips.targetUser?.trips.map((_, i) => (
-                <TripCard key={i} />
-              ))}
+              {data?.readTrips.targetUser?.trips
+                .slice()
+                .sort(
+                  (a, b) =>
+                    new Date(b.startDate).getTime() -
+                    new Date(a.startDate).getTime(),
+                )
+                .map((trip, i) => (
+                  <TripCard key={i} trip={trip} />
+                ))}
             </ul>
           </div>
         </section>

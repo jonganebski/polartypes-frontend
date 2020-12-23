@@ -27,11 +27,11 @@ export interface CreateAccountInput {
 }
 
 export interface CreateTripInput {
-  startDate: any;
+  startDate: string;
   name: string;
   availability: Availability;
   summary?: string | null;
-  endDate?: any | null;
+  endDate?: string | null;
 }
 
 export interface ImageInputType {
@@ -71,8 +71,8 @@ export interface StepInputType {
 }
 
 export interface TripInputType {
-  startDate: any;
-  endDate?: any | null;
+  startDate: string;
+  endDate?: string | null;
   name: string;
   summary?: string | null;
   coverUrl?: string | null;

@@ -1,23 +1,27 @@
 import { gql, useMutation } from '@apollo/client';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
 import {
+  faGlobe,
   faLock,
   faUserFriends,
-  faGlobe,
 } from '@fortawesome/free-solid-svg-icons';
-import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import moment from 'moment-timezone';
 import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { client } from '../apollo';
+import { READ_TRIPS_QUERY } from '../pages/Trips';
 import {
   createTripMutation,
   createTripMutationVariables,
 } from '../__generated__/createTripMutation';
+import { Availability } from '../__generated__/globalTypes';
+import { readTripsQuery_readTrips_targetUser_trips } from '../__generated__/readTripsQuery';
 import { Button } from './Button';
+import { Calendar } from './Calendar';
 import { FormError } from './Form-error';
 import { ModalCloseIcon } from './Icon-close-modal';
-import { Calendar } from './Calendar';
 import { ModalBackground } from './Modal-background';
-import { useForm } from 'react-hook-form';
-import { Availability } from '../__generated__/globalTypes';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
@@ -35,55 +39,108 @@ const INITIAL_DATE_STATE = new Date(
 );
 
 interface ICreateTripModal {
+  targetUsername: string;
   setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
+  trips?: readTripsQuery_readTrips_targetUser_trips[];
 }
 
 interface IFormProps {
   name: string;
   summary: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   availability: Availability;
 }
 
 export const CreateTripModal: React.FC<ICreateTripModal> = ({
+  targetUsername,
   setIsCreateTrip,
+  trips = [],
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(INITIAL_DATE_STATE);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [isStartDateCalendar, setIsStartDateCalendar] = useState<
     boolean | null
   >(null);
-  useEffect(() => {
-    if (startDate && endDate && endDate.getTime() < startDate.getTime()) {
-      setEndDate(startDate);
-    }
-  }, [endDate, startDate]);
   const {
     register,
     getValues,
     formState,
     handleSubmit,
     errors,
+    setError,
+    clearErrors,
   } = useForm<IFormProps>({
     mode: 'onChange',
   });
+  useEffect(() => {
+    const setEndDateAfterStartDate = () => {
+      if (startDate && endDate && endDate.getTime() < startDate.getTime()) {
+        setEndDate(startDate);
+      }
+    };
+    const validateTripDates = () => {
+      const overlappedTrip = trips.find((trip) => {
+        const otherTripStart = new Date(trip.startDate).getTime();
+        const otherTripEnd = trip.endDate
+          ? new Date(trip.endDate).getTime()
+          : Infinity;
+        const start = new Date(startDate!).getTime();
+        const end = endDate ? new Date(endDate).getTime() : Infinity;
+        const isTripsOverlapped = Boolean(
+          (otherTripStart < start && start < otherTripEnd) ||
+            (otherTripStart < end && end < otherTripEnd) ||
+            (start < otherTripStart && otherTripStart < end) ||
+            (start < otherTripEnd && otherTripEnd < end),
+        );
+        return isTripsOverlapped;
+      });
+      overlappedTrip
+        ? setError('startDate', {
+            message: `This trip overlaps with "${overlappedTrip.name}". Select a different date.`,
+          })
+        : clearErrors('startDate');
+    };
+    setEndDateAfterStartDate();
+    validateTripDates();
+  }, [clearErrors, endDate, setError, startDate, trips]);
   const onCompleted = (data: createTripMutation) => {
     const {
       createTrip: { ok, error },
     } = data;
-    console.log(ok, error);
+    if (ok && !error) {
+      const prevQuery = client.readQuery({
+        query: READ_TRIPS_QUERY,
+        variables: { input: { targetUsername: targetUsername.toLowerCase() } },
+      });
+      console.log(prevQuery);
+      client.writeQuery({
+        query: READ_TRIPS_QUERY,
+        data: {
+          readTrips: {
+            ...prevQuery.readTrips,
+            targetUser: {
+              ...prevQuery.readTrips.targetUser,
+              trips: [
+                ...prevQuery.readTrips.targetUser.trips,
+                { __typename: 'Trip', ...getValues() },
+              ],
+            },
+          },
+        },
+        variables: { input: { targetUsername: targetUsername.toLowerCase() } },
+      });
+      setIsCreateTrip(false);
+    }
   };
   const [createTripMutation, { loading }] = useMutation<
     createTripMutation,
     createTripMutationVariables
   >(CREATE_TRIP_MUTATION, { onCompleted });
   const onSubmit = () => {
-    const { name, summary, startDate, endDate, availability } = getValues();
-    console.log(getValues());
-    // createTripMutation({
-    //   variables: { input: { name, summary, startDate, endDate, availability } },
-    // });
+    createTripMutation({
+      variables: { input: { ...getValues() } },
+    });
   };
   return (
     <>
@@ -133,13 +190,13 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
                 ref={register({
                   required: true,
                   setValueAs: (value) => {
-                    const y = new Date(value);
-                    const x = Date.UTC(
-                      y.getUTCFullYear(),
-                      y.getUTCMonth(),
-                      y.getUTCDate(),
-                    );
-                    console.log(new Date(x));
+                    const ISO8601_UTC = moment.utc(value).format();
+                    if (ISO8601_UTC !== 'Invalid date') {
+                      return ISO8601_UTC;
+                    }
+                    setError('startDate', {
+                      message: 'Invalid date format.',
+                    });
                   },
                 })}
                 name="startDate"
@@ -172,7 +229,15 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <h6 className="font-semibold text-myGreen-darkest">End date</h6>
             <div className="relative">
               <input
-                ref={register({ valueAsDate: true })}
+                ref={register({
+                  setValueAs: (value) => {
+                    const ISO8601_UTC = moment.utc(value).format();
+                    if (ISO8601_UTC !== 'Invalid date') {
+                      return ISO8601_UTC;
+                    }
+                    return null;
+                  },
+                })}
                 name="endDate"
                 readOnly
                 value={
@@ -207,8 +272,10 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
               )}
             </div>
           </div>
-          <div className="px-6">
-            <FormError err='This trip overlaps with "future trip". Select a different date.' />
+          <div className="px-6 grid">
+            {errors.startDate?.message && (
+              <FormError err={errors.startDate.message} />
+            )}
           </div>
           <div className="p-6 text-xl text-myGreen-darkest font-semibold border-t border-b bg-myGray-lightest">
             Who can see my trip?
@@ -271,7 +338,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           </div>
           <div className="p-6 grid bg-myGray-lightest border-t border-myGray-light rounded-bl-2xl">
             <Button
-              text="Sign in"
+              text="Create trip"
               disabled={!formState.isValid}
               loading={loading}
               type="red-solid"

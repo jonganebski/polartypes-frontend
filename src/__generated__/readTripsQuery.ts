@@ -22,7 +22,8 @@ export interface readTripsQuery_readTrips_targetUser_followings {
 export interface readTripsQuery_readTrips_targetUser_trips {
   __typename: "Trip";
   name: string;
-  startDate: any;
+  startDate: string;
+  endDate: string | null;
 }
 
 export interface readTripsQuery_readTrips_targetUser {

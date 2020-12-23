@@ -6,7 +6,6 @@ import {
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { TOKEN } from './constants';
-import { useWhoAmI } from './hooks/useWhoAmI';
 
 const token = localStorage.getItem(TOKEN);
 
@@ -18,12 +17,10 @@ const httpLink = createHttpLink({
   uri: 'http://localhost:4000/graphql',
 });
 
-const authLink = setContext((x, y) => {
-  console.log('x: ', x);
-  console.log('y: ', y);
+const authLink = setContext((_, { headers }) => {
   return {
     headers: {
-      ...y.headers,
+      ...headers,
       'x-jwt': authTokenVar() ?? '',
     },
   };

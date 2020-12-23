@@ -1,6 +1,6 @@
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import timeZones from 'moment-timezone/data/packed/latest.json';
+import moment from 'moment-timezone';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { client } from '../apollo';
@@ -100,9 +100,9 @@ export const SetTimeZoneModal: React.FC<ISetTimeZoneModalProps> = ({
               className="input mb-6"
               defaultValue={clientTimeZone}
             >
-              {timeZones.zones.map((zone, i) => (
-                <option key={i} value={zone.split('|')[0]}>
-                  {zone.split('|')[0]}
+              {moment.tz.names().map((zone, i) => (
+                <option key={i} value={zone}>
+                  {zone}
                 </option>
               ))}
             </select>

@@ -24,7 +24,9 @@ export const Calendar: React.FC<ICalendarProps> = ({
   effectiveSince = null,
   nullable = false,
 }) => {
-  const [calendarDate, setCalendarDate] = useState<Date>(initialDateState);
+  const [calendarDate, setCalendarDate] = useState<Date>(
+    selectedDate ?? initialDateState,
+  );
   const thisYear = calendarDate?.getFullYear();
   const thisMonthIndex = calendarDate?.getMonth();
   const lastDateLastMonth = new Date(thisYear, thisMonthIndex, 0).getDate();
