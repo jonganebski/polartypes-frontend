@@ -1,3 +1,6 @@
+const commonHeaderH = '3.5rem';
+const tripHeaderH = '3rem';
+
 module.exports = {
   purge: [],
   darkMode: false, // or 'media' or 'class'
@@ -37,21 +40,29 @@ module.exports = {
         homepageCover: '90vh',
       },
       height: {
+        commonHeader: commonHeaderH,
         homepageCover: '90vh',
+        tripBody: `calc(100vh - ${commonHeaderH} - ${tripHeaderH})`,
+        tripHeader: tripHeaderH,
       },
       maxHeight: {
         screen70: '70vh',
         screen80: '80vh',
         screen90: '90vh',
       },
+      padding: {
+        imageRatio: '66.67%',
+      },
       gridTemplateColumns: {
         tripsPage: '400px auto',
+        tripPage: `minmax(600px, 1fr) 1fr`,
       },
     },
   },
   variants: {
     extend: {
       scale: ['group-hover'],
+      translate: ['group-hover'],
     },
   },
   plugins: [],

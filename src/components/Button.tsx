@@ -3,13 +3,14 @@ import { Spinner } from './Loading-spinner';
 
 interface IButtonProps {
   text: string;
-  type: 'red-solid' | 'blue-regular' | 'white-regular' | 'void';
+  type: 'red-solid' | 'white-solid' | 'blue-regular' | 'white-regular' | 'void';
   className?: string;
   size?: 'sm' | 'md';
   fontColorClass?: string;
   disabled?: boolean;
   loading?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  icon?: JSX.Element;
 }
 
 export const Button: React.FC<IButtonProps> = ({
@@ -21,6 +22,7 @@ export const Button: React.FC<IButtonProps> = ({
   disabled = false,
   loading = false,
   onClick,
+  icon,
 }) => {
   return (
     <button
@@ -32,6 +34,8 @@ export const Button: React.FC<IButtonProps> = ({
           ? 'pointer-events-none bg-myGray text-myGray-light'
           : type === 'red-solid'
           ? 'bg-myRed text-white'
+          : type === 'white-solid'
+          ? 'bg-white text-myGray-darkest border border-myGray-light'
           : type === 'blue-regular'
           ? 'border border-myBlue text-myBlue'
           : type === 'white-regular'
@@ -42,6 +46,7 @@ export const Button: React.FC<IButtonProps> = ({
       }`}
     >
       {loading && <Spinner />}
+      {icon}
       <span className={`${loading && 'opacity-0'}`}>{text}</span>
     </button>
   );

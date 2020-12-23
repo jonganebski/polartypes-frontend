@@ -13,6 +13,7 @@ export interface createTripMutation_createTrip {
   __typename: "CreateTripOutput";
   ok: boolean;
   error: string | null;
+  tripId: number | null;
 }
 
 export interface createTripMutation {

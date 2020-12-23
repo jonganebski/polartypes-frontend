@@ -13,7 +13,7 @@ import {
   readTripsQueryVariables,
 } from '../__generated__/readTripsQuery';
 
-export const READ_TRIPS_QUERY = gql`
+const READ_TRIPS_QUERY = gql`
   query readTripsQuery($input: ReadTripsInput!) {
     readTrips(input: $input) {
       ok

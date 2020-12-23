@@ -9,8 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment-timezone';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { client } from '../apollo';
-import { READ_TRIPS_QUERY } from '../pages/Trips';
+import { useHistory } from 'react-router-dom';
 import {
   createTripMutation,
   createTripMutationVariables,
@@ -28,6 +27,7 @@ const CREATE_TRIP_MUTATION = gql`
     createTrip(input: $input) {
       ok
       error
+      tripId
     }
   }
 `;
@@ -57,6 +57,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
   setIsCreateTrip,
   trips = [],
 }) => {
+  const history = useHistory();
   const [startDate, setStartDate] = useState<Date | null>(INITIAL_DATE_STATE);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [isStartDateCalendar, setIsStartDateCalendar] = useState<
@@ -106,31 +107,10 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
   }, [clearErrors, endDate, setError, startDate, trips]);
   const onCompleted = (data: createTripMutation) => {
     const {
-      createTrip: { ok, error },
+      createTrip: { ok, error, tripId },
     } = data;
-    if (ok && !error) {
-      const prevQuery = client.readQuery({
-        query: READ_TRIPS_QUERY,
-        variables: { input: { targetUsername: targetUsername.toLowerCase() } },
-      });
-      console.log(prevQuery);
-      client.writeQuery({
-        query: READ_TRIPS_QUERY,
-        data: {
-          readTrips: {
-            ...prevQuery.readTrips,
-            targetUser: {
-              ...prevQuery.readTrips.targetUser,
-              trips: [
-                ...prevQuery.readTrips.targetUser.trips,
-                { __typename: 'Trip', ...getValues() },
-              ],
-            },
-          },
-        },
-        variables: { input: { targetUsername: targetUsername.toLowerCase() } },
-      });
-      setIsCreateTrip(false);
+    if (ok && tripId && !error) {
+      history.push(`/${targetUsername}/${tripId}`);
     }
   };
   const [createTripMutation, { loading }] = useMutation<

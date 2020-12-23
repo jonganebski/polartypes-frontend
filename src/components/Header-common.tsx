@@ -15,8 +15,8 @@ export const CommonHeader = () => {
   const { username: usernameParam } = useParams<IPrams>();
   const isSelf = usernameParam.toLowerCase() === data?.whoAmI.slug;
   return (
-    <header className="flex justify-between bg-myGreen-darkest">
-      <div className="p-3 flex items-center">
+    <header className="h-commonHeader flex justify-between bg-myGreen-darkest">
+      <div className="px-3 flex items-center">
         <Logo usage="common" />
         <form className="relative ml-4 w-80">
           <input

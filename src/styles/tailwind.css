@@ -1,6 +1,10 @@
 @tailwind base;
 @tailwind components;
 
+body {
+  @apply h-screen;
+}
+
 .input {
   @apply px-4 py-3 border border-solid border-myGray rounded-sm focus:border-myBlue focus:outline-none;
 }
