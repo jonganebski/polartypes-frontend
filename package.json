@@ -19,6 +19,7 @@
     "autoprefixer": "^10.1.0",
     "axios": "^0.21.1",
     "graphql": "^15.4.0",
+    "moment-timezone": "^0.5.32",
     "postcss": "^8.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

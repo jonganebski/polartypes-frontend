@@ -57,7 +57,10 @@ export const Trips = () => {
     <div>
       {isCreateTrip && <CreateTripModal setIsCreateTrip={setIsCreateTrip} />}
       {isAskTimeZone && (
-        <SetTimeZoneModal setIsAskTimeZone={setIsAskTimeZone} />
+        <SetTimeZoneModal
+          setIsAskTimeZone={setIsAskTimeZone}
+          setIsCreateTrip={setIsCreateTrip}
+        />
       )}
       <CommonHeader />
       <div className="grid grid-cols-tripsPage">

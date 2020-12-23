@@ -1,14 +1,20 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
-import React, { useEffect, useRef, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import timeZones from 'moment-timezone/data/packed/latest.json';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { client } from '../apollo';
+import { useUpdateAccount } from '../hooks/useUpdateAccount';
+import { WHO_AM_I_QUERY } from '../hooks/useWhoAmI';
+import { updateAccountMutation } from '../__generated__/updateAccountMutation';
+import { Button } from './Button';
+import { FormError } from './Form-error';
 import { ModalCloseIcon } from './Icon-close-modal';
 import { ModalBackground } from './Modal-background';
-import { Button } from './Button';
-import { useForm } from 'react-hook-form';
-import { useGeocoder } from '../hooks/useGeocoder';
 
 interface ISetTimeZoneModalProps {
   setIsAskTimeZone: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface IFormProps {
@@ -18,22 +24,45 @@ interface IFormProps {
 
 export const SetTimeZoneModal: React.FC<ISetTimeZoneModalProps> = ({
   setIsAskTimeZone,
+  setIsCreateTrip,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const {
     getValues,
     formState,
     register,
     handleSubmit,
-    watch,
-    setValue,
+    errors,
   } = useForm<IFormProps>({
     mode: 'onChange',
   });
-  const cityInputWatch = watch('city');
-  const dataList = useGeocoder(cityInputWatch);
-  const onSubmit = () => {
-    console.log(getValues());
+  const onCompleted = (data: updateAccountMutation) => {
+    const {
+      updateAccount: { ok, error },
+    } = data;
+    if (ok && !error) {
+      const { timeZone } = getValues();
+      const prevQuery = client.readQuery({ query: WHO_AM_I_QUERY });
+      client.writeQuery({
+        query: WHO_AM_I_QUERY,
+        data: {
+          whoAmI: {
+            ...prevQuery.whoAmI,
+            timeZone,
+          },
+        },
+      });
+      setIsLoading(false);
+      setIsAskTimeZone(false);
+      setIsCreateTrip(true);
+    }
   };
+  const [updateAccountMutation] = useUpdateAccount(onCompleted);
+  const onSubmit = () => {
+    setIsLoading(true);
+    updateAccountMutation({ variables: { input: { ...getValues() } } });
+  };
+  const clientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return (
     <>
       <ModalBackground onClick={() => setIsAskTimeZone(false)} />
@@ -47,35 +76,40 @@ export const SetTimeZoneModal: React.FC<ISetTimeZoneModalProps> = ({
             <FontAwesomeIcon icon={faHome} />
           </div>
           <p className="mb-6 text-myGray-darkest text-center">
-            Please set your city. It helps us to determine your home timezone.
+            Please set your city and timezone.
           </p>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col align-center"
           >
-            <input
-              ref={register({ required: true })}
-              name="city"
-              list="geocoder"
-              type="text"
-              placeholder="Enter your city"
-              className="input mb-6"
-              autoComplete="off"
-            />
-            <datalist id="geocoder">
-              {dataList?.map((data: any, i: number) => {
-                const value = `${data.name}, ${data.country}`;
-                return <option key={i} value={value} onClick={() => {}} />;
-              })}
-            </datalist>
-            <input
+            <div className="mb-3">
+              <input
+                ref={register({ required: 'Your location is required.' })}
+                name="city"
+                list="city"
+                type="text"
+                placeholder="Enter your city"
+                className="input w-full"
+                autoComplete="off"
+              />
+              {errors.city?.message && <FormError err={errors.city.message} />}
+            </div>
+            <select
               ref={register({ required: true })}
               name="timeZone"
-              className="hidden"
-            />
+              className="input mb-6"
+              defaultValue={clientTimeZone}
+            >
+              {timeZones.zones.map((zone, i) => (
+                <option key={i} value={zone.split('|')[0]}>
+                  {zone.split('|')[0]}
+                </option>
+              ))}
+            </select>
             <Button
               text="Create trip"
               disabled={!formState.isValid}
+              loading={isLoading}
               type="red-solid"
               className="mx-auto"
             />
