@@ -10,24 +10,28 @@ import {
   faCog,
   faHome,
   faPassport,
-  faPlusCircle,
   faShareAlt,
   faTachometerAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Card-step';
 import { CommonHeader } from '../components/Header-common';
+import { CreateStepModal } from '../components/Modal-create-step';
 
 export const Trip = () => {
+  const [isCreateStepModal, setIsCreateStepModal] = useState(true);
   return (
-    <div className="">
+    <div>
       <CommonHeader />
-      <div className="grid grid-cols-tripPage">
-        <section>
+      <div className="h-screenExceptHeader flex">
+        <section className="relative w-1/2 h-full min-w-px600">
+          {isCreateStepModal && (
+            <CreateStepModal setIsCreateStepModal={setIsCreateStepModal} />
+          )}
           <div className="h-tripHeader px-2 flex items-center justify-between">
             <div className="flex items-center">
               <Avatar size={8} />
@@ -158,9 +162,9 @@ export const Trip = () => {
                   <span className="text-myGray-dark">Started date</span>
                 </div>
               </li>
-              <AddStepButton />
+              <AddStepButton onClick={() => setIsCreateStepModal(true)} />
               <StepCard />
-              <AddStepButton />
+              <AddStepButton onClick={() => setIsCreateStepModal(true)} />
               <li className="pl-3 flex">
                 <div className="w-10 h-10 mr-3 flex items-center justify-center rounded-full border border-myGray text-myGray text-xl">
                   <FontAwesomeIcon icon={faHome} />
@@ -175,7 +179,7 @@ export const Trip = () => {
             </ul>
           </article>
         </section>
-        <section className="bg-green-700"></section>
+        <section className="w-1/2 h-tripBody bg-green-700"></section>
       </div>
     </div>
   );

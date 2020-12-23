@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
 interface IAddStepButton {
-  onClick?: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
+  onClick: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
 }
 
 export const AddStepButton: React.FC<IAddStepButton> = ({ onClick }) => (

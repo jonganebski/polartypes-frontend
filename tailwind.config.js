@@ -40,22 +40,34 @@ module.exports = {
         homepageCover: '90vh',
       },
       height: {
-        commonHeader: commonHeaderH,
         homepageCover: '90vh',
-        tripBody: `calc(100vh - ${commonHeaderH} - ${tripHeaderH})`,
+        commonHeader: commonHeaderH,
         tripHeader: tripHeaderH,
+        tripBody: `calc(100vh - ${commonHeaderH} - ${tripHeaderH})`,
+        screenExceptHeader: `calc(100vh - ${commonHeaderH})`,
+      },
+      width: {
+        p90: '90%',
       },
       maxHeight: {
         screen70: '70vh',
         screen80: '80vh',
         screen90: '90vh',
       },
+      minWidth: {
+        px600: `600px`,
+      },
       padding: {
         imageRatio: '66.67%',
+        p90: '90%',
+        square: '100%',
       },
       gridTemplateColumns: {
         tripsPage: '400px auto',
-        tripPage: `minmax(600px, 1fr) 1fr`,
+        oneToTwo: '1fr 2fr',
+      },
+      boxShadow: {
+        surround: '0 2px 8px 0 rgba(0,0,0,0.12)',
       },
     },
   },
