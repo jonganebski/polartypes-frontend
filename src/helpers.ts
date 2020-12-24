@@ -22,3 +22,12 @@ export const getTimeZone = async (
     return { ok: false, error: 'Failed to get timezone.' };
   }
 };
+
+export const formatDate = (date: Date | null, monthType: 'long' | 'short') => {
+  const format = date?.toLocaleDateString('en-GB', {
+    year: 'numeric',
+    month: monthType,
+    day: 'numeric',
+  });
+  return format;
+};

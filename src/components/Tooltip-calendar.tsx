@@ -1,7 +1,7 @@
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { months, weekdaysShort } from 'moment-timezone';
 import React, { useState } from 'react';
-import { DAY_STRINGS, MONTHS } from '../constants';
 
 const range = (start: number, stop: number, year: number, month: number) =>
   Array.from(
@@ -14,6 +14,7 @@ interface ICalendarProps {
   setSelectedDate: React.Dispatch<React.SetStateAction<Date | null>>;
   initialDateState: Date;
   effectiveSince?: Date | null;
+  effectiveUntil?: Date | null;
   nullable?: boolean;
 }
 
@@ -22,6 +23,7 @@ export const Calendar: React.FC<ICalendarProps> = ({
   setSelectedDate,
   initialDateState,
   effectiveSince = null,
+  effectiveUntil = null,
   nullable = false,
 }) => {
   const [calendarDate, setCalendarDate] = useState<Date>(
@@ -115,7 +117,7 @@ export const Calendar: React.FC<ICalendarProps> = ({
           value={thisMonthIndex}
           className="select mr-2"
         >
-          {MONTHS.map((month, i) => (
+          {months().map((month, i) => (
             <option key={i} value={i}>
               {month}
             </option>
@@ -142,13 +144,16 @@ export const Calendar: React.FC<ICalendarProps> = ({
         </div>
       </div>
       <div className="mb-4 grid grid-cols-7 justify-items-center text-myGray-dark text-xs">
-        {DAY_STRINGS.map((day) => (
+        {weekdaysShort().map((day) => (
           <span key={day}>{day}</span>
         ))}
       </div>
       <div className="grid grid-cols-7 justify-items-center text-myGray-dark text-xs">
         {datesLastMonth.map((date, i) => {
-          if (effectiveSince && date.getTime() <= effectiveSince?.getTime()) {
+          if (
+            (effectiveSince && date.getTime() <= effectiveSince?.getTime()) ||
+            (effectiveUntil && date.getTime() >= effectiveUntil?.getTime())
+          ) {
             return (
               <span
                 key={i}
@@ -170,7 +175,10 @@ export const Calendar: React.FC<ICalendarProps> = ({
           }
         })}
         {datesThisMonth.map((date, i) => {
-          if (effectiveSince && date.getTime() <= effectiveSince?.getTime()) {
+          if (
+            (effectiveSince && date.getTime() <= effectiveSince?.getTime()) ||
+            (effectiveUntil && date.getTime() >= effectiveUntil?.getTime())
+          ) {
             return (
               <span
                 key={i}
@@ -184,7 +192,10 @@ export const Calendar: React.FC<ICalendarProps> = ({
               <span
                 key={i}
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-white cursor-pointer ${
-                  date.getTime() === selectedDate?.getTime() && 'bg-myBlue'
+                  date.getFullYear() === selectedDate?.getFullYear() &&
+                  date.getMonth() === selectedDate?.getMonth() &&
+                  date.getDate() === selectedDate?.getDate() &&
+                  'bg-myBlue'
                 }`}
                 onClick={() => onDateClick(date)}
               >
@@ -194,7 +205,10 @@ export const Calendar: React.FC<ICalendarProps> = ({
           }
         })}
         {datesNextMonth.map((date, i) => {
-          if (effectiveSince && date.getTime() <= effectiveSince?.getTime()) {
+          if (
+            (effectiveSince && date.getTime() <= effectiveSince?.getTime()) ||
+            (effectiveUntil && date.getTime() >= effectiveUntil?.getTime())
+          ) {
             return (
               <span
                 key={i}

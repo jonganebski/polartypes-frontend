@@ -24,6 +24,7 @@ import { ModalBackground } from './Modal-background';
 import { INITIAL_DATE_STATE } from '../constants';
 import { useWhoAmI } from '../hooks/useWhoAmI';
 import { whoAmIQuery } from '../__generated__/whoAmIQuery';
+import { formatDate } from '../helpers';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
@@ -194,11 +195,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
                 })}
                 name="startDate"
                 readOnly
-                value={startDate?.toLocaleDateString('en-GB', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
+                value={formatDate(startDate, 'long')}
                 onClick={() =>
                   setIsStartDateCalendar((prev) => (prev ? null : true))
                 }
@@ -246,15 +243,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
                 })}
                 name="endDate"
                 readOnly
-                value={
-                  endDate
-                    ? endDate.toLocaleDateString('en-GB', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })
-                    : "I don't know"
-                }
+                value={formatDate(endDate, 'long') ?? "I don't know"}
                 onClick={() =>
                   setIsStartDateCalendar((prev) =>
                     prev === false ? null : false,

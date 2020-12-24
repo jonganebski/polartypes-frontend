@@ -52,6 +52,10 @@ export interface LoginInput {
   rememberMe: boolean;
 }
 
+export interface ReadTripInput {
+  tripId: number;
+}
+
 export interface ReadTripsInput {
   targetUsername: string;
 }
@@ -60,7 +64,7 @@ export interface StepInputType {
   country: string;
   coord: number[];
   name: string;
-  arrivedAt: any;
+  arrivedAt: string;
   timeZone: string;
   story?: string | null;
   likes: LikeInputType[];

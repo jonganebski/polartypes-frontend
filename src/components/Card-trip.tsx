@@ -1,8 +1,8 @@
 import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { months } from 'moment-timezone';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MONTHS } from '../constants';
 import { readTripsQuery_readTrips_targetUser_trips } from '../__generated__/readTripsQuery';
 
 interface ITripCardProps {
@@ -49,10 +49,10 @@ export const TripCard: React.FC<ITripCardProps> = ({
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-5/6 flex justify-between text-white">
           <div className="leading-tight">
             <span className="block font-semibold">{year}</span>
-            <span className="text-xs">{MONTHS[monthIndex]}</span>
+            <span className="text-xs">{months()[monthIndex]}</span>
           </div>
           <div className="leading-tight">
-            <span className="block font-semibold">{MONTHS[monthIndex]}</span>
+            <span className="block font-semibold">{months()[monthIndex]}</span>
             <span className="text-xs">days</span>
           </div>
           <div className="leading-tight">

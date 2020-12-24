@@ -5,14 +5,12 @@ import { ICreateStepFormProps } from './Modal-create-step';
 const range = (start: number, stop: number, step: number) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + step * i);
 
-interface IClockProps {}
+interface IClockProps {
+  timeZone: string;
+}
 
-export const Clock: React.FC<IClockProps> = () => {
-  const {
-    register,
-    setValue,
-    getValues,
-  } = useFormContext<ICreateStepFormProps>();
+export const Clock: React.FC<IClockProps> = ({ timeZone }) => {
+  const { setValue, getValues } = useFormContext<ICreateStepFormProps>();
   const hours = range(0, 23, 1);
   const minutes = range(0, 55, 5);
   const onHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -72,12 +70,9 @@ export const Clock: React.FC<IClockProps> = () => {
       </div>
       <div className="grid text-center text-myGray font-semibold">
         <span>Timezone:</span>
-        <input
-          ref={register({ required: true })}
-          name="timeZone"
-          readOnly
-          className="bg-transparent w-full text-center text-myGray font-semibold focus:outline-none"
-        />
+        <span className="bg-transparent w-full text-center text-myGray font-semibold">
+          {timeZone}
+        </span>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { gql, useQuery } from '@apollo/client';
 import {
   faCalendar,
   faEye,
@@ -14,24 +15,89 @@ import {
   faTachometerAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import moment from 'moment';
 import React, { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Card-step';
 import { CommonHeader } from '../components/Header-common';
 import { CreateStepModal } from '../components/Modal-create-step';
+import {
+  readTripQuery,
+  readTripQueryVariables,
+} from '../__generated__/readTripQuery';
+
+const READ_TRIP_QUERY = gql`
+  query readTripQuery($input: ReadTripInput!) {
+    readTrip(input: $input) {
+      ok
+      error
+      trip {
+        startDate
+        endDate
+        traveler {
+          username
+          timeZone
+        }
+        steps {
+          id
+          name
+          createdAt
+          country
+          arrivedAt
+          timeZone
+          story
+          likes {
+            user {
+              username
+            }
+          }
+          images {
+            url
+          }
+          comments {
+            id
+          }
+        }
+      }
+    }
+  }
+`;
+
+interface IParams {
+  tripId: string;
+}
 
 export const Trip = () => {
-  const [isCreateStepModal, setIsCreateStepModal] = useState(true);
+  const { tripId } = useParams<IParams>();
+  const [isCreateStepModal, setIsCreateStepModal] = useState(false);
+  const [belowStepDate, setBelowStepDate] = useState<string | null>('');
+  const [belowStepTimeZone, setBelowStepTimeZone] = useState('');
+  const { data } = useQuery<readTripQuery, readTripQueryVariables>(
+    READ_TRIP_QUERY,
+    {
+      variables: { input: { tripId: +tripId } },
+    },
+  );
+  const startDateData = data?.readTrip.trip?.startDate;
+  const endDateData = data?.readTrip.trip?.endDate;
+  const timeZoneData = data?.readTrip.trip?.traveler.timeZone;
+  console.log(data);
   return (
     <div>
       <CommonHeader />
       <div className="h-screenExceptHeader flex">
         <section className="relative w-1/2 h-full min-w-px600">
-          {isCreateStepModal && (
-            <CreateStepModal setIsCreateStepModal={setIsCreateStepModal} />
+          {isCreateStepModal && data?.readTrip.trip && (
+            <CreateStepModal
+              tripStartDate={data.readTrip.trip.startDate}
+              tripEndDate={data.readTrip.trip.endDate}
+              belowStepDate={belowStepDate}
+              belowStepTimeZone={belowStepTimeZone}
+              setIsCreateStepModal={setIsCreateStepModal}
+            />
           )}
           <div className="h-tripHeader px-2 flex items-center justify-between">
             <div className="flex items-center">
@@ -160,21 +226,50 @@ export const Trip = () => {
                   <span className="block text-myGray-darkest font-semibold">
                     Trip started
                   </span>
-                  <span className="text-myGray-dark">Started date</span>
+                  <span className="text-myGray-dark">
+                    {startDateData &&
+                      timeZoneData &&
+                      moment(startDateData)
+                        .tz(timeZoneData)
+                        .format('d MMMM YYYY')}
+                  </span>
                 </div>
               </li>
-              <AddStepButton onClick={() => setIsCreateStepModal(true)} />
-              <StepCard />
-              <AddStepButton onClick={() => setIsCreateStepModal(true)} />
+              {data?.readTrip.trip?.steps.map((step) => {
+                return (
+                  <React.Fragment key={step.id}>
+                    <AddStepButton
+                      onClick={() => {
+                        setBelowStepDate(step.arrivedAt);
+                        setBelowStepTimeZone(step.timeZone);
+                        setIsCreateStepModal(true);
+                      }}
+                    />
+                    <StepCard step={step} />
+                  </React.Fragment>
+                );
+              })}
+              <AddStepButton
+                onClick={() => {
+                  setBelowStepDate(data?.readTrip.trip?.endDate ?? null);
+                  setIsCreateStepModal(true);
+                }}
+              />
               <li className="pl-3 flex">
                 <div className="w-10 h-10 mr-3 flex items-center justify-center rounded-full border border-myGray text-myGray text-xl">
                   <FontAwesomeIcon icon={faHome} />
                 </div>
                 <div className="text-sm">
                   <span className="block text-myGray-darkest font-semibold">
-                    Trip started
+                    Trip Finished
                   </span>
-                  <span className="text-myGray-dark">Started date</span>
+                  <span className="text-myGray-dark">
+                    {endDateData &&
+                      timeZoneData &&
+                      moment(endDateData)
+                        .tz(timeZoneData)
+                        .format('d MMMM YYYY')}
+                  </span>
                 </div>
               </li>
             </ul>

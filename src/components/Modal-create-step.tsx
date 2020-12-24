@@ -5,7 +5,7 @@ import moment from 'moment';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { INITIAL_DATE_STATE } from '../constants';
-import { getTimeZone } from '../helpers';
+import { formatDate, getTimeZone } from '../helpers';
 import { useGeocoder } from '../hooks/useGeocoder';
 import { Button } from './Button';
 import { ModalCloseIcon } from './Icon-close-modal';
@@ -13,6 +13,10 @@ import { Calendar } from './Tooltip-calendar';
 import { Clock } from './Tooltip-clock';
 
 interface ICreateStepModal {
+  tripStartDate: string;
+  tripEndDate: string | null;
+  belowStepDate: string | null;
+  belowStepTimeZone: string;
   setIsCreateStepModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -22,23 +26,30 @@ export interface ICreateStepFormProps {
   country: string;
   lat: string;
   lon: string;
+  story: string;
   arrivedDate: string;
   arrivedTime: string;
   timeZone: string;
+  images: FileList;
 }
 
 export const CreateStepModal: React.FC<ICreateStepModal> = ({
+  tripStartDate,
+  tripEndDate,
+  belowStepDate,
+  belowStepTimeZone,
   setIsCreateStepModal,
 }) => {
-  const [arrivedDate, setArrivedDate] = useState<Date | null>(
-    INITIAL_DATE_STATE,
-  );
+  const belowDateObj = belowStepDate ? new Date(belowStepDate) : new Date();
+  const belowLocalDate = moment(belowStepDate).tz(belowStepTimeZone);
+  const [arrivedDate, setArrivedDate] = useState<Date | null>(belowDateObj);
   const [searchTerm, setSearchTerm] = useState('');
   const [isPopupCalendar, setIsPopupCalendar] = useState<boolean | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
-    defaultValues: { arrivedTime: '13:20' },
+    defaultValues: {
+      arrivedTime: `${belowLocalDate?.hour() ?? '00'}:00`,
+    },
   });
   const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
   const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,10 +88,14 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                           onClick={async () => {
                             const lat = (+d.point?.lat)?.toFixed(6);
                             const lon = (+d.point?.lng)?.toFixed(6);
-                            f.setValue('location', d.name);
-                            f.setValue('lat', lat);
-                            f.setValue('lon', lon);
-                            f.setValue('country', d.country);
+                            f.setValue('location', d.name, {
+                              shouldValidate: true,
+                            });
+                            f.setValue('lat', lat, { shouldValidate: true });
+                            f.setValue('lon', lon, { shouldValidate: true });
+                            f.setValue('country', d.country, {
+                              shouldValidate: true,
+                            });
                             setGeocodeData(null);
                           }}
                           className="px-4 py-2 cursor-pointer text-sm hover:bg-myGray-lightest"
@@ -119,6 +134,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                         lon,
                       );
                       if (ok && !error && timeZone) {
+                        console.log(timeZone);
                         f.setValue('timeZone', timeZone);
                       }
                     }}
@@ -156,8 +172,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                   <input
                     ref={f.register({
                       required: true,
-                      setValueAs: (value) => {
-                        console.log(value);
+                      setValueAs: () => {
                         if (!arrivedDate) {
                           f.setError('arrivedDate', {
                             message: 'Arrival date is not provided.',
@@ -185,11 +200,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                     onClick={() =>
                       setIsPopupCalendar((prev) => (prev ? null : true))
                     }
-                    value={arrivedDate?.toLocaleDateString('en-GB', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })}
+                    value={formatDate(arrivedDate, 'short')}
                     readOnly
                     className={`px-4 py-3 w-full border border-solid rounded-sm cursor-pointer focus:outline-none ${
                       isPopupCalendar ? 'border-myBlue' : 'border-myGray'
@@ -204,6 +215,16 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                       selectedDate={arrivedDate}
                       initialDateState={INITIAL_DATE_STATE}
                       setSelectedDate={setArrivedDate}
+                      effectiveSince={
+                        new Date(
+                          new Date(tripStartDate).getFullYear(),
+                          new Date(tripStartDate).getMonth(),
+                          new Date(tripStartDate).getDate() - 1,
+                        )
+                      }
+                      effectiveUntil={
+                        tripEndDate ? new Date(tripEndDate) : null
+                      }
                     />
                   )}
                 </div>
@@ -227,12 +248,20 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                     icon={faClock}
                     className="absolute top-1/2 transform -translate-y-1/2 right-3 text-myBlue text-xl"
                   />
-                  {isPopupCalendar === false && <Clock />}
+                  {isPopupCalendar === false && (
+                    <Clock timeZone={f.watch('timeZone')} />
+                  )}
+                  <input
+                    ref={f.register()}
+                    name="timeZone"
+                    readOnly
+                    className="hidden"
+                  />
                 </div>
               </div>
               <h3 className="text-myGreen-darkest font-semibold">Your story</h3>
               <textarea
-                ref={f.register({ required: true })}
+                ref={f.register()}
                 name="story"
                 placeholder="What have you been up to?"
                 className="resize-none px-4 py-3 h-48 border border-myGray rounded-sm focus:outline-none focus:border-myBlue"
