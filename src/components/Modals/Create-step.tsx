@@ -11,6 +11,7 @@ import { Button } from '../Button';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { Calendar } from '../Tooltips/Calendar';
 import { Clock } from '../Tooltips/Clock';
+import { UploadBox } from './partials/UploadBox';
 
 interface ICreateStepModal {
   tripStartDate: string;
@@ -269,29 +270,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
               <h3 className="text-myGreen-darkest font-semibold">
                 Add your photos
               </h3>
-              <div className="p-2 gap-3 grid grid-cols-4 border border-myGray rounded-sm">
-                <div className="relative pt-square border border-dashed border-myBlue rounded-md">
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-p90 pt-p90 bg-myGray-dark rounded-sm"></div>
-                  <FontAwesomeIcon
-                    icon={faTimesCircle}
-                    className="absolute top-0 right-0 text-xl cursor-pointer bg-white rounded-full hover:text-myRed"
-                  />
-                </div>
-                <div className="relative pt-square border border-myBlue rounded-md cursor-pointer group hover:bg-myBlue">
-                  <FontAwesomeIcon
-                    icon={faCamera}
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-myBlue text-lg group-hover:text-white"
-                  />
-                </div>
-              </div>
-              <input
-                ref={f.register()}
-                name="images"
-                type="file"
-                className=""
-                accept="image/*"
-                multiple={true}
-              />
+              <UploadBox />
             </section>
             <div>
               <Button
