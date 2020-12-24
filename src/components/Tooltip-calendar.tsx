@@ -113,7 +113,7 @@ export const Calendar: React.FC<ICalendarProps> = ({
         <select
           onChange={onMonthChange}
           value={thisMonthIndex}
-          className="p-1 mr-2 rounded-sm text-myBlue focus:outline-none"
+          className="select mr-2"
         >
           {MONTHS.map((month, i) => (
             <option key={i} value={i}>
@@ -124,7 +124,7 @@ export const Calendar: React.FC<ICalendarProps> = ({
         <select
           onChange={onYearChange}
           value={thisYear}
-          className="p-1 rounded-sm text-myBlue focus:outline-none"
+          className="select mr-2"
         >
           {yearsIdx.map((i) => {
             return (

@@ -22,3 +22,10 @@ export const MONTHS = [
 ];
 
 export const DAY_STRINGS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+const dateObj = new Date();
+export const INITIAL_DATE_STATE = new Date(
+  dateObj.getFullYear(),
+  dateObj.getMonth(),
+  dateObj.getDate(),
+);

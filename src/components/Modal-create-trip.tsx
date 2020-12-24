@@ -17,10 +17,11 @@ import {
 import { Availability } from '../__generated__/globalTypes';
 import { readTripsQuery_readTrips_targetUser_trips } from '../__generated__/readTripsQuery';
 import { Button } from './Button';
-import { Calendar } from './Calendar';
+import { Calendar } from './Tooltip-calendar';
 import { FormError } from './Form-error';
 import { ModalCloseIcon } from './Icon-close-modal';
 import { ModalBackground } from './Modal-background';
+import { INITIAL_DATE_STATE } from '../constants';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
@@ -31,12 +32,6 @@ const CREATE_TRIP_MUTATION = gql`
     }
   }
 `;
-const dateObj = new Date();
-const INITIAL_DATE_STATE = new Date(
-  dateObj.getFullYear(),
-  dateObj.getMonth(),
-  dateObj.getDate(),
-);
 
 interface ICreateTripModal {
   targetUsername: string;

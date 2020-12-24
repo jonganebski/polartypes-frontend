@@ -7,9 +7,13 @@ import { readTripsQuery_readTrips_targetUser_trips } from '../__generated__/read
 
 interface ITripCardProps {
   trip: readTripsQuery_readTrips_targetUser_trips;
+  targetUsername: string;
 }
 
-export const TripCard: React.FC<ITripCardProps> = ({ trip }) => {
+export const TripCard: React.FC<ITripCardProps> = ({
+  trip,
+  targetUsername,
+}) => {
   const dateObject = new Date(trip.startDate);
   const year = dateObject.getFullYear();
   const monthIndex = dateObject.getMonth();
@@ -18,7 +22,10 @@ export const TripCard: React.FC<ITripCardProps> = ({ trip }) => {
       style={{ minHeight: '220px' }}
       className="relative group overflow-hidden"
     >
-      <Link to="/" className="block w-full h-full">
+      <Link
+        to={`/${targetUsername}/${trip.id}`}
+        className="block w-full h-full"
+      >
         <div
           style={{
             backgroundImage:

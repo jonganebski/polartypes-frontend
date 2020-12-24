@@ -31,6 +31,7 @@ const READ_TRIPS_QUERY = gql`
           id
         }
         trips {
+          id
           name
           startDate
           endDate
@@ -148,7 +149,11 @@ export const Trips = () => {
                     new Date(a.startDate).getTime(),
                 )
                 .map((trip, i) => (
-                  <TripCard key={i} trip={trip} />
+                  <TripCard
+                    key={i}
+                    targetUsername={targetUsername}
+                    trip={trip}
+                  />
                 ))}
             </ul>
           </div>

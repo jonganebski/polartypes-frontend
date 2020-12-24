@@ -15,6 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
