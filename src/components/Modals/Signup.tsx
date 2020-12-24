@@ -4,21 +4,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { authTokenVar, isLoggedInVar } from '../apollo';
+import { authTokenVar, isLoggedInVar } from '../../apollo';
 import {
   AZ_NUM_PATTERN,
   EMAIL_PATTERN,
   PW_MIN_LENGTH,
   TOKEN,
-} from '../constants';
+} from '../../constants';
 import {
   createAccountMutation,
   createAccountMutationVariables,
-} from '../__generated__/createAccountMutation';
-import { Button } from './Button';
-import { FormError } from './Form-error';
-import { ModalCloseIcon } from './Icon-close-modal';
-import { ModalBackground } from './Modal-background';
+} from '../../__generated__/createAccountMutation';
+import { Button } from '../Button';
+import { FormError } from '../Form-error';
+import { ModalCloseIcon } from './partials/CloseIcon';
+import { ModalBackground } from './partials/Background';
 
 const CREATE_ACCOUNT_MUTAION = gql`
   mutation createAccountMutation($input: CreateAccountInput!) {

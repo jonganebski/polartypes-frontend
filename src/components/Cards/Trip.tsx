@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { months } from 'moment-timezone';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { readTripsQuery_readTrips_targetUser_trips } from '../__generated__/readTripsQuery';
+import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
 
 interface ITripCardProps {
   trip: readTripsQuery_readTrips_targetUser_trips;

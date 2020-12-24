@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
-import { TripCard } from '../components/Card-trip';
-import { CommonHeader } from '../components/Header-common';
-import { CreateTripModal } from '../components/Modal-create-trip';
-import { SetTimeZoneModal } from '../components/Modal-set-time-zone';
+import { TripCard } from '../components/Cards/Trip';
+import { CommonHeader } from '../components/Headers/CommonHeader';
+import { CreateTripModal } from '../components/Modals/Create-trip';
+import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
 import { useWhoAmI } from '../hooks/useWhoAmI';
 import {
   readTripsQuery,

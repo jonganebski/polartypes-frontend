@@ -4,13 +4,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { INITIAL_DATE_STATE } from '../constants';
-import { formatDate, getTimeZone } from '../helpers';
-import { useGeocoder } from '../hooks/useGeocoder';
-import { Button } from './Button';
-import { ModalCloseIcon } from './Icon-close-modal';
-import { Calendar } from './Tooltip-calendar';
-import { Clock } from './Tooltip-clock';
+import { INITIAL_DATE_STATE } from '../../constants';
+import { formatDate, getTimeZone } from '../../helpers';
+import { useGeocoder } from '../../hooks/useGeocoder';
+import { Button } from '../Button';
+import { ModalCloseIcon } from './partials/CloseIcon';
+import { Calendar } from '../Tooltips/Calendar';
+import { Clock } from '../Tooltips/Clock';
 
 interface ICreateStepModal {
   tripStartDate: string;

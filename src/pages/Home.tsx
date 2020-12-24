@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { HomepageHeader } from '../components/Header-home';
-import { SigninModal } from '../components/Modal-signin';
-import { SignupModal } from '../components/Modal-signup';
+import { HomepageHeader } from '../components/Headers/HomeHeader';
+import { SigninModal } from '../components/Modals/Signin';
+import { SignupModal } from '../components/Modals/Signup';
 
 export const Home = () => {
   const [isSignup, setIsSignup] = useState<boolean | null>(null);

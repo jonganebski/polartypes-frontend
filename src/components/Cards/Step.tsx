@@ -3,10 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { readTripQuery_readTrip_trip_steps } from '../__generated__/readTripQuery';
-import { Avatar } from './Avatar';
-import { Button } from './Button';
-import { Comments } from './Comments';
+import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
+import { Avatar } from '../Avatar';
+import { Button } from '../Button';
+import { Comments } from './partials/Comments';
 
 interface IStepProps {
   step: readTripQuery_readTrip_trip_steps;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from './Button';
-import { Logo } from './Logo';
+import { Button } from '../Button';
+import { Logo } from '../Logo';
 
 interface IHomepageHeaderProps {
   setIsSignup: React.Dispatch<React.SetStateAction<boolean | null>>;

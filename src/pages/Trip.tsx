@@ -21,9 +21,9 @@ import { useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
-import { StepCard } from '../components/Card-step';
-import { CommonHeader } from '../components/Header-common';
-import { CreateStepModal } from '../components/Modal-create-step';
+import { StepCard } from '../components/Cards/Step';
+import { CommonHeader } from '../components/Headers/CommonHeader';
+import { CreateStepModal } from '../components/Modals/Create-step';
 import {
   readTripQuery,
   readTripQueryVariables,

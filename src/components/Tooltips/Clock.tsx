@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { ICreateStepFormProps } from './Modal-create-step';
+import { ICreateStepFormProps } from '../Modals/Create-step';
 
 const range = (start: number, stop: number, step: number) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + step * i);

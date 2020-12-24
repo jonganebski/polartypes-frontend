@@ -1,10 +1,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBars } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
-import { Logo } from './Logo';
-import { Avatar } from './Avatar';
+import { Logo } from '../Logo';
+import { Avatar } from '../Avatar';
 import { Link, useParams } from 'react-router-dom';
-import { useWhoAmI } from '../hooks/useWhoAmI';
+import { useWhoAmI } from '../../hooks/useWhoAmI';
 
 interface IPrams {
   username: string;

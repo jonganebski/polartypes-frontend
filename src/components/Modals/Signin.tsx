@@ -3,16 +3,16 @@ import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { authTokenVar, isLoggedInVar } from '../apollo';
-import { PW_MIN_LENGTH, TOKEN } from '../constants';
+import { authTokenVar, isLoggedInVar } from '../../apollo';
+import { PW_MIN_LENGTH, TOKEN } from '../../constants';
 import {
   signInMutation,
   signInMutationVariables,
-} from '../__generated__/signInMutation';
-import { Button } from './Button';
-import { FormError } from './Form-error';
-import { ModalCloseIcon } from './Icon-close-modal';
-import { ModalBackground } from './Modal-background';
+} from '../../__generated__/signInMutation';
+import { Button } from '../Button';
+import { FormError } from '../Form-error';
+import { ModalCloseIcon } from './partials/CloseIcon';
+import { ModalBackground } from './partials/Background';
 
 const SIGN_IN_MUTATION = gql`
   mutation signInMutation($input: LoginInput!) {

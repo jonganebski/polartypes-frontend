@@ -3,14 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment-timezone';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { client } from '../apollo';
-import { useUpdateAccount } from '../hooks/useUpdateAccount';
-import { WHO_AM_I_QUERY } from '../hooks/useWhoAmI';
-import { updateAccountMutation } from '../__generated__/updateAccountMutation';
-import { Button } from './Button';
-import { FormError } from './Form-error';
-import { ModalCloseIcon } from './Icon-close-modal';
-import { ModalBackground } from './Modal-background';
+import { client } from '../../apollo';
+import { useUpdateAccount } from '../../hooks/useUpdateAccount';
+import { WHO_AM_I_QUERY } from '../../hooks/useWhoAmI';
+import { updateAccountMutation } from '../../__generated__/updateAccountMutation';
+import { Button } from '../Button';
+import { FormError } from '../Form-error';
+import { ModalCloseIcon } from './partials/CloseIcon';
+import { ModalBackground } from './partials/Background';
 
 interface ISetTimeZoneModalProps {
   setIsAskTimeZone: React.Dispatch<React.SetStateAction<boolean>>;

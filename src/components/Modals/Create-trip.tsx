@@ -13,18 +13,17 @@ import { useHistory } from 'react-router-dom';
 import {
   createTripMutation,
   createTripMutationVariables,
-} from '../__generated__/createTripMutation';
-import { Availability } from '../__generated__/globalTypes';
-import { readTripsQuery_readTrips_targetUser_trips } from '../__generated__/readTripsQuery';
-import { Button } from './Button';
-import { Calendar } from './Tooltip-calendar';
-import { FormError } from './Form-error';
-import { ModalCloseIcon } from './Icon-close-modal';
-import { ModalBackground } from './Modal-background';
-import { INITIAL_DATE_STATE } from '../constants';
-import { useWhoAmI } from '../hooks/useWhoAmI';
-import { whoAmIQuery } from '../__generated__/whoAmIQuery';
-import { formatDate } from '../helpers';
+} from '../../__generated__/createTripMutation';
+import { Availability } from '../../__generated__/globalTypes';
+import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
+import { Button } from '../Button';
+import { Calendar } from '../Tooltips/Calendar';
+import { FormError } from '../Form-error';
+import { ModalCloseIcon } from './partials/CloseIcon';
+import { ModalBackground } from './partials/Background';
+import { INITIAL_DATE_STATE } from '../../constants';
+import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
+import { formatDate } from '../../helpers';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
