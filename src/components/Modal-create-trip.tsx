@@ -22,6 +22,8 @@ import { FormError } from './Form-error';
 import { ModalCloseIcon } from './Icon-close-modal';
 import { ModalBackground } from './Modal-background';
 import { INITIAL_DATE_STATE } from '../constants';
+import { useWhoAmI } from '../hooks/useWhoAmI';
+import { whoAmIQuery } from '../__generated__/whoAmIQuery';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
@@ -34,7 +36,7 @@ const CREATE_TRIP_MUTATION = gql`
 `;
 
 interface ICreateTripModal {
-  targetUsername: string;
+  userData: whoAmIQuery;
   setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
   trips?: readTripsQuery_readTrips_targetUser_trips[];
 }
@@ -48,7 +50,7 @@ interface IFormProps {
 }
 
 export const CreateTripModal: React.FC<ICreateTripModal> = ({
-  targetUsername,
+  userData,
   setIsCreateTrip,
   trips = [],
 }) => {
@@ -105,7 +107,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
       createTrip: { ok, error, tripId },
     } = data;
     if (ok && tripId && !error) {
-      history.push(`/${targetUsername}/${tripId}`);
+      history.push(`/${userData.whoAmI.username}/${tripId}`);
     }
   };
   const [createTripMutation, { loading }] = useMutation<
@@ -164,8 +166,24 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
               <input
                 ref={register({
                   required: true,
-                  setValueAs: (value) => {
-                    const ISO8601_UTC = moment.utc(value).format();
+                  setValueAs: () => {
+                    if (!startDate) {
+                      setError('startDate', {
+                        message: 'Start date is not provided.',
+                      });
+                      return;
+                    }
+                    const year = startDate.getFullYear();
+                    const month = (startDate.getMonth() + 1)
+                      .toString()
+                      .padStart(2, '0');
+                    const date = startDate
+                      .getDate()
+                      .toString()
+                      .padStart(2, '0');
+                    const ISO8601_UTC = moment
+                      .utc(`${year}-${month}-${date}`)
+                      .format();
                     if (ISO8601_UTC !== 'Invalid date') {
                       return ISO8601_UTC;
                     }
@@ -205,8 +223,21 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <div className="relative">
               <input
                 ref={register({
-                  setValueAs: (value) => {
-                    const ISO8601_UTC = moment.utc(value).format();
+                  setValueAs: () => {
+                    if (!endDate) {
+                      setError('endDate', {
+                        message: 'End date is not provided.',
+                      });
+                      return;
+                    }
+                    const year = endDate.getFullYear();
+                    const month = (endDate.getMonth() + 1)
+                      .toString()
+                      .padStart(2, '0');
+                    const date = endDate.getDate().toString().padStart(2, '0');
+                    const ISO8601_UTC = moment
+                      .utc(`${year}-${month}-${date}`)
+                      .format();
                     if (ISO8601_UTC !== 'Invalid date') {
                       return ISO8601_UTC;
                     }

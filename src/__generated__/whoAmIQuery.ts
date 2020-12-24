@@ -10,6 +10,7 @@
 export interface whoAmIQuery_whoAmI {
   __typename: "Users";
   firstName: string;
+  username: string;
   slug: string;
   timeZone: string | null;
 }

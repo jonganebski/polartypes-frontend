@@ -5,6 +5,7 @@ export const WHO_AM_I_QUERY = gql`
   query whoAmIQuery {
     whoAmI {
       firstName
+      username
       slug
       timeZone
     }

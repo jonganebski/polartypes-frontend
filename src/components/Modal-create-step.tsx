@@ -152,13 +152,29 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                 Arrival Date & Time
               </h3>
               <div className="flex">
-                <div className="relative mr-4 w-full">
+                <div className="relative mr-4 w-full min-w-min">
                   <input
                     ref={f.register({
                       required: true,
                       setValueAs: (value) => {
                         console.log(value);
-                        const ISO8601_UTC = moment.utc(value).format();
+                        if (!arrivedDate) {
+                          f.setError('arrivedDate', {
+                            message: 'Arrival date is not provided.',
+                          });
+                          return;
+                        }
+                        const year = arrivedDate.getFullYear();
+                        const month = (arrivedDate.getMonth() + 1)
+                          .toString()
+                          .padStart(2, '0');
+                        const date = arrivedDate
+                          .getDate()
+                          .toString()
+                          .padStart(2, '0');
+                        const ISO8601_UTC = moment
+                          .utc(`${year}-${month}-${date}`)
+                          .format();
                         if (ISO8601_UTC !== 'Invalid date') {
                           return ISO8601_UTC;
                         }
@@ -171,7 +187,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                     }
                     value={arrivedDate?.toLocaleDateString('en-GB', {
                       year: 'numeric',
-                      month: 'long',
+                      month: 'short',
                       day: 'numeric',
                     })}
                     readOnly
@@ -201,7 +217,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                       )
                     }
                     readOnly
-                    className={`px-4 py-3 w-full border border-solid rounded-sm cursor-pointer focus:outline-none ${
+                    className={`pl-4 py-3 w-full border border-solid rounded-sm cursor-pointer focus:outline-none ${
                       isPopupCalendar === false
                         ? 'border-myBlue'
                         : 'border-myGray'

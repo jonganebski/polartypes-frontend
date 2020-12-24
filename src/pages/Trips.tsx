@@ -57,9 +57,9 @@ export const Trips = () => {
   // const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
   return (
     <div>
-      {isCreateTrip && (
+      {isCreateTrip && userData && (
         <CreateTripModal
-          targetUsername={targetUsername}
+          userData={userData}
           setIsCreateTrip={setIsCreateTrip}
           trips={data?.readTrips.targetUser?.trips}
         />
