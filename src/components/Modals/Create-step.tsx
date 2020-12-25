@@ -31,7 +31,7 @@ export interface ICreateStepFormProps {
   arrivedDate: string;
   arrivedTime: string;
   timeZone: string;
-  images: FileList;
+  imageUrls: string[];
 }
 
 export const CreateStepModal: React.FC<ICreateStepModal> = ({
@@ -45,6 +45,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
   const belowLocalDate = moment(belowStepDate).tz(belowStepTimeZone);
   const [arrivedDate, setArrivedDate] = useState<Date | null>(belowDateObj);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
   const [isPopupCalendar, setIsPopupCalendar] = useState<boolean | null>(null);
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
@@ -270,13 +271,16 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
               <h3 className="text-myGreen-darkest font-semibold">
                 Add your photos
               </h3>
-              <UploadBox />
+              <UploadBox
+                isUploading={isUploading}
+                setIsUploading={setIsUploading}
+              />
             </section>
             <div>
               <Button
                 text="Add step"
                 type="red-solid"
-                disabled={!f.formState.isValid}
+                disabled={!f.formState.isValid || isUploading}
                 className="mr-4"
               />
               <Button

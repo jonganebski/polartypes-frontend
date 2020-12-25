@@ -12,3 +12,5 @@ export const INITIAL_DATE_STATE = new Date(
   dateObj.getMonth(),
   dateObj.getDate(),
 );
+
+export const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
