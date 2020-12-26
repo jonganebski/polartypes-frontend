@@ -10,7 +10,7 @@ import { Button } from '../Button';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { Calendar } from '../Tooltips/Calendar';
 import { Clock } from '../Tooltips/Clock';
-import { UploadBox } from './partials/UploadBox';
+import { FilesArea } from './partials/FilesArea';
 import { gql, useMutation } from '@apollo/client';
 import {
   createStepMutation,
@@ -450,7 +450,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                   Drag'n drop to re-arrange
                 </span>
               </h3>
-              <UploadBox
+              <FilesArea
                 images={images}
                 setImages={setImages}
                 isUploading={isUploading}
