@@ -92,6 +92,7 @@ export const Trip = () => {
         <section className="relative w-1/2 h-full min-w-px600">
           {isCreateStepModal && data?.readTrip.trip && (
             <CreateStepModal
+              tripId={tripId}
               tripStartDate={data.readTrip.trip.startDate}
               tripEndDate={data.readTrip.trip.endDate}
               belowStepDate={belowStepDate}

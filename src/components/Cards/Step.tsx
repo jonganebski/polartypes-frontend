@@ -30,13 +30,17 @@ export const StepCard: React.FC<IStepProps> = ({ step }) => {
         </div>
       </div>
       <p className="mb-3 text-myGray-darkest">{step.story}</p>
-      <div
-        style={{
-          backgroundImage:
-            'url("../andreas-gucklhorn-mawU2PoJWfU-unsplash.jpg")',
-        }}
-        className="relative mb-4 pt-imageRatio bg-cover bg-center"
-      ></div>
+      <div className="mb-4 grid gap-y-3">
+        {step.images.map((image, i) => (
+          <div
+            key={i}
+            style={{
+              backgroundImage: `url(${image.url})`,
+            }}
+            className="pt-imageRatio bg-cover bg-center"
+          ></div>
+        ))}
+      </div>
       {step.likes.length > 0 && (
         <div className="p-3 flex border-t border-b border-myGray-light">
           <Avatar size={8} />

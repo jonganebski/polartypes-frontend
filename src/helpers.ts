@@ -31,3 +31,14 @@ export const formatDate = (date: Date | null, monthType: 'long' | 'short') => {
   });
   return format;
 };
+
+export const deleteFiles = async (urls: string[]) => {
+  console.log(JSON.stringify({ urls: urls }));
+  const response = await fetch('http://localhost:4000/aws-s3/delete', {
+    method: 'POST',
+    body: JSON.stringify({ urls: urls }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const data = await response.json();
+  console.log(data);
+};

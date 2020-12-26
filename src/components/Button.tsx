@@ -4,6 +4,7 @@ import { Spinner } from './Loading-spinner';
 interface IButtonProps {
   text: string;
   type: 'red-solid' | 'white-solid' | 'blue-regular' | 'white-regular' | 'void';
+  isSubmitBtn?: boolean;
   className?: string;
   size?: 'sm' | 'md';
   fontColorClass?: string;
@@ -16,6 +17,7 @@ interface IButtonProps {
 export const Button: React.FC<IButtonProps> = ({
   text,
   type,
+  isSubmitBtn = true,
   className,
   size = 'md',
   fontColorClass,
@@ -26,6 +28,7 @@ export const Button: React.FC<IButtonProps> = ({
 }) => {
   return (
     <button
+      type={isSubmitBtn ? 'submit' : 'button'}
       onClick={onClick}
       className={`relative focus:outline-none font-semibold rounded-full ${className} ${
         size === 'sm' ? 'px-3.5 py-1.5 text-xs' : 'px-5 py-3'

@@ -1,19 +1,48 @@
 import { faCalendar, faClock } from '@fortawesome/free-regular-svg-icons';
-import { faCamera, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { INITIAL_DATE_STATE } from '../../constants';
-import { formatDate, getTimeZone } from '../../helpers';
+import { deleteFiles, formatDate, getTimeZone } from '../../helpers';
 import { useGeocoder } from '../../hooks/useGeocoder';
 import { Button } from '../Button';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { Calendar } from '../Tooltips/Calendar';
 import { Clock } from '../Tooltips/Clock';
 import { UploadBox } from './partials/UploadBox';
+import { gql, useMutation } from '@apollo/client';
+import {
+  createStepMutation,
+  createStepMutationVariables,
+} from '../../__generated__/createStepMutation';
+import {
+  createImageMutation,
+  createImageMutationVariables,
+} from '../../__generated__/createImageMutation';
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+
+const CREATE_STEP_MUTAION = gql`
+  mutation createStepMutation($input: CreateStepInput!) {
+    createStep(input: $input) {
+      ok
+      error
+      createdStepId
+    }
+  }
+`;
+
+const CREATE_IMAGE_MUTATION = gql`
+  mutation createImageMutation($input: CreateImageInput!) {
+    createImage(input: $input) {
+      ok
+      error
+    }
+  }
+`;
 
 interface ICreateStepModal {
+  tripId: string;
   tripStartDate: string;
   tripEndDate: string | null;
   belowStepDate: string | null;
@@ -34,7 +63,14 @@ export interface ICreateStepFormProps {
   imageUrls: string[];
 }
 
+export interface IImagesState {
+  id: string;
+  src: string;
+  url?: string;
+}
+
 export const CreateStepModal: React.FC<ICreateStepModal> = ({
+  tripId,
   tripStartDate,
   tripEndDate,
   belowStepDate,
@@ -43,9 +79,13 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
 }) => {
   const belowDateObj = belowStepDate ? new Date(belowStepDate) : new Date();
   const belowLocalDate = moment(belowStepDate).tz(belowStepTimeZone);
-  const [arrivedDate, setArrivedDate] = useState<Date | null>(belowDateObj);
+  const [arrivedDateState, setArrivedDate] = useState<Date | null>(
+    belowDateObj,
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [isLocationBlock, setIsLocationBlock] = useState(false);
+  const [images, setImages] = useState<IImagesState[]>([]);
   const [isPopupCalendar, setIsPopupCalendar] = useState<boolean | null>(null);
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
@@ -53,24 +93,118 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
       arrivedTime: `${belowLocalDate?.hour() ?? '00'}:00`,
     },
   });
+  const onCreateImageCompleted = (data: createImageMutation) => {
+    const {
+      createImage: { ok, error },
+    } = data;
+    if (ok && !error) {
+      // manipulate query
+      // close modal
+    }
+  };
+  const [
+    createImageMutation,
+    { loading: createImageMutationLoading },
+  ] = useMutation<createImageMutation, createImageMutationVariables>(
+    CREATE_IMAGE_MUTATION,
+    { onCompleted: onCreateImageCompleted },
+  );
+
+  const onCreateStepCompleted = (data: createStepMutation) => {
+    const {
+      createStep: { ok, error, createdStepId },
+    } = data;
+    if (ok && !error && createdStepId) {
+      createImageMutation({
+        variables: {
+          input: { stepId: createdStepId, urls: f.getValues().imageUrls },
+        },
+      });
+    }
+  };
+
+  const [
+    createStepMutation,
+    { loading: createStepMutationLoading },
+  ] = useMutation<createStepMutation, createStepMutationVariables>(
+    CREATE_STEP_MUTAION,
+    { onCompleted: onCreateStepCompleted },
+  );
+
   const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
+
   const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.currentTarget.value);
   };
+
   const onSubmit = () => {
     console.log(f.getValues());
+    const {
+      arrivedDate,
+      arrivedTime,
+      country,
+      lat,
+      lon,
+      location,
+      name,
+      story,
+      timeZone,
+    } = f.getValues();
+    const dateObj = new Date(arrivedDate);
+    const year = dateObj.getFullYear();
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const date = dateObj.getDate().toString().padStart(2, '0');
+    console.log(`${year}-${month}-${date} ${arrivedTime}`);
+    const ISO8601_LOCAL = moment
+      .tz(`${year}-${month}-${date} ${arrivedTime}`, timeZone)
+      .format();
+    if (ISO8601_LOCAL === 'Invalid date') {
+      f.setError('arrivedTime', { message: 'Invalid date format.' });
+      return;
+    }
+    createStepMutation({
+      variables: {
+        input: {
+          timeZone,
+          name,
+          lat: +lat,
+          lon: +lon,
+          location,
+          country,
+          story,
+          tripId: +tripId,
+          arrivedAt: ISO8601_LOCAL,
+        },
+      },
+    });
   };
+  useEffect(() => {
+    return () => {
+      window.addEventListener('beforeunload', () => {
+        const urls = f.getValues().imageUrls;
+        urls && deleteFiles(urls);
+      });
+    };
+  }, [f]);
   return (
     <FormProvider {...f}>
       <div className="absolute z-50 top-0 left-0 w-full h-full bg-myGreen-darkest bg-opacity-80"></div>
       <div className="absolute z-50 top-0 left-0 w-full h-screenExceptHeader overflow-y-scroll">
         <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-11/12 bg-white rounded-2xl">
-          <ModalCloseIcon onClick={() => setIsCreateStepModal(false)} />
+          <ModalCloseIcon
+            onClick={() => {
+              if (!isUploading) {
+                setIsCreateStepModal(false);
+                const urls = f.getValues().imageUrls;
+                urls && deleteFiles(urls);
+              }
+            }}
+          />
           <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
             New Trip
           </div>
           <form onSubmit={f.handleSubmit(onSubmit)} className="p-6">
-            <section className="p-6 mb-4 grid grid-cols-oneToTwo bg-myGray-dark rounded-2xl">
+            <section className="relative p-6 mb-4 grid grid-cols-oneToTwo bg-myGray-dark rounded-2xl">
               <h3 className="text-white font-semibold">Location</h3>
               <div className="rounded-sm">
                 <div className="relative">
@@ -130,14 +264,17 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                   </div>
                   <div
                     onClick={async () => {
-                      const { lat, lon } = f.getValues();
-                      const { ok, error, timeZone } = await getTimeZone(
-                        lat,
-                        lon,
-                      );
-                      if (ok && !error && timeZone) {
-                        console.log(timeZone);
-                        f.setValue('timeZone', timeZone);
+                      const { location, lat, lon } = f.getValues();
+                      if (location && lat && lon) {
+                        const { ok, error, timeZone } = await getTimeZone(
+                          lat,
+                          lon,
+                        );
+                        if (ok && !error && timeZone) {
+                          console.log(timeZone);
+                          f.setValue('timeZone', timeZone);
+                        }
+                        setIsLocationBlock(true);
                       }
                     }}
                     className="py-1.5 px-4 rounded-full bg-myBlue text-white cursor-pointer"
@@ -146,9 +283,24 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                   </div>
                 </div>
               </div>
+              {isLocationBlock && (
+                <div
+                  onClick={() => {
+                    setIsLocationBlock((prev) => !prev);
+                  }}
+                  className="absolute top-0 left-0 w-full h-full p-3 rounded-2xl text-sm bg-white bg-opacity-80 cursor-pointer group hover:bg-myBlue hover:bg-opacity-80"
+                >
+                  <div className="text-transparent group-hover:text-white">
+                    <FontAwesomeIcon icon={faPencilAlt} className="mr-2" />
+                    <span>Edit info</span>
+                  </div>
+                </div>
+              )}
             </section>
-            <section className="p-6 mb-6 grid grid-cols-oneToTwo gap-y-4 rounded-2xl shadow-surround">
-              <h3 className="text-myGreen-darkest font-semibold">Step name</h3>
+            <section className="relative p-6 mb-6 grid grid-cols-oneToTwo gap-y-4 rounded-2xl shadow-surround">
+              <h3 className="flex items-center text-myGreen-darkest font-semibold">
+                Step name
+              </h3>
               <div className="flex">
                 <input
                   ref={f.register({ required: true })}
@@ -166,7 +318,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                   className="px-2 py-3 w-0 text-myGray-dark border border-l-0 border-myGray bg-myGray-light rounded-r-md rounded-l-none focus:outline-none"
                 />
               </div>
-              <h3 className="text-myGreen-darkest font-semibold">
+              <h3 className="flex items-center text-myGreen-darkest font-semibold">
                 Arrival Date & Time
               </h3>
               <div className="flex">
@@ -174,35 +326,12 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                   <input
                     ref={f.register({
                       required: true,
-                      setValueAs: () => {
-                        if (!arrivedDate) {
-                          f.setError('arrivedDate', {
-                            message: 'Arrival date is not provided.',
-                          });
-                          return;
-                        }
-                        const year = arrivedDate.getFullYear();
-                        const month = (arrivedDate.getMonth() + 1)
-                          .toString()
-                          .padStart(2, '0');
-                        const date = arrivedDate
-                          .getDate()
-                          .toString()
-                          .padStart(2, '0');
-                        const ISO8601_UTC = moment
-                          .utc(`${year}-${month}-${date}`)
-                          .format();
-                        if (ISO8601_UTC !== 'Invalid date') {
-                          return ISO8601_UTC;
-                        }
-                        return null;
-                      },
                     })}
                     name="arrivedDate"
                     onClick={() =>
                       setIsPopupCalendar((prev) => (prev ? null : true))
                     }
-                    value={formatDate(arrivedDate, 'short')}
+                    value={formatDate(arrivedDateState, 'short')}
                     readOnly
                     className={`px-4 py-3 w-full border border-solid rounded-sm cursor-pointer focus:outline-none ${
                       isPopupCalendar ? 'border-myBlue' : 'border-myGray'
@@ -214,7 +343,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                   />
                   {isPopupCalendar && (
                     <Calendar
-                      selectedDate={arrivedDate}
+                      selectedDate={arrivedDateState}
                       initialDateState={INITIAL_DATE_STATE}
                       setSelectedDate={setArrivedDate}
                       effectiveSince={
@@ -261,32 +390,70 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                   />
                 </div>
               </div>
-              <h3 className="text-myGreen-darkest font-semibold">Your story</h3>
+              <h3 className="mt-3 text-myGreen-darkest font-semibold">
+                Your story
+              </h3>
               <textarea
                 ref={f.register()}
                 name="story"
                 placeholder="What have you been up to?"
                 className="resize-none px-4 py-3 h-48 border border-myGray rounded-sm focus:outline-none focus:border-myBlue"
               />
-              <h3 className="text-myGreen-darkest font-semibold">
+              <h3 className="flex flex-col justify-center text-myGreen-darkest font-semibold">
                 Add your photos
+                <span className="text-sm font-medium text-myGray-dark">
+                  Drag'n drop to re-arrange
+                </span>
               </h3>
               <UploadBox
+                images={images}
+                setImages={setImages}
                 isUploading={isUploading}
                 setIsUploading={setIsUploading}
               />
+              {!isLocationBlock && (
+                <div
+                  onClick={() => {
+                    const {
+                      location,
+                      lat,
+                      lon,
+                      country,
+                      timeZone,
+                    } = f.getValues();
+                    if (location && lat && lon && country && timeZone) {
+                      setIsLocationBlock((prev) => !prev);
+                    }
+                  }}
+                  className="absolute top-0 left-0 w-full h-full p-3 rounded-2xl text-sm bg-white bg-opacity-80 cursor-pointer group hover:bg-myBlue hover:bg-opacity-80"
+                >
+                  <div className="text-transparent group-hover:text-white">
+                    <FontAwesomeIcon icon={faPencilAlt} className="mr-2" />
+                    <span>Edit info</span>
+                  </div>
+                </div>
+              )}
             </section>
             <div>
               <Button
                 text="Add step"
                 type="red-solid"
+                loading={
+                  createStepMutationLoading || createImageMutationLoading
+                }
                 disabled={!f.formState.isValid || isUploading}
                 className="mr-4"
               />
               <Button
                 text="Cancel"
                 type="white-solid"
-                onClick={() => setIsCreateStepModal(false)}
+                isSubmitBtn={false}
+                disabled={isUploading}
+                onClick={() => {
+                  setIsCreateStepModal(false);
+                  // const urls = f.getValues().imageUrls;
+                  // urls && deleteFiles(urls);
+                }}
               />
             </div>
           </form>

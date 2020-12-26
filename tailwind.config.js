@@ -65,6 +65,7 @@ module.exports = {
       gridTemplateColumns: {
         tripsPage: '400px auto',
         oneToTwo: '1fr 2fr',
+        uploadBox: '10px 1fr 10px 1fr 10px 1fr 10px 1fr 10px',
       },
       boxShadow: {
         surround: '0 2px 8px 0 rgba(0,0,0,0.12)',

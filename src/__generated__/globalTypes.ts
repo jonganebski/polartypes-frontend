@@ -26,6 +26,23 @@ export interface CreateAccountInput {
   lastName: string;
 }
 
+export interface CreateImageInput {
+  stepId: number;
+  urls: string[];
+}
+
+export interface CreateStepInput {
+  location: string;
+  country: string;
+  lat: number;
+  lon: number;
+  name: string;
+  arrivedAt: string;
+  timeZone: string;
+  tripId: number;
+  story?: string | null;
+}
+
 export interface CreateTripInput {
   startDate: string;
   name: string;
@@ -61,8 +78,10 @@ export interface ReadTripsInput {
 }
 
 export interface StepInputType {
+  location: string;
   country: string;
-  coord: number[];
+  lat: number;
+  lon: number;
   name: string;
   arrivedAt: string;
   timeZone: string;

@@ -4,45 +4,29 @@ import React, { useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { ACCEPTED_IMAGE_TYPES } from '../../../constants';
+import { deleteFiles } from '../../../helpers';
 import { FormError } from '../../Form-error';
 import { Spinner } from '../../Loading-spinner';
-import { ICreateStepFormProps } from '../Create-step';
+import { ICreateStepFormProps, IImagesState } from '../Create-step';
 
 interface IUploadBoxProps {
+  images: IImagesState[];
+  setImages: React.Dispatch<React.SetStateAction<IImagesState[]>>;
   isUploading: boolean;
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 type TMyFile = File & { id: string };
 
-const dummy = [
-  { id: '1', src: '', url: '' },
-  { id: '2', src: '', url: '' },
-  { id: '3', src: '', url: '' },
-  { id: '4', src: '', url: '' },
-  { id: '5', src: '', url: '' },
-];
-
 export const UploadBox: React.FC<IUploadBoxProps> = ({
+  images,
+  setImages,
   isUploading,
   setIsUploading,
 }) => {
-  const [images, setImages] = useState<
-    { id: string; src: string; url?: string }[]
-  >(dummy);
+  const [draggingId, setDraggingId] = useState<string | null>();
   const { register, setError, errors } = useFormContext<ICreateStepFormProps>();
   const imageInputRef = useRef<HTMLInputElement | null>(null);
-
-  const deleteFiles = async (urls: string[]) => {
-    console.log(JSON.stringify({ urls: urls }));
-    const response = await fetch('http://localhost:4000/aws-s3/delete', {
-      method: 'POST',
-      body: JSON.stringify({ urls: urls }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    const data = await response.json();
-    console.log(data);
-  };
 
   const validateFiles = (
     files: FileList,
@@ -142,6 +126,7 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
     readFiles(validFiles);
     uploadFiles(validFiles);
   };
+  console.log(images);
   return (
     <div>
       <div
@@ -150,14 +135,18 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
         }}
         onDragEnter={(e) => {
           e.preventDefault();
-          e.currentTarget.style.backgroundColor = 'rgba(0, 153, 204, 0.2)';
+          if (!draggingId) {
+            e.currentTarget.style.backgroundColor = 'rgba(0, 153, 204, 0.2)';
+          }
         }}
         onDragLeave={(e) => {
           e.preventDefault();
-          e.currentTarget.style.backgroundColor = 'white';
+          if (!draggingId) {
+            e.currentTarget.style.backgroundColor = 'white';
+          }
         }}
         onDrop={handleFileDrop}
-        className="relative p-2 gap-3 grid grid-cols-4 border border-myGray rounded-sm bg-white"
+        className="relative py-2 gap-y-3 grid grid-cols-uploadBox border border-myGray rounded-sm bg-white"
       >
         {images.length === 0 && (
           <span className="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 text-myGray text-sm">
@@ -166,45 +155,135 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
         )}
         {images.map((image, i) => {
           return (
-            <div
-              key={i}
-              className="relative pt-square border border-dashed border-myBlue rounded-md"
-            >
+            <React.Fragment key={i}>
+              {i % 4 === 0 && (
+                <div
+                  id={'initialDropPoint-' + i}
+                  onDragEnter={(e) => {
+                    if (!draggingId) {
+                      return;
+                    }
+                    const child = e.currentTarget.querySelector('div');
+                    child && (child.style.backgroundColor = '#0bc');
+                  }}
+                  onDragLeave={(e) => {
+                    if (!draggingId) {
+                      return;
+                    }
+                    const child = e.currentTarget.querySelector('div');
+                    child && (child.style.backgroundColor = 'white');
+                  }}
+                  onDrop={(e) => {
+                    const child = e.currentTarget.querySelector('div');
+                    child && (child.style.backgroundColor = 'white');
+                    const targetIdx = +e.currentTarget.id.split('-')[1];
+                    const draggingElIdx = +draggingId!.split('-')[1];
+                    setImages((prev) => {
+                      const draggingEl = images[draggingElIdx];
+                      console.log(draggingElIdx, targetIdx);
+                      const state = prev.filter((_, i) => i !== draggingElIdx);
+                      if (draggingElIdx < targetIdx) {
+                        state.splice(targetIdx - 1, 0, draggingEl);
+                      } else {
+                        state.splice(targetIdx, 0, draggingEl);
+                      }
+                      return state;
+                    });
+                  }}
+                  style={{ padding: '3px' }}
+                >
+                  <div className="w-full h-full bg-white rounded-full pointer-events-none"></div>
+                </div>
+              )}
               <div
-                style={{ backgroundImage: `url(${image.src})` }}
-                className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-p90 pt-p90 bg-myGray-dark bg-cover bg-center rounded-sm `}
+                key={i}
+                id={'uploadedImg-' + i}
+                onDragStart={(e) => {
+                  setDraggingId(e.currentTarget.id);
+                }}
+                onDragEnd={(e) => {
+                  setDraggingId(null);
+                }}
+                style={{ cursor: 'grab' }}
+                className="relative pt-square border border-dashed border-myBlue rounded-md"
               >
                 <div
-                  className={`absolute top-0 left-0 w-full h-full rounded-sm bg-black ${
-                    image.url ? 'bg-opacity-0' : 'bg-opacity-80'
-                  }`}
+                  style={{ backgroundImage: `url(${image.src})` }}
+                  className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-p90 pt-p90 bg-myGray-dark bg-cover bg-center rounded-sm `}
                 >
-                  {/* {!image.url && <Spinner />} */}
+                  <div
+                    className={`absolute top-0 left-0 w-full h-full rounded-sm bg-black ${
+                      image.url ? 'bg-opacity-0' : 'bg-opacity-80'
+                    }`}
+                  >
+                    {!image.url && <Spinner />}
+                  </div>
                 </div>
+                <input
+                  ref={register()}
+                  name={`imageUrls[${i}]`}
+                  readOnly
+                  value={image?.url ?? ''}
+                  type="text"
+                  className="hidden"
+                />
+                <FontAwesomeIcon
+                  icon={faTimesCircle}
+                  onClick={() => {
+                    if (!isUploading) {
+                      setImages((prev) => prev.filter((_, idx) => idx !== i));
+                      image?.url && deleteFiles([image.url]);
+                    }
+                  }}
+                  className={`absolute -top-1 -right-1 text-xl cursor-pointer rounded-full text-black bg-white ${
+                    image?.url && 'hover:text-myRed'
+                  }`}
+                />
               </div>
-              <input
-                ref={register()}
-                name={`imageUrls[${i}]`}
-                readOnly
-                value={image.url ?? ''}
-                type="text"
-                className="hidden"
-              />
-              <FontAwesomeIcon
-                icon={faTimesCircle}
-                onClick={() => {
-                  if (!isUploading) {
-                    setImages((prev) => prev.filter((_, idx) => idx !== i));
-                    image.url && deleteFiles([image.url]);
+              <div
+                id={'dropPoint-' + (i + 1)}
+                onDragEnter={(e) => {
+                  if (!draggingId) {
+                    return;
                   }
+                  const child = e.currentTarget.querySelector('div');
+                  child && (child.style.backgroundColor = '#0bc');
                 }}
-                className={`absolute -top-1 -right-1 text-xl cursor-pointer rounded-full text-black bg-white ${
-                  image.url && 'hover:text-myRed'
-                }`}
-              />
-            </div>
+                onDragLeave={(e) => {
+                  if (!draggingId) {
+                    return;
+                  }
+                  const child = e.currentTarget.querySelector('div');
+                  child && (child.style.backgroundColor = 'white');
+                }}
+                onDrop={(e) => {
+                  if (!draggingId) {
+                    return;
+                  }
+                  const child = e.currentTarget.querySelector('div');
+                  child && (child.style.backgroundColor = 'white');
+                  const targetIdx = +e.currentTarget.id.split('-')[1];
+                  const draggingElIdx = +draggingId.split('-')[1];
+                  setImages((prev) => {
+                    const draggingEl = images[draggingElIdx];
+                    console.log(draggingElIdx, targetIdx);
+                    const state = prev.filter((_, i) => i !== draggingElIdx);
+                    if (draggingElIdx < targetIdx) {
+                      state.splice(targetIdx - 1, 0, draggingEl);
+                    } else {
+                      state.splice(targetIdx, 0, draggingEl);
+                    }
+                    return state;
+                  });
+                }}
+                style={{ padding: '3px' }}
+              >
+                <div className="w-full h-full bg-white rounded-full pointer-events-none"></div>
+              </div>
+            </React.Fragment>
           );
         })}
+        {images.length % 4 === 0 && <div></div>}
         <div
           onClick={() => imageInputRef.current?.click()}
           className="relative pt-square border border-myBlue rounded-md cursor-pointer group bg-white hover:bg-myBlue"
