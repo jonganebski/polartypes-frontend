@@ -29,7 +29,9 @@ export const StepCard: React.FC<IStepProps> = ({ step }) => {
           </span>
         </div>
       </div>
-      <p className="mb-3 text-myGray-darkest">{step.story}</p>
+      <p className="mb-3 text-myGray-darkest whitespace-pre-wrap">
+        {step.story}
+      </p>
       <div className="mb-4 grid gap-y-3">
         {step.images.map((image, i) => (
           <div

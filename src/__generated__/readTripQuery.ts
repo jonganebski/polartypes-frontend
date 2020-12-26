@@ -39,10 +39,11 @@ export interface readTripQuery_readTrip_trip_steps {
   __typename: "Step";
   id: number;
   name: string;
-  createdAt: any;
   country: string;
   arrivedAt: string;
   timeZone: string;
+  lat: number;
+  lon: number;
   story: string | null;
   likes: readTripQuery_readTrip_trip_steps_likes[];
   images: readTripQuery_readTrip_trip_steps_images[];

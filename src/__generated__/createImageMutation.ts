@@ -13,6 +13,7 @@ export interface createImageMutation_createImage {
   __typename: "CreateImageOutput";
   ok: boolean;
   error: string | null;
+  stepId: number | null;
 }
 
 export interface createImageMutation {

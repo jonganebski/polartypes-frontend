@@ -29,7 +29,7 @@ import {
   readTripQueryVariables,
 } from '../__generated__/readTripQuery';
 
-const READ_TRIP_QUERY = gql`
+export const READ_TRIP_QUERY = gql`
   query readTripQuery($input: ReadTripInput!) {
     readTrip(input: $input) {
       ok
@@ -44,10 +44,11 @@ const READ_TRIP_QUERY = gql`
         steps {
           id
           name
-          createdAt
           country
           arrivedAt
           timeZone
+          lat
+          lon
           story
           likes {
             user {
@@ -197,7 +198,9 @@ export const Trip = () => {
                   <div>
                     <FontAwesomeIcon icon={faCamera} className="text-xl" />
                     <span className="block mt-1.5 -mb-1.5 font-semibold">
-                      56
+                      {data?.readTrip.trip?.steps.reduce((acc, v) => {
+                        return acc + v.images.length;
+                      }, 0)}
                     </span>
                     <span className="text-xs">photos</span>
                   </div>
@@ -211,9 +214,13 @@ export const Trip = () => {
                   <div>
                     <FontAwesomeIcon icon={faAtlas} className="text-xl" />
                     <span className="block mt-1.5 -mb-1.5 font-semibold">
-                      65
+                      {data?.readTrip.trip?.steps.length}
                     </span>
-                    <span className="text-xs">steps</span>
+                    <span className="text-xs">
+                      {data?.readTrip.trip?.steps.length === 1
+                        ? 'step'
+                        : 'steps'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -236,20 +243,29 @@ export const Trip = () => {
                   </span>
                 </div>
               </li>
-              {data?.readTrip.trip?.steps.map((step) => {
-                return (
-                  <React.Fragment key={step.id}>
-                    <AddStepButton
-                      onClick={() => {
-                        setBelowStepDate(step.arrivedAt);
-                        setBelowStepTimeZone(step.timeZone);
-                        setIsCreateStepModal(true);
-                      }}
-                    />
-                    <StepCard step={step} />
-                  </React.Fragment>
-                );
-              })}
+              {data?.readTrip.trip?.steps
+                .slice()
+                .sort((a, b) => {
+                  console.log(a.arrivedAt);
+                  return (
+                    new Date(a.arrivedAt).getTime() -
+                    new Date(b.arrivedAt).getTime()
+                  );
+                })
+                .map((step) => {
+                  return (
+                    <React.Fragment key={step.id}>
+                      <AddStepButton
+                        onClick={() => {
+                          setBelowStepDate(step.arrivedAt);
+                          setBelowStepTimeZone(step.timeZone);
+                          setIsCreateStepModal(true);
+                        }}
+                      />
+                      <StepCard step={step} />
+                    </React.Fragment>
+                  );
+                })}
               <AddStepButton
                 onClick={() => {
                   setBelowStepDate(data?.readTrip.trip?.endDate ?? null);

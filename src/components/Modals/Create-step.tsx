@@ -21,6 +21,13 @@ import {
   createImageMutationVariables,
 } from '../../__generated__/createImageMutation';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { client } from '../../apollo';
+import { READ_TRIP_QUERY } from '../../pages/Trip';
+import {
+  readTripQuery,
+  readTripQueryVariables,
+  readTripQuery_readTrip_trip_steps_images,
+} from '../../__generated__/readTripQuery';
 
 const CREATE_STEP_MUTAION = gql`
   mutation createStepMutation($input: CreateStepInput!) {
@@ -37,6 +44,7 @@ const CREATE_IMAGE_MUTATION = gql`
     createImage(input: $input) {
       ok
       error
+      stepId
     }
   }
 `;
@@ -90,16 +98,84 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
     defaultValues: {
-      arrivedTime: `${belowLocalDate?.hour() ?? '00'}:00`,
+      arrivedTime: `${
+        belowLocalDate?.hour()?.toString().padStart(2, '0') ?? '00'
+      }:00`,
     },
   });
+  const updateApolloCache = (stepId: number, imageUrls: string[] = []) => {
+    const {
+      arrivedDate,
+      arrivedTime,
+      country,
+      lat,
+      lon,
+      name,
+      story,
+      timeZone,
+    } = f.getValues();
+    const dateObj = new Date(arrivedDate);
+    const year = dateObj.getFullYear();
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const date = dateObj.getDate().toString().padStart(2, '0');
+    const ISO8601_LOCAL = moment
+      .tz(`${year}-${month}-${date} ${arrivedTime}`, timeZone)
+      .format();
+    if (ISO8601_LOCAL === 'Invalid date') {
+      f.setError('arrivedTime', { message: 'Invalid date format.' });
+      return;
+    }
+    const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
+      query: READ_TRIP_QUERY,
+      variables: { input: { tripId: +tripId } },
+    });
+    prevQuery &&
+      client.writeQuery<readTripQuery, readTripQueryVariables>({
+        query: READ_TRIP_QUERY,
+        variables: { input: { tripId: +tripId } },
+        data: {
+          readTrip: {
+            ...prevQuery.readTrip,
+            trip: {
+              ...prevQuery.readTrip.trip!,
+              steps: [
+                {
+                  __typename: 'Step',
+                  id: stepId,
+                  timeZone,
+                  name,
+                  country,
+                  lat: +lat,
+                  lon: +lon,
+                  story,
+                  arrivedAt: ISO8601_LOCAL,
+                  likes: [],
+                  comments: [],
+                  images: [
+                    ...imageUrls.map(
+                      (url) =>
+                        ({
+                          __typename: 'Image',
+                          url,
+                        } as readTripQuery_readTrip_trip_steps_images),
+                    ),
+                  ],
+                },
+                ...prevQuery.readTrip.trip!.steps,
+              ],
+            },
+          },
+        },
+      });
+    // close modal
+    setIsCreateStepModal(false);
+  };
   const onCreateImageCompleted = (data: createImageMutation) => {
     const {
-      createImage: { ok, error },
+      createImage: { ok, error, stepId },
     } = data;
-    if (ok && !error) {
-      // manipulate query
-      // close modal
+    if (ok && !error && stepId) {
+      updateApolloCache(stepId, f.getValues().imageUrls);
     }
   };
   const [
@@ -114,12 +190,17 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
     const {
       createStep: { ok, error, createdStepId },
     } = data;
+    const urls = f.getValues().imageUrls;
     if (ok && !error && createdStepId) {
-      createImageMutation({
-        variables: {
-          input: { stepId: createdStepId, urls: f.getValues().imageUrls },
-        },
-      });
+      if (urls) {
+        createImageMutation({
+          variables: {
+            input: { stepId: createdStepId, urls },
+          },
+        });
+      } else {
+        updateApolloCache(createdStepId);
+      }
     }
   };
 
@@ -130,7 +211,6 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
     CREATE_STEP_MUTAION,
     { onCompleted: onCreateStepCompleted },
   );
-
   const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
 
   const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,7 +218,6 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
   };
 
   const onSubmit = () => {
-    console.log(f.getValues());
     const {
       arrivedDate,
       arrivedTime,
@@ -154,7 +233,6 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
     const year = dateObj.getFullYear();
     const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
     const date = dateObj.getDate().toString().padStart(2, '0');
-    console.log(`${year}-${month}-${date} ${arrivedTime}`);
     const ISO8601_LOCAL = moment
       .tz(`${year}-${month}-${date} ${arrivedTime}`, timeZone)
       .format();
@@ -186,6 +264,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
       });
     };
   }, [f]);
+
   return (
     <FormProvider {...f}>
       <div className="absolute z-50 top-0 left-0 w-full h-full bg-myGreen-darkest bg-opacity-80"></div>
@@ -271,7 +350,6 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                           lon,
                         );
                         if (ok && !error && timeZone) {
-                          console.log(timeZone);
                           f.setValue('timeZone', timeZone);
                         }
                         setIsLocationBlock(true);
@@ -451,8 +529,8 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                 disabled={isUploading}
                 onClick={() => {
                   setIsCreateStepModal(false);
-                  // const urls = f.getValues().imageUrls;
-                  // urls && deleteFiles(urls);
+                  const urls = f.getValues().imageUrls;
+                  urls && deleteFiles(urls);
                 }}
               />
             </div>
