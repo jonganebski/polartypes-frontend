@@ -3,7 +3,13 @@ import { Spinner } from './Loading-spinner';
 
 interface IButtonProps {
   text: string;
-  type: 'red-solid' | 'white-solid' | 'blue-regular' | 'white-regular' | 'void';
+  type:
+    | 'red-solid'
+    | 'white-solid'
+    | 'blue-solid'
+    | 'blue-regular'
+    | 'white-regular'
+    | 'void';
   isSubmitBtn?: boolean;
   className?: string;
   size?: 'sm' | 'md';
@@ -36,9 +42,11 @@ export const Button: React.FC<IButtonProps> = ({
         disabled
           ? 'pointer-events-none bg-myGray text-myGray-light'
           : type === 'red-solid'
-          ? 'bg-myRed text-white'
+          ? 'bg-myRed text-white border border-myRed'
           : type === 'white-solid'
           ? 'bg-white text-myGray-darkest border border-myGray-light'
+          : type === 'blue-solid'
+          ? 'bg-myBlue text-white border border-myBlue'
           : type === 'blue-regular'
           ? 'border border-myBlue text-myBlue'
           : type === 'white-regular'

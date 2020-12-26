@@ -1,19 +1,20 @@
 import { faCamera, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { ACCEPTED_IMAGE_TYPES } from '../../../constants';
 import { deleteFiles } from '../../../helpers';
 import { FormError } from '../../Form-error';
 import { Spinner } from '../../Loading-spinner';
-import { ICreateStepFormProps, IImagesState } from '../Create-step';
+import { IImagesState } from '../Create-step';
 
 interface IUploadBoxProps {
   images: IImagesState[];
   setImages: React.Dispatch<React.SetStateAction<IImagesState[]>>;
   isUploading: boolean;
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>;
+  uploadErr: string;
+  setUploadErr: React.Dispatch<React.SetStateAction<string>>;
 }
 
 type TMyFile = File & { id: string };
@@ -23,9 +24,10 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
   setImages,
   isUploading,
   setIsUploading,
+  uploadErr,
+  setUploadErr,
 }) => {
   const [draggingId, setDraggingId] = useState<string | null>();
-  const { register, setError, errors } = useFormContext<ICreateStepFormProps>();
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const validateFiles = (
@@ -75,12 +77,12 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
               });
             });
           } else if (error) {
-            setError('imageUrls', { message: error });
+            setUploadErr(error);
           } else {
-            setError('imageUrls', { message: 'Failed to upload.' });
+            setUploadErr('Failed to upload.');
           }
         } catch {
-          setError('imageUrls', { message: 'Failed to upload.' });
+          setUploadErr('Failed to upload.');
         }
       }),
     ).then(() => setIsUploading(false));
@@ -107,7 +109,7 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
     }
     const { validFiles, err } = validateFiles(files);
     if (err) {
-      setError('imageUrl', { message: err });
+      setUploadErr(err);
       return;
     }
     readFiles(validFiles);
@@ -120,7 +122,7 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
     const files = e.dataTransfer.files;
     const { validFiles, err } = validateFiles(files);
     if (err) {
-      setError('imageUrl', { message: err });
+      setUploadErr(err);
       return;
     }
     readFiles(validFiles);
@@ -219,14 +221,14 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
                     {!image.url && <Spinner />}
                   </div>
                 </div>
-                <input
+                {/* <input
                   ref={register()}
                   name={`imageUrls[${i}]`}
                   readOnly
                   value={image?.url ?? ''}
                   type="text"
                   className="hidden"
-                />
+                /> */}
                 <FontAwesomeIcon
                   icon={faTimesCircle}
                   onClick={() => {
@@ -295,7 +297,7 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
         </div>
         <input
           ref={imageInputRef}
-          name="images"
+          // name="images"
           onChange={handleFileInput}
           type="file"
           className="hidden"
@@ -304,8 +306,7 @@ export const UploadBox: React.FC<IUploadBoxProps> = ({
           multiple={true}
         />
       </div>
-      {errors.imageUrls?.some((i) => i?.message) &&
-        errors.imageUrls.map((i) => <FormError err={i?.message} />)}
+      {uploadErr && <FormError err={uploadErr} />}
     </div>
   );
 };

@@ -4,7 +4,7 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { INITIAL_DATE_STATE } from '../../constants';
-import { deleteFiles, formatDate, getTimeZone } from '../../helpers';
+import { deleteFiles, getTimeZone } from '../../helpers';
 import { useGeocoder } from '../../hooks/useGeocoder';
 import { Button } from '../Button';
 import { ModalCloseIcon } from './partials/CloseIcon';
@@ -65,10 +65,8 @@ export interface ICreateStepFormProps {
   lat: string;
   lon: string;
   story: string;
-  arrivedDate: string;
-  arrivedTime: string;
+  arrivedAt: string;
   timeZone: string;
-  imageUrls: string[];
 }
 
 export interface IImagesState {
@@ -86,7 +84,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
   setIsCreateStepModal,
 }) => {
   const belowDateObj = belowStepDate ? new Date(belowStepDate) : new Date();
-  const belowLocalDate = moment(belowStepDate).tz(belowStepTimeZone);
+  const belowLocalDate = moment(belowStepDate).tz(belowStepTimeZone).format();
   const [arrivedDateState, setArrivedDate] = useState<Date | null>(
     belowDateObj,
   );
@@ -94,37 +92,24 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [isLocationBlock, setIsLocationBlock] = useState(false);
   const [images, setImages] = useState<IImagesState[]>([]);
+  const [uploadErr, setUploadErr] = useState('');
   const [isPopupCalendar, setIsPopupCalendar] = useState<boolean | null>(null);
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
     defaultValues: {
-      arrivedTime: `${
-        belowLocalDate?.hour()?.toString().padStart(2, '0') ?? '00'
-      }:00`,
+      arrivedAt: belowLocalDate,
     },
   });
-  const updateApolloCache = (stepId: number, imageUrls: string[] = []) => {
-    const {
-      arrivedDate,
-      arrivedTime,
-      country,
-      lat,
-      lon,
-      name,
-      story,
-      timeZone,
-    } = f.getValues();
-    const dateObj = new Date(arrivedDate);
-    const year = dateObj.getFullYear();
-    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-    const date = dateObj.getDate().toString().padStart(2, '0');
-    const ISO8601_LOCAL = moment
-      .tz(`${year}-${month}-${date} ${arrivedTime}`, timeZone)
-      .format();
-    if (ISO8601_LOCAL === 'Invalid date') {
-      f.setError('arrivedTime', { message: 'Invalid date format.' });
-      return;
-    }
+  const updateApolloCache = (
+    stepId: number,
+    imagesState: IImagesState[] = [],
+  ) => {
+    const { lat, lon } = f.getValues();
+    const images: readTripQuery_readTrip_trip_steps_images[] = [];
+    imagesState.forEach(
+      (state) =>
+        state.url && images.push({ __typename: 'Image', url: state.url }),
+    );
     const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
       query: READ_TRIP_QUERY,
       variables: { input: { tripId: +tripId } },
@@ -140,26 +125,14 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
               ...prevQuery.readTrip.trip!,
               steps: [
                 {
+                  ...f.getValues(),
                   __typename: 'Step',
                   id: stepId,
-                  timeZone,
-                  name,
-                  country,
                   lat: +lat,
                   lon: +lon,
-                  story,
-                  arrivedAt: ISO8601_LOCAL,
                   likes: [],
                   comments: [],
-                  images: [
-                    ...imageUrls.map(
-                      (url) =>
-                        ({
-                          __typename: 'Image',
-                          url,
-                        } as readTripQuery_readTrip_trip_steps_images),
-                    ),
-                  ],
+                  images,
                 },
                 ...prevQuery.readTrip.trip!.steps,
               ],
@@ -167,39 +140,41 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
           },
         },
       });
-    // close modal
-    setIsCreateStepModal(false);
   };
-  const onCreateImageCompleted = (data: createImageMutation) => {
-    const {
-      createImage: { ok, error, stepId },
-    } = data;
-    if (ok && !error && stepId) {
-      updateApolloCache(stepId, f.getValues().imageUrls);
-    }
-  };
+
   const [
     createImageMutation,
     { loading: createImageMutationLoading },
   ] = useMutation<createImageMutation, createImageMutationVariables>(
     CREATE_IMAGE_MUTATION,
-    { onCompleted: onCreateImageCompleted },
   );
 
-  const onCreateStepCompleted = (data: createStepMutation) => {
+  const onCreateStepCompleted = async (data: createStepMutation) => {
     const {
       createStep: { ok, error, createdStepId },
     } = data;
-    const urls = f.getValues().imageUrls;
+    // const urls = f.getValues().imageUrls;
     if (ok && !error && createdStepId) {
-      if (urls) {
-        createImageMutation({
+      if (images.length !== 0 && images.some((image) => image.url)) {
+        const urls: string[] = [];
+        images.forEach((image) => image.url && urls.push(image.url));
+        const { data, errors } = await createImageMutation({
           variables: {
             input: { stepId: createdStepId, urls },
           },
         });
+        if (data && !errors) {
+          const {
+            createImage: { ok, error, stepId },
+          } = data;
+          if (ok && !error && stepId) {
+            updateApolloCache(stepId, images);
+            setIsCreateStepModal(false);
+          }
+        }
       } else {
         updateApolloCache(createdStepId);
+        setIsCreateStepModal(false);
       }
     }
   };
@@ -218,40 +193,14 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
   };
 
   const onSubmit = () => {
-    const {
-      arrivedDate,
-      arrivedTime,
-      country,
-      lat,
-      lon,
-      location,
-      name,
-      story,
-      timeZone,
-    } = f.getValues();
-    const dateObj = new Date(arrivedDate);
-    const year = dateObj.getFullYear();
-    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-    const date = dateObj.getDate().toString().padStart(2, '0');
-    const ISO8601_LOCAL = moment
-      .tz(`${year}-${month}-${date} ${arrivedTime}`, timeZone)
-      .format();
-    if (ISO8601_LOCAL === 'Invalid date') {
-      f.setError('arrivedTime', { message: 'Invalid date format.' });
-      return;
-    }
+    const { lat, lon } = f.getValues();
     createStepMutation({
       variables: {
         input: {
-          timeZone,
-          name,
+          ...f.getValues(),
           lat: +lat,
           lon: +lon,
-          location,
-          country,
-          story,
           tripId: +tripId,
-          arrivedAt: ISO8601_LOCAL,
         },
       },
     });
@@ -259,12 +208,12 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
   useEffect(() => {
     return () => {
       window.addEventListener('beforeunload', () => {
-        const urls = f.getValues().imageUrls;
+        const urls: string[] = [];
+        images.forEach((image) => image.url && urls.push(image.url));
         urls && deleteFiles(urls);
       });
     };
-  }, [f]);
-
+  }, [images]);
   return (
     <FormProvider {...f}>
       <div className="absolute z-50 top-0 left-0 w-full h-full bg-myGreen-darkest bg-opacity-80"></div>
@@ -274,7 +223,8 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
             onClick={() => {
               if (!isUploading) {
                 setIsCreateStepModal(false);
-                const urls = f.getValues().imageUrls;
+                const urls: string[] = [];
+                images.forEach((image) => image.url && urls.push(image.url));
                 urls && deleteFiles(urls);
               }
             }}
@@ -400,25 +350,35 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                 Arrival Date & Time
               </h3>
               <div className="flex">
-                <div className="relative mr-4 w-full min-w-min">
-                  <input
-                    ref={f.register({
-                      required: true,
-                    })}
-                    name="arrivedDate"
+                <input
+                  ref={f.register({ required: true })}
+                  name="arrivedAt"
+                  className="hidden"
+                  readOnly
+                />
+                <div
+                  className={`relative mr-3 w-full border border-solid rounded-sm cursor-pointer focus:outline-none ${
+                    isPopupCalendar ? 'border-myBlue' : 'border-myGray'
+                  }`}
+                >
+                  <div
+                    className="px-4 py-3 flex items-center justify-between"
                     onClick={() =>
                       setIsPopupCalendar((prev) => (prev ? null : true))
                     }
-                    value={formatDate(arrivedDateState, 'short')}
-                    readOnly
-                    className={`px-4 py-3 w-full border border-solid rounded-sm cursor-pointer focus:outline-none ${
-                      isPopupCalendar ? 'border-myBlue' : 'border-myGray'
-                    }`}
-                  />
-                  <FontAwesomeIcon
-                    icon={faCalendar}
-                    className="absolute top-1/2 transform -translate-y-1/2 right-3 text-myBlue text-xl"
-                  />
+                  >
+                    <span>
+                      {f.getValues().timeZone
+                        ? moment
+                            .tz(f.watch('arrivedAt'), f.watch('timeZone'))
+                            .format('MMM D YYYY')
+                        : ''}
+                    </span>
+                    <FontAwesomeIcon
+                      icon={faCalendar}
+                      className="text-myBlue text-xl"
+                    />
+                  </div>
                   {isPopupCalendar && (
                     <Calendar
                       selectedDate={arrivedDateState}
@@ -437,26 +397,33 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                     />
                   )}
                 </div>
-                <div className="relative min-w-min">
-                  <input
-                    ref={f.register({ required: true })}
-                    name="arrivedTime"
+                <div
+                  className={`relative px-4 py-3 border border-solid rounded-sm cursor-pointer ${
+                    isPopupCalendar === false
+                      ? 'border-myBlue'
+                      : 'border-myGray'
+                  }`}
+                >
+                  <div
                     onClick={() =>
                       setIsPopupCalendar((prev) =>
                         prev === false ? null : false,
                       )
                     }
-                    readOnly
-                    className={`pl-4 py-3 w-full border border-solid rounded-sm cursor-pointer focus:outline-none ${
-                      isPopupCalendar === false
-                        ? 'border-myBlue'
-                        : 'border-myGray'
-                    }`}
-                  />
-                  <FontAwesomeIcon
-                    icon={faClock}
-                    className="absolute top-1/2 transform -translate-y-1/2 right-3 text-myBlue text-xl"
-                  />
+                    className="mr-3 w-full flex items-center justify-between whitespace-nowrap"
+                  >
+                    <span>
+                      {f.getValues().timeZone
+                        ? moment
+                            .tz(f.watch('arrivedAt'), f.watch('timeZone'))
+                            .format('HH : mm')
+                        : ''}
+                    </span>
+                    <FontAwesomeIcon
+                      icon={faClock}
+                      className="text-myBlue text-xl"
+                    />
+                  </div>
                   {isPopupCalendar === false && (
                     <Clock timeZone={f.watch('timeZone')} />
                   )}
@@ -488,6 +455,8 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                 setImages={setImages}
                 isUploading={isUploading}
                 setIsUploading={setIsUploading}
+                uploadErr={uploadErr}
+                setUploadErr={setUploadErr}
               />
               {!isLocationBlock && (
                 <div
@@ -529,7 +498,8 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                 disabled={isUploading}
                 onClick={() => {
                   setIsCreateStepModal(false);
-                  const urls = f.getValues().imageUrls;
+                  const urls: string[] = [];
+                  images.forEach((image) => image.url && urls.push(image.url));
                   urls && deleteFiles(urls);
                 }}
               />

@@ -66,29 +66,34 @@ export const StepCard: React.FC<IStepProps> = ({ step }) => {
           </span>
         </div>
       )}
-      <div className="py-4">
-        <Button
-          text="Like"
-          type="white-solid"
-          size="sm"
-          className="mr-2"
-          icon={<FontAwesomeIcon icon={faHeart} className="text-myBlue mr-2" />}
-        />
-        <Button
-          text={
-            commentsCount === 0
-              ? 'Comment'
-              : commentsCount === 1
-              ? '1 Comment'
-              : `${commentsCount} Comments`
-          }
-          onClick={() => setIsCommentBox((prev) => !prev)}
-          type="white-solid"
-          size="sm"
-          icon={
-            <FontAwesomeIcon icon={faComment} className="text-myBlue mr-2" />
-          }
-        />
+      <div className="py-4 flex justify-between">
+        <div>
+          <Button
+            text="Like"
+            type="white-solid"
+            size="sm"
+            className="mr-2"
+            icon={
+              <FontAwesomeIcon icon={faHeart} className="text-myBlue mr-2" />
+            }
+          />
+          <Button
+            text={
+              commentsCount === 0
+                ? 'Comment'
+                : commentsCount === 1
+                ? '1 Comment'
+                : `${commentsCount} Comments`
+            }
+            onClick={() => setIsCommentBox((prev) => !prev)}
+            type="white-solid"
+            size="sm"
+            icon={
+              <FontAwesomeIcon icon={faComment} className="text-myBlue mr-2" />
+            }
+          />
+        </div>
+        <Button text="Edit step" type="blue-solid" size="sm" />
       </div>
       {isCommentBox && <Comments />}
     </li>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ICreateStepFormProps } from '../Modals/Create-step';
+import moment from 'moment-timezone';
 
 const range = (start: number, stop: number, step: number) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + step * i);
@@ -12,18 +13,29 @@ interface IClockProps {
 export const Clock: React.FC<IClockProps> = ({ timeZone }) => {
   const { setValue, getValues } = useFormContext<ICreateStepFormProps>();
   const hours = range(0, 23, 1);
-  const minutes = range(0, 55, 5);
+  const minutes = Array.from(
+    new Set([
+      ...range(0, 55, 5),
+      moment.tz(getValues().arrivedAt, timeZone).minute(),
+    ]),
+  ).sort((a, b) => a - b);
   const onHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { arrivedTime } = getValues();
-    const hour = e.currentTarget.value;
-    const minute = arrivedTime.split(':')[1];
-    setValue('arrivedTime', `${hour}:${minute}`);
+    const { arrivedAt } = getValues();
+    const hour = +e.currentTarget.value;
+    setValue(
+      'arrivedAt',
+      moment.tz(arrivedAt, timeZone).set('hour', hour).format(),
+      { shouldValidate: true },
+    );
   };
   const onMinuteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { arrivedTime } = getValues();
-    const hour = arrivedTime.split(':')[0];
-    const minute = e.currentTarget.value;
-    setValue('arrivedTime', `${hour}:${minute}`);
+    const { arrivedAt } = getValues();
+    const minute = +e.currentTarget.value;
+    setValue(
+      'arrivedAt',
+      moment.tz(arrivedAt, timeZone).set('minute', minute).format(),
+      { shouldValidate: true },
+    );
   };
   return (
     <div className="absolute top-14 left-1/2 transform -translate-x-1/2 z-10 p-5 bg-myGray-darkest rounded-lg">
@@ -40,7 +52,7 @@ export const Clock: React.FC<IClockProps> = ({ timeZone }) => {
       <div className="mb-3 flex items-center">
         <select
           onChange={onHourChange}
-          defaultValue={getValues().arrivedTime.split(':')[0]}
+          defaultValue={moment.tz(getValues().arrivedAt, timeZone).format('HH')}
           className="select"
         >
           {hours.map((h) => {
@@ -55,7 +67,7 @@ export const Clock: React.FC<IClockProps> = ({ timeZone }) => {
         <div className="mx-2 text-white">:</div>
         <select
           onChange={onMinuteChange}
-          defaultValue={getValues().arrivedTime.split(':')[1]}
+          defaultValue={moment.tz(getValues().arrivedAt, timeZone).format('mm')}
           className="select"
         >
           {minutes.map((m) => {
