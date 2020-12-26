@@ -44,7 +44,9 @@ export const Button: React.FC<IButtonProps> = ({
           : type === 'red-solid'
           ? 'bg-myRed text-white border border-myRed'
           : type === 'white-solid'
-          ? 'bg-white text-myGray-darkest border border-myGray-light'
+          ? `bg-white ${
+              fontColorClass ?? 'text-myGray-darkest'
+            } border border-myGray-light`
           : type === 'blue-solid'
           ? 'bg-myBlue text-white border border-myBlue'
           : type === 'blue-regular'

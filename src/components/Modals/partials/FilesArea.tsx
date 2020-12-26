@@ -86,7 +86,7 @@ export const FilesArea: React.FC<IUploadBoxProps> = ({
                 {...imageBoxDragFns}
               >
                 <div
-                  style={{ backgroundImage: `url(${image.src})` }}
+                  style={{ backgroundImage: `url(${image.src ?? image.url})` }}
                   className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-p90 pt-p90 bg-myGray-dark bg-cover bg-center rounded-sm `}
                 >
                   <div

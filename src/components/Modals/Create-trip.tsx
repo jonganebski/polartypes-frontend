@@ -60,6 +60,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
   const [isStartDateCalendar, setIsStartDateCalendar] = useState<
     boolean | null
   >(null);
+  console.log(startDate);
   const {
     register,
     getValues,
@@ -195,6 +196,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
                 name="startDate"
                 readOnly
                 value={formatDate(startDate, 'long')}
+                // value={moment.tz()}
                 onClick={() =>
                   setIsStartDateCalendar((prev) => (prev ? null : true))
                 }

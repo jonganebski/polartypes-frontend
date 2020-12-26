@@ -73,7 +73,11 @@ export const useDragNDropFile = (
       body.append('file', file);
       reader.onloadend = async () => {
         const src = reader.result?.toString();
-        src && setImages((prev) => [...prev, { id: file.id, src }]);
+        src &&
+          setImages((prev) => [
+            ...prev,
+            { id: file.id, src, __typename: 'Image' },
+          ]);
       };
       reader.readAsDataURL(file);
     });

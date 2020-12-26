@@ -51,6 +51,15 @@ export interface CreateTripInput {
   endDate?: string | null;
 }
 
+export interface DeleteImagesInput {
+  stepId: number;
+  urls: string[];
+}
+
+export interface DeleteStepInput {
+  stepId: number;
+}
+
 export interface ImageInputType {
   url: string;
   step: StepInputType;
@@ -125,6 +134,26 @@ export interface UpdateAccountInput {
   followings?: UserInputType[] | null;
   comments?: CommentInputType[] | null;
   likes?: LikeInputType[] | null;
+}
+
+export interface UpdateStepInput {
+  id?: number | null;
+  createdAt?: any | null;
+  updatedAt?: any | null;
+  location?: string | null;
+  country?: string | null;
+  lat?: number | null;
+  lon?: number | null;
+  name?: string | null;
+  arrivedAt?: string | null;
+  timeZone?: string | null;
+  story?: string | null;
+  likes?: LikeInputType[] | null;
+  images?: ImageInputType[] | null;
+  comments?: CommentInputType[] | null;
+  traveler?: UserInputType | null;
+  trip?: TripInputType | null;
+  stepId: number;
 }
 
 export interface UserInputType {

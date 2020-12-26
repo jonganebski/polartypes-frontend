@@ -16,7 +16,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
@@ -27,6 +27,7 @@ import { CreateStepModal } from '../components/Modals/Create-step';
 import {
   readTripQuery,
   readTripQueryVariables,
+  readTripQuery_readTrip_trip_steps,
 } from '../__generated__/readTripQuery';
 
 export const READ_TRIP_QUERY = gql`
@@ -44,6 +45,7 @@ export const READ_TRIP_QUERY = gql`
         steps {
           id
           name
+          location
           country
           arrivedAt
           timeZone
@@ -74,6 +76,10 @@ interface IParams {
 export const Trip = () => {
   const { tripId } = useParams<IParams>();
   const [isCreateStepModal, setIsCreateStepModal] = useState(false);
+  const [
+    editingStep,
+    setEditingStep,
+  ] = useState<readTripQuery_readTrip_trip_steps | null>(null);
   const [belowStepDate, setBelowStepDate] = useState<string | null>('');
   const [belowStepTimeZone, setBelowStepTimeZone] = useState('');
   const { data } = useQuery<readTripQuery, readTripQueryVariables>(
@@ -85,7 +91,11 @@ export const Trip = () => {
   const startDateData = data?.readTrip.trip?.startDate;
   const endDateData = data?.readTrip.trip?.endDate;
   const timeZoneData = data?.readTrip.trip?.traveler.timeZone;
-  console.log(data);
+  useEffect(() => {
+    if (!isCreateStepModal) {
+      setEditingStep(null);
+    }
+  }, [isCreateStepModal]);
   return (
     <div>
       <CommonHeader />
@@ -99,6 +109,7 @@ export const Trip = () => {
               belowStepDate={belowStepDate}
               belowStepTimeZone={belowStepTimeZone}
               setIsCreateStepModal={setIsCreateStepModal}
+              editingStep={editingStep}
             />
           )}
           <div className="h-tripHeader px-2 flex items-center justify-between">
@@ -246,7 +257,6 @@ export const Trip = () => {
               {data?.readTrip.trip?.steps
                 .slice()
                 .sort((a, b) => {
-                  console.log(a.arrivedAt);
                   return (
                     new Date(a.arrivedAt).getTime() -
                     new Date(b.arrivedAt).getTime()
@@ -262,7 +272,11 @@ export const Trip = () => {
                           setIsCreateStepModal(true);
                         }}
                       />
-                      <StepCard step={step} />
+                      <StepCard
+                        step={step}
+                        setEditingStep={setEditingStep}
+                        setIsCreateStepModal={setIsCreateStepModal}
+                      />
                     </React.Fragment>
                   );
                 })}

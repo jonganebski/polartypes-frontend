@@ -1,61 +1,72 @@
-import { faCalendar, faClock } from '@fortawesome/free-regular-svg-icons';
+import { gql, useMutation } from '@apollo/client';
+import {
+  faCalendar,
+  faClock,
+  faTrashAlt,
+} from '@fortawesome/free-regular-svg-icons';
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { INITIAL_DATE_STATE } from '../../constants';
 import { deleteFiles, getTimeZone } from '../../helpers';
+import { useCreateStep } from '../../hooks/useCreateStep';
 import { useGeocoder } from '../../hooks/useGeocoder';
+import {
+  deleteImageMutation,
+  deleteImageMutationVariables,
+} from '../../__generated__/deleteImageMutation';
+import {
+  deleteStepMutation,
+  deleteStepMutationVariables,
+} from '../../__generated__/deleteStepMutation';
+import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
+import {
+  updateStepMutation,
+  updateStepMutationVariables,
+} from '../../__generated__/updateStepMutation';
 import { Button } from '../Button';
-import { ModalCloseIcon } from './partials/CloseIcon';
 import { Calendar } from '../Tooltips/Calendar';
 import { Clock } from '../Tooltips/Clock';
+import { ModalCloseIcon } from './partials/CloseIcon';
 import { FilesArea } from './partials/FilesArea';
-import { gql, useMutation } from '@apollo/client';
-import {
-  createStepMutation,
-  createStepMutationVariables,
-} from '../../__generated__/createStepMutation';
-import {
-  createImageMutation,
-  createImageMutationVariables,
-} from '../../__generated__/createImageMutation';
-import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
-import { client } from '../../apollo';
-import { READ_TRIP_QUERY } from '../../pages/Trip';
-import {
-  readTripQuery,
-  readTripQueryVariables,
-  readTripQuery_readTrip_trip_steps_images,
-} from '../../__generated__/readTripQuery';
 
-const CREATE_STEP_MUTAION = gql`
-  mutation createStepMutation($input: CreateStepInput!) {
-    createStep(input: $input) {
+const UPDATE_STEP_MUTATION = gql`
+  mutation updateStepMutation($input: UpdateStepInput!) {
+    updateStep(input: $input) {
       ok
       error
-      createdStepId
     }
   }
 `;
 
-const CREATE_IMAGE_MUTATION = gql`
-  mutation createImageMutation($input: CreateImageInput!) {
-    createImage(input: $input) {
+const DELETE_IMAGE_MUTATION = gql`
+  mutation deleteImageMutation($input: DeleteImagesInput!) {
+    deleteImage(input: $input) {
       ok
       error
-      stepId
     }
   }
 `;
 
-interface ICreateStepModal {
+const DELETE_STEP_MUTATION = gql`
+  mutation deleteStepMutation($input: DeleteStepInput!) {
+    deleteStep(input: $input) {
+      ok
+      error
+    }
+  }
+`;
+
+interface ICreateStepModalProps {
   tripId: string;
   tripStartDate: string;
   tripEndDate: string | null;
   belowStepDate: string | null;
   belowStepTimeZone: string;
   setIsCreateStepModal: React.Dispatch<React.SetStateAction<boolean>>;
+  editingStep: readTripQuery_readTrip_trip_steps | null;
 }
 
 export interface ICreateStepFormProps {
@@ -70,122 +81,213 @@ export interface ICreateStepFormProps {
 }
 
 export interface IImagesState {
-  id: string;
-  src: string;
+  id?: string;
+  src?: string;
   url?: string;
+  __typename: 'Image';
 }
 
-export const CreateStepModal: React.FC<ICreateStepModal> = ({
+export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   tripId,
   tripStartDate,
   tripEndDate,
   belowStepDate,
   belowStepTimeZone,
   setIsCreateStepModal,
+  editingStep,
 }) => {
   const belowDateObj = belowStepDate ? new Date(belowStepDate) : new Date();
-  const belowLocalDate = moment(belowStepDate).tz(belowStepTimeZone).format();
   const [arrivedDateState, setArrivedDate] = useState<Date | null>(
     belowDateObj,
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isLocationBlock, setIsLocationBlock] = useState(false);
-  const [images, setImages] = useState<IImagesState[]>([]);
+  const [images, setImages] = useState<IImagesState[]>(
+    editingStep?.images ?? [],
+  );
   const [uploadErr, setUploadErr] = useState('');
   const [isPopupCalendar, setIsPopupCalendar] = useState<boolean | null>(null);
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
     defaultValues: {
-      arrivedAt: belowLocalDate,
+      arrivedAt:
+        editingStep?.arrivedAt ??
+        moment(belowStepDate).tz(belowStepTimeZone).format(),
+      country: editingStep?.country ?? '',
+      lat: editingStep?.lat.toString() ?? '',
+      lon: editingStep?.lon.toString() ?? '',
+      location: editingStep?.location ?? '',
+      name: editingStep?.name ?? '',
+      story: editingStep?.story ?? '',
+      timeZone: editingStep?.timeZone ?? '',
     },
   });
-  const updateApolloCache = (
-    stepId: number,
-    imagesState: IImagesState[] = [],
-  ) => {
-    const { lat, lon } = f.getValues();
-    const images: readTripQuery_readTrip_trip_steps_images[] = [];
-    imagesState.forEach(
-      (state) =>
-        state.url && images.push({ __typename: 'Image', url: state.url }),
-    );
-    const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
-      query: READ_TRIP_QUERY,
-      variables: { input: { tripId: +tripId } },
-    });
-    prevQuery &&
-      client.writeQuery<readTripQuery, readTripQueryVariables>({
-        query: READ_TRIP_QUERY,
-        variables: { input: { tripId: +tripId } },
-        data: {
-          readTrip: {
-            ...prevQuery.readTrip,
-            trip: {
-              ...prevQuery.readTrip.trip!,
-              steps: [
-                {
-                  ...f.getValues(),
-                  __typename: 'Step',
-                  id: stepId,
-                  lat: +lat,
-                  lon: +lon,
-                  likes: [],
-                  comments: [],
-                  images,
-                },
-                ...prevQuery.readTrip.trip!.steps,
-              ],
-            },
-          },
-        },
-      });
-  };
+  const [
+    createStepMutation,
+    { loading: createStepMutationLoading },
+  ] = useCreateStep(f, tripId, images, setIsCreateStepModal);
+  // const updateApolloCache = (
+  //   stepId: number,
+  //   imagesState: IImagesState[] = [],
+  // ) => {
+  //   const { lat, lon } = f.getValues();
+  //   const images: readTripQuery_readTrip_trip_steps_images[] = [];
+  //   imagesState.forEach(
+  //     (state) =>
+  //       state.url &&
+  //       images.push({
+  //         __typename: state.__typename,
+  //         url: state.url,
+  //       }),
+  //   );
+  //   const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
+  //     query: READ_TRIP_QUERY,
+  //     variables: { input: { tripId: +tripId } },
+  //   });
+  //   prevQuery &&
+  //     client.writeQuery<readTripQuery, readTripQueryVariables>({
+  //       query: READ_TRIP_QUERY,
+  //       variables: { input: { tripId: +tripId } },
+  //       data: {
+  //         readTrip: {
+  //           ...prevQuery.readTrip,
+  //           trip: {
+  //             ...prevQuery.readTrip.trip!,
+  //             steps: [
+  //               {
+  //                 ...f.getValues(),
+  //                 __typename: 'Step',
+  //                 id: stepId,
+  //                 lat: +lat,
+  //                 lon: +lon,
+  //                 likes: [],
+  //                 comments: [],
+  //                 images,
+  //               },
+  //               ...prevQuery.readTrip.trip!.steps,
+  //             ],
+  //           },
+  //         },
+  //       },
+  //     });
+  // };
+
+  const onDeleteStepCompleted = (data: deleteStepMutation) => {};
 
   const [
-    createImageMutation,
-    { loading: createImageMutationLoading },
-  ] = useMutation<createImageMutation, createImageMutationVariables>(
-    CREATE_IMAGE_MUTATION,
+    deleteStepMutation,
+    { loading: deleteStepMutaionLoading },
+  ] = useMutation<deleteStepMutation, deleteStepMutationVariables>(
+    DELETE_STEP_MUTATION,
+    { onCompleted: onDeleteStepCompleted },
   );
 
-  const onCreateStepCompleted = async (data: createStepMutation) => {
+  // const [
+  //   createImageMutation,
+  //   { loading: createImageMutationLoading },
+  // ] = useMutation<createImageMutation, createImageMutationVariables>(
+  //   CREATE_IMAGE_MUTATION,
+  // );
+
+  const [
+    deleteImageMutation,
+    { loading: deleteImageMutationLoading },
+  ] = useMutation<deleteImageMutation, deleteImageMutationVariables>(
+    DELETE_IMAGE_MUTATION,
+  );
+
+  const onUpdateStepCompleted = async (data: updateStepMutation) => {
     const {
-      createStep: { ok, error, createdStepId },
+      updateStep: { ok, error },
     } = data;
-    // const urls = f.getValues().imageUrls;
-    if (ok && !error && createdStepId) {
-      if (images.length !== 0 && images.some((image) => image.url)) {
-        const urls: string[] = [];
-        images.forEach((image) => image.url && urls.push(image.url));
-        const { data, errors } = await createImageMutation({
-          variables: {
-            input: { stepId: createdStepId, urls },
-          },
-        });
-        if (data && !errors) {
-          const {
-            createImage: { ok, error, stepId },
-          } = data;
-          if (ok && !error && stepId) {
-            updateApolloCache(stepId, images);
-            setIsCreateStepModal(false);
-          }
-        }
-      } else {
-        updateApolloCache(createdStepId);
-        setIsCreateStepModal(false);
-      }
+    if (ok && !error) {
+      const newImages = images.filter(
+        (image) =>
+          image.url &&
+          !editingStep?.images.includes({
+            __typename: 'Image',
+            url: image.url,
+          }),
+      );
+      // const deletedImages = editingStep!.images.filter(
+      //   (image) => !images.includes({ __typename: 'Image', url: image.url }),
+      // );
+      // if (deletedImages.length !== 0) {
+      //   const urls: string[] = [];
+      //   deletedImages.forEach((image) => image.url && urls.push(image.url));
+      //   await deleteImageMutation({
+      //     variables: { input: { stepId: editingStep!.id, urls } },
+      //   });
+      // }
+      // if (newImages.length !== 0) {
+      //   const urls: string[] = [];
+      //   newImages.forEach((image) => image.url && urls.push(image.url));
+      //   const { data, errors } = await createImageMutation({
+      //     variables: {
+      //       input: { stepId: editingStep!.id, urls },
+      //     },
+      //   });
+      //   if (data && !errors) {
+      //     const {
+      //       createImage: { ok, error, stepId },
+      //     } = data;
+      //     if (ok && !error && stepId) {
+      //       updateApolloCache(stepId, images);
+      //       setIsCreateStepModal(false);
+      //     }
+      //   }
+      // } else {
+      //   updateApolloCache(editingStep!.id);
+      //   setIsCreateStepModal(false);
+      // }
     }
   };
 
   const [
-    createStepMutation,
-    { loading: createStepMutationLoading },
-  ] = useMutation<createStepMutation, createStepMutationVariables>(
-    CREATE_STEP_MUTAION,
-    { onCompleted: onCreateStepCompleted },
+    updateStepMutation,
+    { loading: updateStepMutaionLoading },
+  ] = useMutation<updateStepMutation, updateStepMutationVariables>(
+    UPDATE_STEP_MUTATION,
+    { onCompleted: onUpdateStepCompleted },
   );
+
+  // const onCreateStepCompleted = async (data: createStepMutation) => {
+  //   const {
+  //     createStep: { ok, error, createdStepId },
+  //   } = data;
+  //   if (ok && !error && createdStepId) {
+  //     if (images.length !== 0 && images.some((image) => image.url)) {
+  //       const urls: string[] = [];
+  //       images.forEach((image) => image.url && urls.push(image.url));
+  //       const { data, errors } = await createImageMutation({
+  //         variables: {
+  //           input: { stepId: createdStepId, urls },
+  //         },
+  //       });
+  //       if (data && !errors) {
+  //         const {
+  //           createImage: { ok, error, stepId },
+  //         } = data;
+  //         if (ok && !error && stepId) {
+  //           updateApolloCache(stepId, images);
+  //           setIsCreateStepModal(false);
+  //         }
+  //       }
+  //     } else {
+  //       updateApolloCache(createdStepId);
+  //       setIsCreateStepModal(false);
+  //     }
+  //   }
+  // };
+
+  // const [
+  //   createStepMutation,
+  //   { loading: createStepMutationLoading },
+  // ] = useMutation<createStepMutation, createStepMutationVariables>(
+  //   CREATE_STEP_MUTAION,
+  //   { onCompleted: onCreateStepCompleted },
+  // );
   const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
 
   const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,26 +296,60 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
 
   const onSubmit = () => {
     const { lat, lon } = f.getValues();
-    createStepMutation({
-      variables: {
-        input: {
-          ...f.getValues(),
-          lat: +lat,
-          lon: +lon,
-          tripId: +tripId,
+    if (editingStep) {
+      updateStepMutation({
+        variables: {
+          input: {
+            ...f.getValues(),
+            stepId: editingStep.id,
+            lat: +lat,
+            lon: +lon,
+          },
         },
-      },
-    });
+      });
+    } else {
+      createStepMutation({
+        variables: {
+          input: {
+            ...f.getValues(),
+            lat: +lat,
+            lon: +lon,
+            tripId: +tripId,
+          },
+        },
+      });
+    }
   };
-  useEffect(() => {
-    return () => {
-      window.addEventListener('beforeunload', () => {
+
+  const cleanupUnusedImages = useCallback(() => {
+    if (images.length !== 0 && images.some((image) => image.url)) {
+      if (editingStep) {
+        const urls: string[] = [];
+        images.forEach((image) => {
+          if (
+            image.url &&
+            editingStep.images.includes({
+              __typename: 'Image',
+              url: image.url,
+            })
+          ) {
+            urls.push(image.url);
+          }
+          urls.length !== 0 && deleteFiles(urls);
+        });
+      } else {
         const urls: string[] = [];
         images.forEach((image) => image.url && urls.push(image.url));
-        urls && deleteFiles(urls);
-      });
+        urls.length !== 0 && deleteFiles(urls);
+      }
+    }
+  }, [editingStep, images]);
+
+  useEffect(() => {
+    return () => {
+      window.addEventListener('beforeunload', cleanupUnusedImages);
     };
-  }, [images]);
+  }, [cleanupUnusedImages]);
   return (
     <FormProvider {...f}>
       <div className="absolute z-50 top-0 left-0 w-full h-full bg-myGreen-darkest bg-opacity-80"></div>
@@ -223,9 +359,7 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
             onClick={() => {
               if (!isUploading) {
                 setIsCreateStepModal(false);
-                const urls: string[] = [];
-                images.forEach((image) => image.url && urls.push(image.url));
-                urls && deleteFiles(urls);
+                cleanupUnusedImages();
               }
             }}
           />
@@ -481,28 +615,58 @@ export const CreateStepModal: React.FC<ICreateStepModal> = ({
                 </div>
               )}
             </section>
-            <div>
-              <Button
-                text="Add step"
-                type="red-solid"
-                loading={
-                  createStepMutationLoading || createImageMutationLoading
-                }
-                disabled={!f.formState.isValid || isUploading}
-                className="mr-4"
-              />
-              <Button
-                text="Cancel"
-                type="white-solid"
-                isSubmitBtn={false}
-                disabled={isUploading}
-                onClick={() => {
-                  setIsCreateStepModal(false);
-                  const urls: string[] = [];
-                  images.forEach((image) => image.url && urls.push(image.url));
-                  urls && deleteFiles(urls);
-                }}
-              />
+            <div className="flex justify-between">
+              <div>
+                <Button
+                  text={editingStep ? 'Save changes' : 'Add step'}
+                  type="red-solid"
+                  loading={
+                    createStepMutationLoading ||
+                    updateStepMutaionLoading ||
+                    deleteImageMutationLoading
+                  }
+                  disabled={
+                    !f.formState.isValid ||
+                    isUploading ||
+                    createStepMutationLoading ||
+                    updateStepMutaionLoading ||
+                    deleteImageMutationLoading
+                  }
+                  className="mr-4"
+                />
+                <Button
+                  text="Cancel"
+                  type="white-solid"
+                  isSubmitBtn={false}
+                  disabled={
+                    isUploading ||
+                    createStepMutationLoading ||
+                    updateStepMutaionLoading ||
+                    deleteImageMutationLoading
+                  }
+                  onClick={() => {
+                    setIsCreateStepModal(false);
+                    cleanupUnusedImages();
+                  }}
+                />
+              </div>
+              {editingStep && (
+                <Button
+                  text=""
+                  type="white-solid"
+                  icon={
+                    <FontAwesomeIcon icon={faTrashAlt} className="text-lg" />
+                  }
+                  fontColorClass="text-myRed"
+                  isSubmitBtn={false}
+                  disabled={isUploading || updateStepMutaionLoading}
+                  onClick={() =>
+                    deleteStepMutation({
+                      variables: { input: { stepId: editingStep.id } },
+                    })
+                  }
+                />
+              )}
             </div>
           </form>
         </div>

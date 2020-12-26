@@ -39,6 +39,7 @@ export interface readTripQuery_readTrip_trip_steps {
   __typename: "Step";
   id: number;
   name: string;
+  location: string;
   country: string;
   arrivedAt: string;
   timeZone: string;

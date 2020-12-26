@@ -10,9 +10,17 @@ import { Comments } from './partials/Comments';
 
 interface IStepProps {
   step: readTripQuery_readTrip_trip_steps;
+  setEditingStep: React.Dispatch<
+    React.SetStateAction<readTripQuery_readTrip_trip_steps | null>
+  >;
+  setIsCreateStepModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const StepCard: React.FC<IStepProps> = ({ step }) => {
+export const StepCard: React.FC<IStepProps> = ({
+  step,
+  setEditingStep,
+  setIsCreateStepModal,
+}) => {
   const [isCommentBox, setIsCommentBox] = useState(false);
   const commentsCount = step.comments.length;
   return (
@@ -93,7 +101,15 @@ export const StepCard: React.FC<IStepProps> = ({ step }) => {
             }
           />
         </div>
-        <Button text="Edit step" type="blue-solid" size="sm" />
+        <Button
+          text="Edit step"
+          type="blue-solid"
+          size="sm"
+          onClick={() => {
+            setIsCreateStepModal(true);
+            setEditingStep(step);
+          }}
+        />
       </div>
       {isCommentBox && <Comments />}
     </li>
