@@ -5,6 +5,7 @@ import { ACCEPTED_IMAGE_TYPES } from '../../../constants';
 import { deleteFiles } from '../../../helpers';
 import { useDragNDropFile } from '../../../hooks/useDragNDrop-file';
 import { useDragNDropImage } from '../../../hooks/useDragNDrop-image';
+import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
 import { FormError } from '../../Form-error';
 import { Spinner } from '../../Loading-spinner';
 import { IImagesState } from '../Create-step';
@@ -16,6 +17,7 @@ interface IUploadBoxProps {
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>;
   uploadErr: string;
   setUploadErr: React.Dispatch<React.SetStateAction<string>>;
+  editingStep: readTripQuery_readTrip_trip_steps | null;
 }
 
 export type TMyFile = File & { id: string };
@@ -27,6 +29,7 @@ export const FilesArea: React.FC<IUploadBoxProps> = ({
   setIsUploading,
   uploadErr,
   setUploadErr,
+  editingStep,
 }) => {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const { draggingId, dropAcceptorFns, imageBoxDragFns } = useDragNDropImage(
@@ -55,6 +58,18 @@ export const FilesArea: React.FC<IUploadBoxProps> = ({
     helperFns.uploadFiles(validFiles);
     e.currentTarget.value = '';
   };
+
+  const onDeleteIconClick = (i: number, image: IImagesState) => {
+    if (isUploading) {
+      return;
+    }
+    setImages((prev) => prev.filter((_, idx) => idx !== i));
+    if (editingStep) {
+    } else {
+      image?.url && deleteFiles([image.url]);
+    }
+  };
+
   return (
     <div>
       <div
@@ -99,12 +114,7 @@ export const FilesArea: React.FC<IUploadBoxProps> = ({
                 </div>
                 <FontAwesomeIcon
                   icon={faTimesCircle}
-                  onClick={() => {
-                    if (!isUploading) {
-                      setImages((prev) => prev.filter((_, idx) => idx !== i));
-                      image?.url && deleteFiles([image.url]);
-                    }
-                  }}
+                  onClick={() => onDeleteIconClick(i, image)}
                   className={`absolute -top-1 -right-1 text-xl cursor-pointer rounded-full text-black bg-white ${
                     image?.url && 'hover:text-myRed'
                   }`}

@@ -80,7 +80,7 @@ export const Trip = () => {
     editingStep,
     setEditingStep,
   ] = useState<readTripQuery_readTrip_trip_steps | null>(null);
-  const [belowStepDate, setBelowStepDate] = useState<string | null>('');
+  const [belowStepDate, setBelowStepDate] = useState<string>('');
   const [belowStepTimeZone, setBelowStepTimeZone] = useState('');
   const { data } = useQuery<readTripQuery, readTripQueryVariables>(
     READ_TRIP_QUERY,
@@ -282,7 +282,13 @@ export const Trip = () => {
                 })}
               <AddStepButton
                 onClick={() => {
-                  setBelowStepDate(data?.readTrip.trip?.endDate ?? null);
+                  console.log(
+                    data?.readTrip.trip?.endDate,
+                    moment(new Date()).format(),
+                  );
+                  setBelowStepDate(
+                    data?.readTrip.trip?.endDate ?? moment(new Date()).format(),
+                  );
                   setIsCreateStepModal(true);
                 }}
               />

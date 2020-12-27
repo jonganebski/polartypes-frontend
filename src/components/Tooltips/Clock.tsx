@@ -19,6 +19,7 @@ export const Clock: React.FC<IClockProps> = ({ timeZone }) => {
       moment.tz(getValues().arrivedAt, timeZone).minute(),
     ]),
   ).sort((a, b) => a - b);
+  console.log('clock render');
   const onHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { arrivedAt } = getValues();
     const hour = +e.currentTarget.value;

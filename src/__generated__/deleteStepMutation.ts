@@ -13,6 +13,7 @@ export interface deleteStepMutation_deleteStep {
   __typename: "DeleteStepOutput";
   ok: boolean;
   error: string | null;
+  stepId: number | null;
 }
 
 export interface deleteStepMutation {

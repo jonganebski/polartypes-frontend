@@ -1,4 +1,3 @@
-import { gql, useMutation } from '@apollo/client';
 import {
   faCalendar,
   faClock,
@@ -12,58 +11,22 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { INITIAL_DATE_STATE } from '../../constants';
 import { deleteFiles, getTimeZone } from '../../helpers';
 import { useCreateStep } from '../../hooks/useCreateStep';
+import { useDeleteStep } from '../../hooks/useDeleteStep';
 import { useGeocoder } from '../../hooks/useGeocoder';
-import {
-  deleteImageMutation,
-  deleteImageMutationVariables,
-} from '../../__generated__/deleteImageMutation';
-import {
-  deleteStepMutation,
-  deleteStepMutationVariables,
-} from '../../__generated__/deleteStepMutation';
+import { useUpdateStep } from '../../hooks/useUpdateStep';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
-import {
-  updateStepMutation,
-  updateStepMutationVariables,
-} from '../../__generated__/updateStepMutation';
 import { Button } from '../Button';
 import { Calendar } from '../Tooltips/Calendar';
 import { Clock } from '../Tooltips/Clock';
+import { NewCalendar } from '../Tooltips/NewCalendar';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { FilesArea } from './partials/FilesArea';
-
-const UPDATE_STEP_MUTATION = gql`
-  mutation updateStepMutation($input: UpdateStepInput!) {
-    updateStep(input: $input) {
-      ok
-      error
-    }
-  }
-`;
-
-const DELETE_IMAGE_MUTATION = gql`
-  mutation deleteImageMutation($input: DeleteImagesInput!) {
-    deleteImage(input: $input) {
-      ok
-      error
-    }
-  }
-`;
-
-const DELETE_STEP_MUTATION = gql`
-  mutation deleteStepMutation($input: DeleteStepInput!) {
-    deleteStep(input: $input) {
-      ok
-      error
-    }
-  }
-`;
 
 interface ICreateStepModalProps {
   tripId: string;
   tripStartDate: string;
   tripEndDate: string | null;
-  belowStepDate: string | null;
+  belowStepDate: string;
   belowStepTimeZone: string;
   setIsCreateStepModal: React.Dispatch<React.SetStateAction<boolean>>;
   editingStep: readTripQuery_readTrip_trip_steps | null;
@@ -96,7 +59,7 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   setIsCreateStepModal,
   editingStep,
 }) => {
-  const belowDateObj = belowStepDate ? new Date(belowStepDate) : new Date();
+  const belowDateObj = new Date(belowStepDate);
   const [arrivedDateState, setArrivedDate] = useState<Date | null>(
     belowDateObj,
   );
@@ -111,183 +74,31 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
     defaultValues: {
-      arrivedAt:
-        editingStep?.arrivedAt ??
-        moment(belowStepDate).tz(belowStepTimeZone).format(),
-      country: editingStep?.country ?? '',
-      lat: editingStep?.lat.toString() ?? '',
-      lon: editingStep?.lon.toString() ?? '',
-      location: editingStep?.location ?? '',
-      name: editingStep?.name ?? '',
+      arrivedAt: editingStep?.arrivedAt ?? belowStepDate,
+      country: editingStep?.country,
+      lat: editingStep?.lat.toString(),
+      lon: editingStep?.lon.toString(),
+      location: editingStep?.location,
+      name: editingStep?.name,
       story: editingStep?.story ?? '',
-      timeZone: editingStep?.timeZone ?? '',
+      timeZone: editingStep?.timeZone,
     },
   });
   const [
     createStepMutation,
     { loading: createStepMutationLoading },
   ] = useCreateStep(f, tripId, images, setIsCreateStepModal);
-  // const updateApolloCache = (
-  //   stepId: number,
-  //   imagesState: IImagesState[] = [],
-  // ) => {
-  //   const { lat, lon } = f.getValues();
-  //   const images: readTripQuery_readTrip_trip_steps_images[] = [];
-  //   imagesState.forEach(
-  //     (state) =>
-  //       state.url &&
-  //       images.push({
-  //         __typename: state.__typename,
-  //         url: state.url,
-  //       }),
-  //   );
-  //   const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
-  //     query: READ_TRIP_QUERY,
-  //     variables: { input: { tripId: +tripId } },
-  //   });
-  //   prevQuery &&
-  //     client.writeQuery<readTripQuery, readTripQueryVariables>({
-  //       query: READ_TRIP_QUERY,
-  //       variables: { input: { tripId: +tripId } },
-  //       data: {
-  //         readTrip: {
-  //           ...prevQuery.readTrip,
-  //           trip: {
-  //             ...prevQuery.readTrip.trip!,
-  //             steps: [
-  //               {
-  //                 ...f.getValues(),
-  //                 __typename: 'Step',
-  //                 id: stepId,
-  //                 lat: +lat,
-  //                 lon: +lon,
-  //                 likes: [],
-  //                 comments: [],
-  //                 images,
-  //               },
-  //               ...prevQuery.readTrip.trip!.steps,
-  //             ],
-  //           },
-  //         },
-  //       },
-  //     });
-  // };
-
-  const onDeleteStepCompleted = (data: deleteStepMutation) => {};
-
-  const [
-    deleteStepMutation,
-    { loading: deleteStepMutaionLoading },
-  ] = useMutation<deleteStepMutation, deleteStepMutationVariables>(
-    DELETE_STEP_MUTATION,
-    { onCompleted: onDeleteStepCompleted },
-  );
-
-  // const [
-  //   createImageMutation,
-  //   { loading: createImageMutationLoading },
-  // ] = useMutation<createImageMutation, createImageMutationVariables>(
-  //   CREATE_IMAGE_MUTATION,
-  // );
-
-  const [
-    deleteImageMutation,
-    { loading: deleteImageMutationLoading },
-  ] = useMutation<deleteImageMutation, deleteImageMutationVariables>(
-    DELETE_IMAGE_MUTATION,
-  );
-
-  const onUpdateStepCompleted = async (data: updateStepMutation) => {
-    const {
-      updateStep: { ok, error },
-    } = data;
-    if (ok && !error) {
-      const newImages = images.filter(
-        (image) =>
-          image.url &&
-          !editingStep?.images.includes({
-            __typename: 'Image',
-            url: image.url,
-          }),
-      );
-      // const deletedImages = editingStep!.images.filter(
-      //   (image) => !images.includes({ __typename: 'Image', url: image.url }),
-      // );
-      // if (deletedImages.length !== 0) {
-      //   const urls: string[] = [];
-      //   deletedImages.forEach((image) => image.url && urls.push(image.url));
-      //   await deleteImageMutation({
-      //     variables: { input: { stepId: editingStep!.id, urls } },
-      //   });
-      // }
-      // if (newImages.length !== 0) {
-      //   const urls: string[] = [];
-      //   newImages.forEach((image) => image.url && urls.push(image.url));
-      //   const { data, errors } = await createImageMutation({
-      //     variables: {
-      //       input: { stepId: editingStep!.id, urls },
-      //     },
-      //   });
-      //   if (data && !errors) {
-      //     const {
-      //       createImage: { ok, error, stepId },
-      //     } = data;
-      //     if (ok && !error && stepId) {
-      //       updateApolloCache(stepId, images);
-      //       setIsCreateStepModal(false);
-      //     }
-      //   }
-      // } else {
-      //   updateApolloCache(editingStep!.id);
-      //   setIsCreateStepModal(false);
-      // }
-    }
-  };
 
   const [
     updateStepMutation,
     { loading: updateStepMutaionLoading },
-  ] = useMutation<updateStepMutation, updateStepMutationVariables>(
-    UPDATE_STEP_MUTATION,
-    { onCompleted: onUpdateStepCompleted },
-  );
+  ] = useUpdateStep(f, tripId, images, editingStep, setIsCreateStepModal);
 
-  // const onCreateStepCompleted = async (data: createStepMutation) => {
-  //   const {
-  //     createStep: { ok, error, createdStepId },
-  //   } = data;
-  //   if (ok && !error && createdStepId) {
-  //     if (images.length !== 0 && images.some((image) => image.url)) {
-  //       const urls: string[] = [];
-  //       images.forEach((image) => image.url && urls.push(image.url));
-  //       const { data, errors } = await createImageMutation({
-  //         variables: {
-  //           input: { stepId: createdStepId, urls },
-  //         },
-  //       });
-  //       if (data && !errors) {
-  //         const {
-  //           createImage: { ok, error, stepId },
-  //         } = data;
-  //         if (ok && !error && stepId) {
-  //           updateApolloCache(stepId, images);
-  //           setIsCreateStepModal(false);
-  //         }
-  //       }
-  //     } else {
-  //       updateApolloCache(createdStepId);
-  //       setIsCreateStepModal(false);
-  //     }
-  //   }
-  // };
+  const [
+    deleteStepMutation,
+    { loading: deleteStepMutaionLoading },
+  ] = useDeleteStep(tripId, images, setIsCreateStepModal);
 
-  // const [
-  //   createStepMutation,
-  //   { loading: createStepMutationLoading },
-  // ] = useMutation<createStepMutation, createStepMutationVariables>(
-  //   CREATE_STEP_MUTAION,
-  //   { onCompleted: onCreateStepCompleted },
-  // );
   const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
 
   const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -322,47 +133,48 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   };
 
   const cleanupUnusedImages = useCallback(() => {
-    if (images.length !== 0 && images.some((image) => image.url)) {
-      if (editingStep) {
-        const urls: string[] = [];
-        images.forEach((image) => {
-          if (
-            image.url &&
-            editingStep.images.includes({
-              __typename: 'Image',
-              url: image.url,
-            })
-          ) {
-            urls.push(image.url);
-          }
-          urls.length !== 0 && deleteFiles(urls);
-        });
-      } else {
-        const urls: string[] = [];
-        images.forEach((image) => image.url && urls.push(image.url));
-        urls.length !== 0 && deleteFiles(urls);
-      }
+    if (images.length === 0 || !images.some((image) => image.url)) {
+      return;
     }
+    const urls: string[] = [];
+    if (editingStep) {
+      images.forEach((image) => {
+        if (!image.url) {
+          return;
+        }
+        const isUsedImage = editingStep.images.some(
+          (img) => img.url === image.url,
+        );
+        console.log(image, isUsedImage);
+        if (!isUsedImage) {
+          urls.push(image.url);
+        }
+      });
+    } else {
+      images.forEach((image) => image.url && urls.push(image.url));
+    }
+    console.log('foo: ', urls);
+    urls.length !== 0 && deleteFiles(urls);
   }, [editingStep, images]);
 
+  const onModalClose = useCallback(() => {
+    if (isUploading) {
+      return;
+    }
+    cleanupUnusedImages();
+    setIsCreateStepModal(false);
+  }, [cleanupUnusedImages, isUploading, setIsCreateStepModal]);
+
   useEffect(() => {
-    return () => {
-      window.addEventListener('beforeunload', cleanupUnusedImages);
-    };
+    window.addEventListener('beforeunload', cleanupUnusedImages);
   }, [cleanupUnusedImages]);
+
   return (
     <FormProvider {...f}>
       <div className="absolute z-50 top-0 left-0 w-full h-full bg-myGreen-darkest bg-opacity-80"></div>
       <div className="absolute z-50 top-0 left-0 w-full h-screenExceptHeader overflow-y-scroll">
         <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-11/12 bg-white rounded-2xl">
-          <ModalCloseIcon
-            onClick={() => {
-              if (!isUploading) {
-                setIsCreateStepModal(false);
-                cleanupUnusedImages();
-              }
-            }}
-          />
+          <ModalCloseIcon onClick={onModalClose} />
           <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
             New Trip
           </div>
@@ -502,7 +314,7 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
                     }
                   >
                     <span>
-                      {f.getValues().timeZone
+                      {f.getValues().arrivedAt && f.getValues().timeZone
                         ? moment
                             .tz(f.watch('arrivedAt'), f.watch('timeZone'))
                             .format('MMM D YYYY')
@@ -513,21 +325,18 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
                       className="text-myBlue text-xl"
                     />
                   </div>
-                  {isPopupCalendar && (
-                    <Calendar
-                      selectedDate={arrivedDateState}
-                      initialDateState={INITIAL_DATE_STATE}
-                      setSelectedDate={setArrivedDate}
-                      effectiveSince={
-                        new Date(
-                          new Date(tripStartDate).getFullYear(),
-                          new Date(tripStartDate).getMonth(),
-                          new Date(tripStartDate).getDate() - 1,
-                        )
-                      }
-                      effectiveUntil={
-                        tripEndDate ? new Date(tripEndDate) : null
-                      }
+                  {isPopupCalendar && f.getValues('timeZone') && (
+                    <NewCalendar
+                      name="arrivedAt"
+                      timeZone={f.getValues('timeZone')}
+                      selectedDate={moment.tz(
+                        f.getValues('arrivedAt'),
+                        f.getValues('timeZone'),
+                      )}
+                      effectiveSince={tripStartDate}
+                      effectiveUntil={moment(tripEndDate)
+                        .add(1, 'days')
+                        .format()}
                     />
                   )}
                 </div>
@@ -547,7 +356,7 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
                     className="mr-3 w-full flex items-center justify-between whitespace-nowrap"
                   >
                     <span>
-                      {f.getValues().timeZone
+                      {f.getValues().arrivedAt && f.getValues().timeZone
                         ? moment
                             .tz(f.watch('arrivedAt'), f.watch('timeZone'))
                             .format('HH : mm')
@@ -591,6 +400,7 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
                 setIsUploading={setIsUploading}
                 uploadErr={uploadErr}
                 setUploadErr={setUploadErr}
+                editingStep={editingStep}
               />
               {!isLocationBlock && (
                 <div
@@ -621,16 +431,13 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
                   text={editingStep ? 'Save changes' : 'Add step'}
                   type="red-solid"
                   loading={
-                    createStepMutationLoading ||
-                    updateStepMutaionLoading ||
-                    deleteImageMutationLoading
+                    createStepMutationLoading || updateStepMutaionLoading
                   }
                   disabled={
                     !f.formState.isValid ||
                     isUploading ||
                     createStepMutationLoading ||
-                    updateStepMutaionLoading ||
-                    deleteImageMutationLoading
+                    updateStepMutaionLoading
                   }
                   className="mr-4"
                 />
@@ -641,13 +448,9 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
                   disabled={
                     isUploading ||
                     createStepMutationLoading ||
-                    updateStepMutaionLoading ||
-                    deleteImageMutationLoading
+                    updateStepMutaionLoading
                   }
-                  onClick={() => {
-                    setIsCreateStepModal(false);
-                    cleanupUnusedImages();
-                  }}
+                  onClick={onModalClose}
                 />
               </div>
               {editingStep && (
@@ -660,11 +463,15 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
                   fontColorClass="text-myRed"
                   isSubmitBtn={false}
                   disabled={isUploading || updateStepMutaionLoading}
-                  onClick={() =>
-                    deleteStepMutation({
-                      variables: { input: { stepId: editingStep.id } },
-                    })
-                  }
+                  onClick={() => {
+                    const isConfirmed = window.confirm(
+                      'You are deleting this step permanently. Are you sure?',
+                    );
+                    isConfirmed &&
+                      deleteStepMutation({
+                        variables: { input: { stepId: editingStep.id } },
+                      });
+                  }}
                 />
               )}
             </div>
