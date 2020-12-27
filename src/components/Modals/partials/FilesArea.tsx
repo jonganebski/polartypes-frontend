@@ -8,11 +8,12 @@ import { useDragNDropImage } from '../../../hooks/useDragNDrop-image';
 import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
 import { FormError } from '../../Form-error';
 import { Spinner } from '../../Loading-spinner';
-import { TImage } from '../Create-step';
+import { TImage } from '../Save-step';
 
 interface IUploadBoxProps {
   images: TImage[];
   setImages: React.Dispatch<React.SetStateAction<TImage[]>>;
+  setImagesRecord: React.Dispatch<React.SetStateAction<TImage[]>>;
   isUploading: boolean;
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>;
   uploadErr: string;
@@ -25,13 +26,13 @@ export type TMyFile = File & { id: string };
 export const FilesArea: React.FC<IUploadBoxProps> = ({
   images,
   setImages,
+  setImagesRecord,
   isUploading,
   setIsUploading,
   uploadErr,
   setUploadErr,
   editingStep,
 }) => {
-  console.log(images);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const { draggingId, dropAcceptorFns, imageBoxDragFns } = useDragNDropImage(
     images,
@@ -40,6 +41,7 @@ export const FilesArea: React.FC<IUploadBoxProps> = ({
   const { dragNDropFilesFns, helperFns } = useDragNDropFile(
     images,
     setImages,
+    setImagesRecord,
     draggingId,
     setIsUploading,
     setUploadErr,

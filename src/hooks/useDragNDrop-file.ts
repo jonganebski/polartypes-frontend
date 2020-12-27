@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
-import { TImage } from '../components/Modals/Create-step';
+import { TImage } from '../components/Modals/Save-step';
 import { TMyFile } from '../components/Modals/partials/FilesArea';
 import { ACCEPTED_IMAGE_TYPES } from '../constants';
 
 export const useDragNDropFile = (
   images: TImage[],
   setImages: React.Dispatch<React.SetStateAction<TImage[]>>,
+  setImagesRecord: React.Dispatch<React.SetStateAction<TImage[]>>,
   draggingId: string | null | undefined,
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>,
   setUploadErr: React.Dispatch<React.SetStateAction<string>>,
@@ -56,6 +57,14 @@ export const useDragNDropFile = (
                 return img;
               }),
             );
+            setImagesRecord((prev) =>
+              prev.map((img) => {
+                if (img.id === file.id) {
+                  img.url = url;
+                }
+                return img;
+              }),
+            );
           } else if (error) {
             setUploadErr(error);
           } else {
@@ -76,8 +85,8 @@ export const useDragNDropFile = (
       body.append('file', file);
       reader.onloadend = async () => {
         const src = reader.result?.toString();
-
         setImages((prev) => prev.concat([{ id: file.id, src }]));
+        setImagesRecord((prev) => prev.concat([{ id: file.id, src }]));
       };
       reader.readAsDataURL(file);
     });

@@ -13,13 +13,13 @@ interface IStepProps {
   setEditingStep: React.Dispatch<
     React.SetStateAction<readTripQuery_readTrip_trip_steps | null>
   >;
-  setIsCreateStepModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSaveStepModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const StepCard: React.FC<IStepProps> = ({
   step,
   setEditingStep,
-  setIsCreateStepModal,
+  setIsSaveStepModal,
 }) => {
   const [isCommentBox, setIsCommentBox] = useState(false);
   const commentsCount = step.comments.length;
@@ -106,7 +106,7 @@ export const StepCard: React.FC<IStepProps> = ({
           type="blue-solid"
           size="sm"
           onClick={() => {
-            setIsCreateStepModal(true);
+            setIsSaveStepModal(true);
             setEditingStep(step);
           }}
         />

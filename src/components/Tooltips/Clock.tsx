@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { ICreateStepFormProps } from '../Modals/Create-step';
+import { ICreateStepFormProps } from '../Modals/Save-step';
 import moment from 'moment-timezone';
 
 const range = (start: number, stop: number, step: number) =>

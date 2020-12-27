@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { INITIAL_DATE_STATE } from '../../constants';
 import { deleteFiles, getTimeZone } from '../../helpers';
 import { useCreateStep } from '../../hooks/useCreateStep';
 import { useDeleteStep } from '../../hooks/useDeleteStep';
@@ -16,19 +15,18 @@ import { useGeocoder } from '../../hooks/useGeocoder';
 import { useUpdateStep } from '../../hooks/useUpdateStep';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
 import { Button } from '../Button';
-import { Calendar } from '../Tooltips/Calendar';
 import { Clock } from '../Tooltips/Clock';
 import { NewCalendar } from '../Tooltips/NewCalendar';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { FilesArea } from './partials/FilesArea';
 
-interface ICreateStepModalProps {
+interface ISaveStepModalProps {
   tripId: string;
   tripStartDate: string;
   tripEndDate: string | null;
   belowStepDate: string;
   belowStepTimeZone: string;
-  setIsCreateStepModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSaveStepModal: React.Dispatch<React.SetStateAction<boolean>>;
   editingStep: readTripQuery_readTrip_trip_steps | null;
 }
 
@@ -45,13 +43,13 @@ export interface ICreateStepFormProps {
 
 export type TImage = { id?: string; src?: string; url?: string };
 
-export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
+export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
   tripId,
   tripStartDate,
   tripEndDate,
   belowStepDate,
   belowStepTimeZone,
-  setIsCreateStepModal,
+  setIsSaveStepModal,
   editingStep,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,6 +60,9 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   const [images, setImages] = useState<TImage[]>(
     editingStep?.imgUrls?.map((url) => ({ url })) ?? [],
   );
+  const [imagesRecord, setImagesRecord] = useState<TImage[]>(images);
+  console.log('images: ', images);
+  console.log('imagesRecord: ', imagesRecord);
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
     defaultValues: {
@@ -78,22 +79,68 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   const [
     createStepMutation,
     { loading: createStepMutationLoading },
-  ] = useCreateStep(f, tripId, images, setIsCreateStepModal);
+  ] = useCreateStep(f, tripId, images, setIsSaveStepModal);
 
   const [
     updateStepMutation,
     { loading: updateStepMutaionLoading },
-  ] = useUpdateStep(f, editingStep, images, setIsCreateStepModal);
+  ] = useUpdateStep(f, editingStep, images, setIsSaveStepModal);
 
   const [
     deleteStepMutation,
     { loading: deleteStepMutaionLoading },
-  ] = useDeleteStep(f, tripId, images, setIsCreateStepModal);
+  ] = useDeleteStep(f, tripId, images, setIsSaveStepModal);
 
   const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
 
   const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.currentTarget.value);
+  };
+
+  const cleanupUnusedImageFilesOnCancel = useCallback(() => {
+    if (imagesRecord.length === 0 || !imagesRecord.some((image) => image.url)) {
+      return;
+    }
+    console.log('cleanupUnusedImageFilesOnCancel starting...');
+    const urls: string[] = [];
+    if (editingStep) {
+      imagesRecord.forEach((image) => {
+        if (!image.url) {
+          return;
+        }
+        const isUsedImage = editingStep.imgUrls?.some(
+          (url) => url === image.url,
+        );
+        console.log(image, isUsedImage);
+        if (!isUsedImage) {
+          urls.push(image.url);
+        }
+      });
+    } else {
+      imagesRecord.forEach((image) => image.url && urls.push(image.url));
+    }
+    console.log('deleting files in s3: ', urls);
+    urls.length !== 0 && deleteFiles(urls);
+  }, [editingStep, imagesRecord]);
+
+  const cleanupUnusedImageFilesOnEditSubmit = () => {
+    if (imagesRecord.length === 0 || !imagesRecord.some((image) => image.url)) {
+      return;
+    }
+    console.log('cleanupUnusedImageFilesOnEditSubmit starting...');
+    const urls: string[] = [];
+    imagesRecord.forEach((image) => {
+      if (!image.url) {
+        return;
+      }
+      const isUsedImage = images.some((img) => img.url === image.url);
+      console.log(image, isUsedImage);
+      if (!isUsedImage) {
+        urls.push(image.url);
+      }
+    });
+    console.log('deleting files in s3: ', urls);
+    urls.length !== 0 && deleteFiles(urls);
   };
 
   const onSubmit = () => {
@@ -107,6 +154,7 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
     }, [] as string[]);
     if (editingStep) {
       console.log('updateStepMutation starting...');
+      cleanupUnusedImageFilesOnEditSubmit();
       updateStepMutation({
         variables: {
           input: {
@@ -134,45 +182,22 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
     }
   };
 
-  const cleanupUnusedImages = useCallback(() => {
-    if (images.length === 0 || !images.some((image) => image.url)) {
-      return;
-    }
-    console.log('cleanupUnusedImages starting...');
-    const urls: string[] = [];
-    if (editingStep) {
-      images.forEach((image) => {
-        if (!image.url) {
-          return;
-        }
-        const isUsedImage = editingStep.imgUrls?.some(
-          (url) => url === image.url,
-        );
-        console.log(image, isUsedImage);
-        if (!isUsedImage) {
-          urls.push(image.url);
-        }
-      });
-    } else {
-      images.forEach((image) => image.url && urls.push(image.url));
-    }
-    console.log('deleting files in s3: ', urls);
-    urls.length !== 0 && deleteFiles(urls);
-  }, [editingStep, images]);
-
   const onModalClose = useCallback(() => {
     if (isUploading) {
       return;
     }
-    cleanupUnusedImages();
-    setIsCreateStepModal(false);
-  }, [cleanupUnusedImages, isUploading, setIsCreateStepModal]);
+    cleanupUnusedImageFilesOnCancel();
+    setIsSaveStepModal(false);
+  }, [cleanupUnusedImageFilesOnCancel, isUploading, setIsSaveStepModal]);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', cleanupUnusedImages);
+    window.addEventListener('beforeunload', cleanupUnusedImageFilesOnCancel);
     return () =>
-      window.removeEventListener('beforeunload', cleanupUnusedImages);
-  }, [cleanupUnusedImages]);
+      window.removeEventListener(
+        'beforeunload',
+        cleanupUnusedImageFilesOnCancel,
+      );
+  }, [cleanupUnusedImageFilesOnCancel]);
 
   return (
     <FormProvider {...f}>
@@ -401,6 +426,7 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
               <FilesArea
                 images={images}
                 setImages={setImages}
+                setImagesRecord={setImagesRecord}
                 isUploading={isUploading}
                 setIsUploading={setIsUploading}
                 uploadErr={uploadErr}

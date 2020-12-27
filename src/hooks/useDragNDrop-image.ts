@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TImage } from '../components/Modals/Create-step';
+import { TImage } from '../components/Modals/Save-step';
 
 export const useDragNDropImage = (
   images: TImage[],

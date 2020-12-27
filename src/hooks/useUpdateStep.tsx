@@ -1,7 +1,7 @@
 import { gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
 import { client } from '../apollo';
-import { ICreateStepFormProps, TImage } from '../components/Modals/Create-step';
+import { ICreateStepFormProps, TImage } from '../components/Modals/Save-step';
 import { readTripQuery_readTrip_trip_steps } from '../__generated__/readTripQuery';
 import {
   updateStepMutation,

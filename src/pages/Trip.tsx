@@ -23,7 +23,7 @@ import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
-import { CreateStepModal } from '../components/Modals/Create-step';
+import { SaveStepModal } from '../components/Modals/Save-step';
 import {
   readTripQuery,
   readTripQueryVariables,
@@ -73,7 +73,7 @@ interface IParams {
 
 export const Trip = () => {
   const { tripId } = useParams<IParams>();
-  const [isCreateStepModal, setIsCreateStepModal] = useState(false);
+  const [isSaveStepModal, setIsSaveStepModal] = useState(false);
   const [
     editingStep,
     setEditingStep,
@@ -90,23 +90,23 @@ export const Trip = () => {
   const endDateData = data?.readTrip.trip?.endDate;
   const timeZoneData = data?.readTrip.trip?.traveler.timeZone;
   useEffect(() => {
-    if (!isCreateStepModal) {
+    if (!isSaveStepModal) {
       setEditingStep(null);
     }
-  }, [isCreateStepModal]);
+  }, [isSaveStepModal]);
   return (
     <div>
       <CommonHeader />
       <div className="h-screenExceptHeader flex">
         <section className="relative w-1/2 h-full min-w-px600">
-          {isCreateStepModal && data?.readTrip.trip && (
-            <CreateStepModal
+          {isSaveStepModal && data?.readTrip.trip && (
+            <SaveStepModal
               tripId={tripId}
               tripStartDate={data.readTrip.trip.startDate}
               tripEndDate={data.readTrip.trip.endDate}
               belowStepDate={belowStepDate}
               belowStepTimeZone={belowStepTimeZone}
-              setIsCreateStepModal={setIsCreateStepModal}
+              setIsSaveStepModal={setIsSaveStepModal}
               editingStep={editingStep}
             />
           )}
@@ -271,13 +271,13 @@ export const Trip = () => {
                         onClick={() => {
                           setBelowStepDate(step.arrivedAt);
                           setBelowStepTimeZone(step.timeZone);
-                          setIsCreateStepModal(true);
+                          setIsSaveStepModal(true);
                         }}
                       />
                       <StepCard
                         step={step}
                         setEditingStep={setEditingStep}
-                        setIsCreateStepModal={setIsCreateStepModal}
+                        setIsSaveStepModal={setIsSaveStepModal}
                       />
                     </React.Fragment>
                   );
@@ -291,7 +291,7 @@ export const Trip = () => {
                   setBelowStepDate(
                     data?.readTrip.trip?.endDate ?? moment(new Date()).format(),
                   );
-                  setIsCreateStepModal(true);
+                  setIsSaveStepModal(true);
                 }}
               />
               <li className="pl-3 flex">
