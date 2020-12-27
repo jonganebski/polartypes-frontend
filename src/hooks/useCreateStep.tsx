@@ -1,21 +1,16 @@
 import { gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
 import { client } from '../apollo';
-import {
-  ICreateStepFormProps,
-  IImagesState,
-} from '../components/Modals/Create-step';
+import { ICreateStepFormProps, TImage } from '../components/Modals/Create-step';
 import { READ_TRIP_QUERY } from '../pages/Trip';
 import {
   createStepMutation,
   createStepMutationVariables,
 } from '../__generated__/createStepMutation';
 import {
-  readTripQuery_readTrip_trip_steps_images,
   readTripQuery,
   readTripQueryVariables,
 } from '../__generated__/readTripQuery';
-import { useCreateImage } from './useCreateImage';
 
 const CREATE_STEP_MUTAION = gql`
   mutation createStepMutation($input: CreateStepInput!) {
@@ -30,25 +25,18 @@ const CREATE_STEP_MUTAION = gql`
 export const useCreateStep = (
   f: UseFormMethods<ICreateStepFormProps>,
   tripId: string,
-  images: IImagesState[],
+  images: TImage[],
   setIsCreateStepModal: (value: React.SetStateAction<boolean>) => void,
 ) => {
-  const [createImageMutation] = useCreateImage();
-
-  const updateApolloCache = (
-    stepId: number,
-    imagesState: IImagesState[] = [],
-  ) => {
-    const { lat, lon } = f.getValues();
-    const images: readTripQuery_readTrip_trip_steps_images[] = [];
-    imagesState.forEach(
-      (state) =>
-        state.url &&
-        images.push({
-          __typename: state.__typename,
-          url: state.url,
-        }),
-    );
+  const updateApolloCache = (stepId: number) => {
+    const { lat, lon, ...values } = f.getValues();
+    const imgUrls = images.reduce((acc, img) => {
+      if (img.url) {
+        return [...acc, img.url];
+      } else {
+        return acc;
+      }
+    }, [] as string[]);
     const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
       query: READ_TRIP_QUERY,
       variables: { input: { tripId: +tripId } },
@@ -64,14 +52,14 @@ export const useCreateStep = (
               ...prevQuery.readTrip.trip!,
               steps: [
                 {
-                  ...f.getValues(),
+                  ...values,
                   __typename: 'Step',
                   id: stepId,
                   lat: +lat,
                   lon: +lon,
+                  imgUrls,
                   likes: [],
                   comments: [],
-                  images,
                 },
                 ...prevQuery.readTrip.trip!.steps,
               ],
@@ -85,29 +73,13 @@ export const useCreateStep = (
       createStep: { ok, error, createdStepId },
     } = data;
     if (ok && !error && createdStepId) {
-      if (images.length !== 0 && images.some((image) => image.url)) {
-        const urls: string[] = [];
-        images.forEach((image) => image.url && urls.push(image.url));
-        const { data, errors } = await createImageMutation({
-          variables: {
-            input: { stepId: createdStepId, urls },
-          },
-        });
-        if (data && !errors) {
-          const {
-            createImage: { ok, error, stepId },
-          } = data;
-          if (ok && !error && stepId) {
-            updateApolloCache(stepId, images);
-            setIsCreateStepModal(false);
-          }
-        }
-      } else {
-        updateApolloCache(createdStepId);
-        setIsCreateStepModal(false);
-      }
+      updateApolloCache(createdStepId);
+      setIsCreateStepModal(false);
+    } else {
+      console.log(error);
     }
   };
+
   return useMutation<createStepMutation, createStepMutationVariables>(
     CREATE_STEP_MUTAION,
     { onCompleted: onCreateStepCompleted },

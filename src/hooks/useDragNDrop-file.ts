@@ -1,12 +1,13 @@
-import { IImagesState } from '../components/Modals/Create-step';
+import { v4 as uuidv4 } from 'uuid';
+import { TImage } from '../components/Modals/Create-step';
 import { TMyFile } from '../components/Modals/partials/FilesArea';
 import { ACCEPTED_IMAGE_TYPES } from '../constants';
-import { v4 as uuidv4 } from 'uuid';
 
 export const useDragNDropFile = (
+  images: TImage[],
+  setImages: React.Dispatch<React.SetStateAction<TImage[]>>,
   draggingId: string | null | undefined,
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>,
-  setImages: React.Dispatch<React.SetStateAction<IImagesState[]>>,
   setUploadErr: React.Dispatch<React.SetStateAction<string>>,
 ) => {
   const validateFiles = (
@@ -47,25 +48,27 @@ export const useDragNDropFile = (
           });
           const { ok, error, url } = await response.json();
           if (ok && !error && url) {
-            setImages((prev) => {
-              return prev.map((image) => {
-                if (image.id === file.id) {
-                  image.url = url;
+            setImages((prev) =>
+              prev.map((img) => {
+                if (img.id === file.id) {
+                  img.url = url;
                 }
-                return image;
-              });
-            });
+                return img;
+              }),
+            );
           } else if (error) {
             setUploadErr(error);
           } else {
             setUploadErr('Failed to upload.');
           }
-        } catch {
+        } catch (err) {
+          console.log(err);
           setUploadErr('Failed to upload.');
         }
       }),
     ).then(() => setIsUploading(false));
   };
+
   const readFiles = (files: TMyFile[]) => {
     files.forEach((file) => {
       const body = new FormData();
@@ -73,11 +76,8 @@ export const useDragNDropFile = (
       body.append('file', file);
       reader.onloadend = async () => {
         const src = reader.result?.toString();
-        src &&
-          setImages((prev) => [
-            ...prev,
-            { id: file.id, src, __typename: 'Image' },
-          ]);
+
+        setImages((prev) => prev.concat([{ id: file.id, src }]));
       };
       reader.readAsDataURL(file);
     });

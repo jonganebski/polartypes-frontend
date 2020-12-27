@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { IImagesState } from '../components/Modals/Create-step';
+import { TImage } from '../components/Modals/Create-step';
 
 export const useDragNDropImage = (
-  images: IImagesState[],
-  setImages: React.Dispatch<React.SetStateAction<IImagesState[]>>,
+  images: TImage[],
+  setImages: React.Dispatch<React.SetStateAction<TImage[]>>,
 ) => {
   const [draggingId, setDraggingId] = useState<string | null>();
 

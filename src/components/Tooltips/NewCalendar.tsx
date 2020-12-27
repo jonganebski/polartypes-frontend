@@ -32,7 +32,7 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
   effectiveUntil = null,
   nullable = false,
 }) => {
-  const { setValue } = useFormContext();
+  const { getValues, setValue } = useFormContext();
   const [calendarDate, setCalendarDate] = useState(
     selectedDate ?? moment.tz(new Date(), timeZone),
   );
@@ -78,7 +78,14 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
     });
   };
   const onDateClick = (date: moment.Moment) => {
-    setValue(name, date.format());
+    const prev = getValues(name);
+    const updated = moment
+      .tz(prev, timeZone)
+      .set('years', date.get('years'))
+      .set('months', date.get('months'))
+      .set('dates', date.get('dates'))
+      .format();
+    setValue(name, updated, { shouldValidate: true });
   };
   const onPrevMonthClick = () => {
     setCalendarDate((prev) => {

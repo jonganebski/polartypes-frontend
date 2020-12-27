@@ -8,11 +8,11 @@ import { useDragNDropImage } from '../../../hooks/useDragNDrop-image';
 import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
 import { FormError } from '../../Form-error';
 import { Spinner } from '../../Loading-spinner';
-import { IImagesState } from '../Create-step';
+import { TImage } from '../Create-step';
 
 interface IUploadBoxProps {
-  images: IImagesState[];
-  setImages: React.Dispatch<React.SetStateAction<IImagesState[]>>;
+  images: TImage[];
+  setImages: React.Dispatch<React.SetStateAction<TImage[]>>;
   isUploading: boolean;
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>;
   uploadErr: string;
@@ -31,18 +31,19 @@ export const FilesArea: React.FC<IUploadBoxProps> = ({
   setUploadErr,
   editingStep,
 }) => {
+  console.log(images);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const { draggingId, dropAcceptorFns, imageBoxDragFns } = useDragNDropImage(
     images,
     setImages,
   );
   const { dragNDropFilesFns, helperFns } = useDragNDropFile(
+    images,
+    setImages,
     draggingId,
     setIsUploading,
-    setImages,
     setUploadErr,
   );
-
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const files = e.currentTarget.files;
@@ -59,17 +60,17 @@ export const FilesArea: React.FC<IUploadBoxProps> = ({
     e.currentTarget.value = '';
   };
 
-  const onDeleteIconClick = (i: number, image: IImagesState) => {
+  const onDeleteIconClick = (i: number) => {
     if (isUploading) {
       return;
     }
-    setImages((prev) => prev.filter((_, idx) => idx !== i));
     if (editingStep) {
     } else {
-      image?.url && deleteFiles([image.url]);
+      const targetUrl = images[i]?.url;
+      targetUrl && deleteFiles([targetUrl]);
     }
+    setImages((prev) => prev.filter((_, index) => index !== i));
   };
-
   return (
     <div>
       <div
@@ -114,9 +115,9 @@ export const FilesArea: React.FC<IUploadBoxProps> = ({
                 </div>
                 <FontAwesomeIcon
                   icon={faTimesCircle}
-                  onClick={() => onDeleteIconClick(i, image)}
+                  onClick={() => onDeleteIconClick(i)}
                   className={`absolute -top-1 -right-1 text-xl cursor-pointer rounded-full text-black bg-white ${
-                    image?.url && 'hover:text-myRed'
+                    image.url && 'hover:text-myRed'
                   }`}
                 />
               </div>

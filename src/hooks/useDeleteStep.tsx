@@ -1,6 +1,7 @@
 import { gql, useMutation } from '@apollo/client';
+import { UseFormMethods } from 'react-hook-form';
 import { client } from '../apollo';
-import { IImagesState } from '../components/Modals/Create-step';
+import { ICreateStepFormProps, TImage } from '../components/Modals/Create-step';
 import { deleteFiles } from '../helpers';
 import { READ_TRIP_QUERY } from '../pages/Trip';
 import {
@@ -23,8 +24,9 @@ const DELETE_STEP_MUTATION = gql`
 `;
 
 export const useDeleteStep = (
+  f: UseFormMethods<ICreateStepFormProps>,
   tripId: string,
-  images: IImagesState[],
+  images: TImage[],
   setIsCreateStepModal: (value: React.SetStateAction<boolean>) => void,
 ) => {
   const onDeleteStepCompleted = (data: deleteStepMutation) => {
@@ -56,13 +58,14 @@ export const useDeleteStep = (
           },
         },
       });
-    const urls: string[] = [];
-    images.forEach((image) => {
-      if (image.url) {
-        urls.push(image.url);
+    const imgUrls = images.reduce((acc, img) => {
+      if (img.url) {
+        return [...acc, img.url];
+      } else {
+        return acc;
       }
-    });
-    deleteFiles(urls);
+    }, [] as string[]);
+    deleteFiles(imgUrls);
     setIsCreateStepModal(false);
   };
 

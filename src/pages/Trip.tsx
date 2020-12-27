@@ -52,13 +52,11 @@ export const READ_TRIP_QUERY = gql`
           lat
           lon
           story
+          imgUrls
           likes {
             user {
               username
             }
-          }
-          images {
-            url
           }
           comments {
             id
@@ -210,7 +208,11 @@ export const Trip = () => {
                     <FontAwesomeIcon icon={faCamera} className="text-xl" />
                     <span className="block mt-1.5 -mb-1.5 font-semibold">
                       {data?.readTrip.trip?.steps.reduce((acc, v) => {
-                        return acc + v.images.length;
+                        if (v.imgUrls) {
+                          return acc + v.imgUrls?.length;
+                        } else {
+                          return acc;
+                        }
                       }, 0)}
                     </span>
                     <span className="text-xs">photos</span>

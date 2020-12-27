@@ -25,11 +25,6 @@ export interface readTripQuery_readTrip_trip_steps_likes {
   user: readTripQuery_readTrip_trip_steps_likes_user;
 }
 
-export interface readTripQuery_readTrip_trip_steps_images {
-  __typename: "Image";
-  url: string;
-}
-
 export interface readTripQuery_readTrip_trip_steps_comments {
   __typename: "Comment";
   id: number;
@@ -46,8 +41,8 @@ export interface readTripQuery_readTrip_trip_steps {
   lat: number;
   lon: number;
   story: string | null;
+  imgUrls: string[] | null;
   likes: readTripQuery_readTrip_trip_steps_likes[];
-  images: readTripQuery_readTrip_trip_steps_images[];
   comments: readTripQuery_readTrip_trip_steps_comments[];
 }
 

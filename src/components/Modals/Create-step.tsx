@@ -43,12 +43,7 @@ export interface ICreateStepFormProps {
   timeZone: string;
 }
 
-export interface IImagesState {
-  id?: string;
-  src?: string;
-  url?: string;
-  __typename: 'Image';
-}
+export type TImage = { id?: string; src?: string; url?: string };
 
 export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   tripId,
@@ -59,18 +54,14 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   setIsCreateStepModal,
   editingStep,
 }) => {
-  const belowDateObj = new Date(belowStepDate);
-  const [arrivedDateState, setArrivedDate] = useState<Date | null>(
-    belowDateObj,
-  );
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isLocationBlock, setIsLocationBlock] = useState(false);
-  const [images, setImages] = useState<IImagesState[]>(
-    editingStep?.images ?? [],
-  );
   const [uploadErr, setUploadErr] = useState('');
   const [isPopupCalendar, setIsPopupCalendar] = useState<boolean | null>(null);
+  const [images, setImages] = useState<TImage[]>(
+    editingStep?.imgUrls?.map((url) => ({ url })) ?? [],
+  );
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
     defaultValues: {
@@ -92,12 +83,12 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   const [
     updateStepMutation,
     { loading: updateStepMutaionLoading },
-  ] = useUpdateStep(f, tripId, images, editingStep, setIsCreateStepModal);
+  ] = useUpdateStep(f, editingStep, images, setIsCreateStepModal);
 
   const [
     deleteStepMutation,
     { loading: deleteStepMutaionLoading },
-  ] = useDeleteStep(tripId, images, setIsCreateStepModal);
+  ] = useDeleteStep(f, tripId, images, setIsCreateStepModal);
 
   const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
 
@@ -106,26 +97,37 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
   };
 
   const onSubmit = () => {
-    const { lat, lon } = f.getValues();
+    const { lat, lon, ...values } = f.getValues();
+    const imgUrls = images.reduce((acc, img) => {
+      if (img.url) {
+        return [...acc, img.url];
+      } else {
+        return acc;
+      }
+    }, [] as string[]);
     if (editingStep) {
+      console.log('updateStepMutation starting...');
       updateStepMutation({
         variables: {
           input: {
-            ...f.getValues(),
+            ...values,
             stepId: editingStep.id,
             lat: +lat,
             lon: +lon,
+            imgUrls,
           },
         },
       });
     } else {
+      console.log('createStepMutation starting...');
       createStepMutation({
         variables: {
           input: {
-            ...f.getValues(),
+            ...values,
+            tripId: +tripId,
             lat: +lat,
             lon: +lon,
-            tripId: +tripId,
+            imgUrls,
           },
         },
       });
@@ -136,14 +138,15 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
     if (images.length === 0 || !images.some((image) => image.url)) {
       return;
     }
+    console.log('cleanupUnusedImages starting...');
     const urls: string[] = [];
     if (editingStep) {
       images.forEach((image) => {
         if (!image.url) {
           return;
         }
-        const isUsedImage = editingStep.images.some(
-          (img) => img.url === image.url,
+        const isUsedImage = editingStep.imgUrls?.some(
+          (url) => url === image.url,
         );
         console.log(image, isUsedImage);
         if (!isUsedImage) {
@@ -153,7 +156,7 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
     } else {
       images.forEach((image) => image.url && urls.push(image.url));
     }
-    console.log('foo: ', urls);
+    console.log('deleting files in s3: ', urls);
     urls.length !== 0 && deleteFiles(urls);
   }, [editingStep, images]);
 
@@ -167,6 +170,8 @@ export const CreateStepModal: React.FC<ICreateStepModalProps> = ({
 
   useEffect(() => {
     window.addEventListener('beforeunload', cleanupUnusedImages);
+    return () =>
+      window.removeEventListener('beforeunload', cleanupUnusedImages);
   }, [cleanupUnusedImages]);
 
   return (

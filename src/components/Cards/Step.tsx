@@ -41,11 +41,11 @@ export const StepCard: React.FC<IStepProps> = ({
         {step.story}
       </p>
       <div className="mb-4 grid gap-y-3">
-        {step.images.map((image, i) => (
+        {step.imgUrls?.map((url, i) => (
           <div
             key={i}
             style={{
-              backgroundImage: `url(${image.url})`,
+              backgroundImage: `url(${url})`,
             }}
             className="pt-imageRatio bg-cover bg-center"
           ></div>
