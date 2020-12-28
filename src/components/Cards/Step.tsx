@@ -1,12 +1,30 @@
+import { gql, useMutation } from '@apollo/client';
 import { faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { client } from '../../apollo';
+import { useWhoAmI } from '../../hooks/useWhoAmI';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
+import { step } from '../../__generated__/step';
+import {
+  toggleLikeMutation,
+  toggleLikeMutationVariables,
+} from '../../__generated__/toggleLikeMutation';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { Comments } from './partials/Comments';
+
+const TOGGLE_LIKE_MUTATION = gql`
+  mutation toggleLikeMutation($input: ToggleLikeInput!) {
+    toggleLike(input: $input) {
+      ok
+      error
+      toggle
+    }
+  }
+`;
 
 interface IStepProps {
   step: readTripQuery_readTrip_trip_steps;
@@ -21,8 +39,59 @@ export const StepCard: React.FC<IStepProps> = ({
   setEditingStep,
   setIsSaveStepModal,
 }) => {
+  const { data: userData } = useWhoAmI();
   const [isCommentBox, setIsCommentBox] = useState(false);
   const commentsCount = step.comments.length;
+
+  const onCompleted = (data: toggleLikeMutation) => {
+    const {
+      toggleLike: { ok, error, toggle },
+    } = data;
+    if (ok && !error && toggle) {
+      const prevStep = client.readFragment<step>({
+        id: `Step:${step.id}`,
+        fragment: gql`
+          fragment step on Step {
+            likes {
+              user {
+                username
+              }
+            }
+          }
+        `,
+      });
+      if (prevStep && userData) {
+        const username = userData.whoAmI.username;
+        let likes = prevStep?.likes.slice();
+        console.log(likes);
+        if (0 < toggle) {
+          likes.unshift({
+            __typename: 'Like',
+            user: { __typename: 'Users', username },
+          });
+        } else {
+          likes = likes.filter((like) => like.user.username !== username);
+        }
+        client.writeFragment<step>({
+          id: `Step:${step.id}`,
+          fragment: gql`
+            fragment toggledLikeStep on Step {
+              likes
+            }
+          `,
+          data: {
+            __typename: 'Step',
+            likes,
+          },
+        });
+      }
+    }
+  };
+
+  const [toggleLikeMutation, { loading: toggleLikeLoading }] = useMutation<
+    toggleLikeMutation,
+    toggleLikeMutationVariables
+  >(TOGGLE_LIKE_MUTATION, { onCompleted });
   return (
     <li className="pt-6 px-6 border bg-white border-myGray-light rounded-xl">
       <div>
@@ -51,26 +120,18 @@ export const StepCard: React.FC<IStepProps> = ({
           ></div>
         ))}
       </div>
-      {step.likes.length > 0 && (
+      {step.likes.length !== 0 && (
         <div className="p-3 flex border-t border-b border-myGray-light">
           <Avatar size={8} />
           <span className="text-sm text-myGray-darkest">
-            <Link to="#" className="text-myGreen-darkest">
-              Allmight
-            </Link>
-            ,{' '}
-            <Link to="#" className="text-myGreen-darkest">
-              Ganai Yuhno
-            </Link>
-            ,{' '}
-            <Link to="#" className="text-myGreen-darkest">
-              Kamado Tanjiro
-            </Link>
-            ,{' '}
-            <Link to="#" className="text-myGreen-darkest">
-              Michael Jackson
-            </Link>{' '}
-            and 45 others like this step.
+            {step.likes.slice(0, 5).map((like, i) => (
+              <Link key={i} to="#" className="text-myGreen-darkest">
+                {i === step.likes.slice(0, 5).length - 1
+                  ? like.user.username + ' '
+                  : like.user.username + ', '}
+              </Link>
+            ))}
+            and {step.likes.length - 5} others like this step.
           </span>
         </div>
       )}
@@ -81,9 +142,22 @@ export const StepCard: React.FC<IStepProps> = ({
             type="white-solid"
             size="sm"
             className="mr-2"
+            disabled={toggleLikeLoading}
             icon={
-              <FontAwesomeIcon icon={faHeart} className="text-myBlue mr-2" />
+              <FontAwesomeIcon
+                icon={faHeart}
+                className={`mr-2 ${
+                  step.likes.some(
+                    (like) => like.user.username === userData?.whoAmI.username,
+                  )
+                    ? 'text-myRed'
+                    : 'text-myBlue'
+                }`}
+              />
             }
+            onClick={(e) => {
+              toggleLikeMutation({ variables: { input: { id: step.id } } });
+            }}
           />
           <Button
             text={

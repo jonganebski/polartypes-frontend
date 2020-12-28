@@ -33,7 +33,6 @@ export interface readTripsQuery_readTrips_targetUser {
   lastName: string;
   about: string | null;
   city: string | null;
-  timeZone: string | null;
   avatarUrl: string | null;
   followers: readTripsQuery_readTrips_targetUser_followers[];
   followings: readTripsQuery_readTrips_targetUser_followings[];

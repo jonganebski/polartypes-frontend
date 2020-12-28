@@ -88,6 +88,10 @@ export interface StepInputType {
   trip: TripInputType;
 }
 
+export interface ToggleLikeInput {
+  id: number;
+}
+
 export interface TripInputType {
   startDate: string;
   endDate?: string | null;
