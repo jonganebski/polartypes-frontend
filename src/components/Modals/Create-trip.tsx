@@ -7,8 +7,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment-timezone';
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import {
   createTripMutation,
@@ -16,14 +16,12 @@ import {
 } from '../../__generated__/createTripMutation';
 import { Availability } from '../../__generated__/globalTypes';
 import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
-import { Button } from '../Button';
-import { Calendar } from '../Tooltips/Calendar';
-import { FormError } from '../Form-error';
-import { ModalCloseIcon } from './partials/CloseIcon';
-import { ModalBackground } from './partials/Background';
-import { INITIAL_DATE_STATE } from '../../constants';
 import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
-import { formatDate } from '../../helpers';
+import { Button } from '../Button';
+import { FormError } from '../Form-error';
+import { NewCalendar } from '../Tooltips/Calendar';
+import { ModalBackground } from './partials/Background';
+import { ModalCloseIcon } from './partials/CloseIcon';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
@@ -55,54 +53,97 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
   trips = [],
 }) => {
   const history = useHistory();
-  const [startDate, setStartDate] = useState<Date | null>(INITIAL_DATE_STATE);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const timeZone = userData.whoAmI.timeZone!;
   const [isStartDateCalendar, setIsStartDateCalendar] = useState<
     boolean | null
   >(null);
-  console.log(startDate);
-  const {
-    register,
-    getValues,
-    formState,
-    handleSubmit,
-    errors,
-    setError,
-    clearErrors,
-  } = useForm<IFormProps>({
+  const f = useForm<IFormProps>({
     mode: 'onChange',
+    defaultValues: {
+      startDate: moment.tz(new Date(), timeZone).format(),
+      endDate: '',
+    },
   });
-  useEffect(() => {
-    const setEndDateAfterStartDate = () => {
-      if (startDate && endDate && endDate.getTime() < startDate.getTime()) {
-        setEndDate(startDate);
+  const { setError, clearErrors, getValues, setValue } = f;
+  const startDate = getValues('startDate');
+  const endDate = getValues('endDate');
+
+  const setEndDateAfterStartDate = useCallback(() => {
+    if (endDate) {
+      if (
+        moment.tz(startDate, timeZone).isAfter(moment.tz(endDate, timeZone))
+      ) {
+        setValue('endDate', startDate, { shouldValidate: true });
       }
-    };
-    const validateTripDates = () => {
-      const overlappedTrip = trips.find((trip) => {
-        const otherTripStart = new Date(trip.startDate).getTime();
-        const otherTripEnd = trip.endDate
-          ? new Date(trip.endDate).getTime()
-          : Infinity;
-        const start = new Date(startDate!).getTime();
-        const end = endDate ? new Date(endDate).getTime() : Infinity;
-        const isTripsOverlapped = Boolean(
-          (otherTripStart < start && start < otherTripEnd) ||
-            (otherTripStart < end && end < otherTripEnd) ||
-            (start < otherTripStart && otherTripStart < end) ||
-            (start < otherTripEnd && otherTripEnd < end),
-        );
-        return isTripsOverlapped;
+    }
+  }, [endDate, setValue, startDate, timeZone]);
+
+  const validateTripDates = useCallback(() => {
+    let overlappedTrip: readTripsQuery_readTrips_targetUser_trips | undefined;
+    if (endDate) {
+      overlappedTrip = trips.find((otherTrip) => {
+        if (otherTrip.endDate) {
+          const isTripsOverlapped =
+            moment(startDate).isBetween(
+              moment(otherTrip.startDate),
+              moment(otherTrip.endDate),
+              'days',
+              '[]',
+            ) ||
+            moment(endDate).isBetween(
+              moment(otherTrip.startDate),
+              moment(otherTrip.endDate),
+              'days',
+              '[]',
+            ) ||
+            moment(otherTrip.startDate).isBetween(
+              moment(startDate),
+              moment(endDate),
+              'days',
+              '[]',
+            ) ||
+            moment(otherTrip.endDate).isBetween(
+              moment(startDate),
+              moment(endDate),
+              'days',
+              '[]',
+            );
+          return isTripsOverlapped;
+        } else {
+          const isTripsOverlapped = moment(endDate).isSameOrAfter(
+            moment(otherTrip.startDate),
+            'days',
+          );
+          return isTripsOverlapped;
+        }
       });
-      overlappedTrip
-        ? setError('startDate', {
-            message: `This trip overlaps with "${overlappedTrip.name}". Select a different date.`,
-          })
-        : clearErrors('startDate');
-    };
+    } else {
+      overlappedTrip = trips.find((otherTrip) => {
+        if (otherTrip.endDate) {
+          const isTripsOverlapped =
+            moment(otherTrip.startDate).isSameOrAfter(
+              moment(startDate),
+              'days',
+            ) ||
+            moment(otherTrip.endDate).isSameOrAfter(moment(startDate), 'days');
+          return isTripsOverlapped;
+        } else {
+          return true;
+        }
+      });
+    }
+    overlappedTrip
+      ? setError('startDate', {
+          message: `This trip overlaps with "${overlappedTrip.name}". Select a different date.`,
+        })
+      : clearErrors('startDate');
+  }, [clearErrors, endDate, setError, startDate, trips]);
+
+  useEffect(() => {
     setEndDateAfterStartDate();
     validateTripDates();
-  }, [clearErrors, endDate, setError, startDate, trips]);
+  }, [setEndDateAfterStartDate, validateTripDates]);
+
   const onCompleted = (data: createTripMutation) => {
     const {
       createTrip: { ok, error, tripId },
@@ -117,11 +158,23 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
   >(CREATE_TRIP_MUTATION, { onCompleted });
   const onSubmit = () => {
     createTripMutation({
-      variables: { input: { ...getValues() } },
+      variables: { input: { ...f.getValues() } },
     });
   };
+
+  const getEndateValue = () => {
+    const dateFormat = moment
+      .tz(f.watch('endDate'), timeZone)
+      .format('DD MMMM YYYY');
+    if (!dateFormat || dateFormat === 'Invalid date') {
+      return "I don't know";
+    }
+    return dateFormat;
+  };
+  console.log('getValues', f.getValues());
+
   return (
-    <>
+    <FormProvider {...f}>
       <ModalBackground onClick={() => setIsCreateTrip(false)} />
       <div className="modal overflow-hidden">
         <ModalCloseIcon onClick={() => setIsCreateTrip(false)} />
@@ -129,7 +182,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           New Trip
         </div>
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={f.handleSubmit(onSubmit)}
           className="relative grid gap-y-5 max-h-screen80 overflow-y-scroll"
         >
           <div className="p-6 text-xl text-myGreen-darkest font-semibold border-b bg-myGray-lightest">
@@ -138,18 +191,20 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           <div className="grid gap-y-1 px-6">
             <h6 className="font-semibold text-myGreen-darkest">Trip name</h6>
             <input
-              ref={register({ required: 'Please enter a name for the trip' })}
+              ref={f.register({ required: 'Please enter a name for the trip' })}
               name="name"
               type="text"
               placeholder="e.g. South American Trip"
               className="input"
             />
-            {errors.name?.message && <FormError err={errors.name.message} />}
+            {f.errors.name?.message && (
+              <FormError err={f.errors.name.message} />
+            )}
           </div>
           <div className="grid gap-y-1 px-6">
             <h6 className="font-semibold text-myGreen-darkest">Trip summary</h6>
             <textarea
-              ref={register({ maxLength: 80 })}
+              ref={f.register({ maxLength: 80 })}
               name="summary"
               maxLength={80}
               placeholder="e.g. An awesome roadtrip through the deserts of Africa with my best friends"
@@ -165,53 +220,31 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <h6 className="font-semibold text-myGreen-darkest">Start date</h6>
             <div className="relative">
               <input
-                ref={register({
-                  required: true,
-                  setValueAs: () => {
-                    if (!startDate) {
-                      setError('startDate', {
-                        message: 'Start date is not provided.',
-                      });
-                      return;
-                    }
-                    const year = startDate.getFullYear();
-                    const month = (startDate.getMonth() + 1)
-                      .toString()
-                      .padStart(2, '0');
-                    const date = startDate
-                      .getDate()
-                      .toString()
-                      .padStart(2, '0');
-                    const ISO8601_UTC = moment
-                      .utc(`${year}-${month}-${date}`)
-                      .format();
-                    if (ISO8601_UTC !== 'Invalid date') {
-                      return ISO8601_UTC;
-                    }
-                    setError('startDate', {
-                      message: 'Invalid date format.',
-                    });
-                  },
-                })}
+                ref={f.register({ required: true })}
                 name="startDate"
                 readOnly
-                value={formatDate(startDate, 'long')}
-                // value={moment.tz()}
+                type="text"
+                className="hidden"
+              />
+              <div
+                className="input w-full bg-white cursor-pointer"
                 onClick={() =>
                   setIsStartDateCalendar((prev) => (prev ? null : true))
                 }
-                type="text"
-                className="input w-full bg-white cursor-pointer"
-              />
+              >
+                {moment
+                  .tz(f.watch('startDate'), timeZone)
+                  .format('DD MMMM YYYY')}
+              </div>
               <FontAwesomeIcon
                 icon={faCalendarAlt}
                 className="absolute top-1/2 right-5 transform -translate-y-1/2 text-myBlue text-lg"
               />
               {isStartDateCalendar && (
-                <Calendar
-                  selectedDate={startDate}
-                  setSelectedDate={setStartDate}
-                  initialDateState={INITIAL_DATE_STATE}
+                <NewCalendar
+                  name="startDate"
+                  selectedDate={moment.tz(f.getValues('startDate'), timeZone)}
+                  timeZone={timeZone}
                 />
               )}
             </div>
@@ -220,57 +253,43 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <h6 className="font-semibold text-myGreen-darkest">End date</h6>
             <div className="relative">
               <input
-                ref={register({
-                  setValueAs: () => {
-                    if (!endDate) {
-                      setError('endDate', {
-                        message: 'End date is not provided.',
-                      });
-                      return;
-                    }
-                    const year = endDate.getFullYear();
-                    const month = (endDate.getMonth() + 1)
-                      .toString()
-                      .padStart(2, '0');
-                    const date = endDate.getDate().toString().padStart(2, '0');
-                    const ISO8601_UTC = moment
-                      .utc(`${year}-${month}-${date}`)
-                      .format();
-                    if (ISO8601_UTC !== 'Invalid date') {
-                      return ISO8601_UTC;
-                    }
-                    return null;
-                  },
-                })}
+                ref={f.register({ required: true })}
                 name="endDate"
                 readOnly
-                value={formatDate(endDate, 'long') ?? "I don't know"}
+                type="text"
+                className="hidden"
+              />
+              <div
+                className="input w-full bg-white cursor-pointer"
                 onClick={() =>
                   setIsStartDateCalendar((prev) =>
                     prev === false ? null : false,
                   )
                 }
-                type="text"
-                className="input w-full bg-white cursor-pointer"
-              />
+              >
+                {getEndateValue()}
+              </div>
               <FontAwesomeIcon
                 icon={faCalendarAlt}
                 className="absolute top-1/2 right-5 transform -translate-y-1/2 text-myBlue text-lg"
               />
               {isStartDateCalendar === false && (
-                <Calendar
-                  selectedDate={endDate}
-                  setSelectedDate={setEndDate}
-                  initialDateState={INITIAL_DATE_STATE}
-                  effectiveSince={startDate}
+                <NewCalendar
+                  name="endDate"
                   nullable={true}
+                  selectedDate={
+                    f.getValues('endDate')
+                      ? moment.tz(f.getValues('endDate'), timeZone)
+                      : null
+                  }
+                  timeZone={timeZone}
                 />
               )}
             </div>
           </div>
           <div className="px-6 grid">
-            {errors.startDate?.message && (
-              <FormError err={errors.startDate.message} />
+            {f.errors.startDate?.message && (
+              <FormError err={f.errors.startDate.message} />
             )}
           </div>
           <div className="p-6 text-xl text-myGreen-darkest font-semibold border-t border-b bg-myGray-lightest">
@@ -279,7 +298,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           <div className="grid">
             <label className="px-6 pb-6 flex items-center border-b border-myGray-light cursor-pointer">
               <input
-                ref={register({ required: true })}
+                ref={f.register({ required: true })}
                 name="availability"
                 value={Availability.Private}
                 type="radio"
@@ -297,7 +316,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             </label>
             <label className="p-6 flex items-center cursor-pointer">
               <input
-                ref={register({ required: true })}
+                ref={f.register({ required: true })}
                 name="availability"
                 value={Availability.Followers}
                 type="radio"
@@ -315,7 +334,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             </label>
             <label className="p-6 flex items-center border-t border-myGray-light cursor-pointer">
               <input
-                ref={register({ required: true })}
+                ref={f.register({ required: true })}
                 name="availability"
                 value={Availability.Public}
                 type="radio"
@@ -335,13 +354,13 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           <div className="p-6 grid bg-myGray-lightest border-t border-myGray-light rounded-bl-2xl">
             <Button
               text="Create trip"
-              disabled={!formState.isValid}
+              disabled={!f.formState.isValid}
               loading={loading}
               type="red-solid"
             />
           </div>
         </form>
       </div>
-    </>
+    </FormProvider>
   );
 };

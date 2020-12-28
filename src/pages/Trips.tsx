@@ -57,7 +57,7 @@ export const Trips = () => {
   // const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
   return (
     <div>
-      {isCreateTrip && userData && (
+      {isCreateTrip && userData?.whoAmI.timeZone && (
         <CreateTripModal
           userData={userData}
           setIsCreateTrip={setIsCreateTrip}

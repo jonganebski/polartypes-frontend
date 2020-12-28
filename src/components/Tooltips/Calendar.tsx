@@ -1,36 +1,46 @@
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { months, weekdaysShort } from 'moment-timezone';
+import moment, { months, weekdaysShort } from 'moment-timezone';
 import React, { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { Day } from './partials/Day';
 
-const range = (start: number, stop: number, year: number, month: number) =>
-  Array.from(
-    { length: stop - start + 1 },
-    (_, i) => new Date(year, month, start + i),
+const range = (
+  start: number,
+  stop: number,
+  year: number,
+  month: number,
+  timeZone: string,
+) =>
+  Array.from({ length: stop - start + 1 }, (_, i) =>
+    moment.tz(new Date(year, month, start + i), timeZone),
   );
 
 interface ICalendarProps {
-  selectedDate: Date | null;
-  setSelectedDate: React.Dispatch<React.SetStateAction<Date | null>>;
-  initialDateState: Date;
-  effectiveSince?: Date | null;
-  effectiveUntil?: Date | null;
+  name: string;
+  timeZone: string;
+  selectedDate: moment.Moment | null;
+  effectiveSince?: string | null;
+  effectiveUntil?: string | null;
   nullable?: boolean;
 }
 
-export const Calendar: React.FC<ICalendarProps> = ({
+export const NewCalendar: React.FC<ICalendarProps> = ({
+  name,
+  timeZone,
   selectedDate,
-  setSelectedDate,
-  initialDateState,
   effectiveSince = null,
   effectiveUntil = null,
   nullable = false,
 }) => {
-  const [calendarDate, setCalendarDate] = useState<Date>(
-    selectedDate ?? initialDateState,
+  const { getValues, setValue } = useFormContext();
+  const [calendarDate, setCalendarDate] = useState(
+    selectedDate ?? moment(new Date()).tz(timeZone),
   );
-  const thisYear = calendarDate?.getFullYear();
-  const thisMonthIndex = calendarDate?.getMonth();
+  console.log('selectedDate: ', selectedDate);
+  console.log('calendarDate: ', calendarDate);
+  const thisYear = calendarDate.get('years');
+  const thisMonthIndex = calendarDate.get('months');
   const lastDateLastMonth = new Date(thisYear, thisMonthIndex, 0).getDate();
   const lastDateThisMonth = new Date(thisYear, thisMonthIndex + 1, 0).getDate();
   const firstDayIdxThisMonth = new Date(thisYear, thisMonthIndex, 1).getDay();
@@ -39,8 +49,15 @@ export const Calendar: React.FC<ICalendarProps> = ({
     lastDateLastMonth,
     thisYear,
     thisMonthIndex - 1,
+    timeZone,
   );
-  const datesThisMonth = range(1, lastDateThisMonth, thisYear, thisMonthIndex);
+  const datesThisMonth = range(
+    1,
+    lastDateThisMonth,
+    thisYear,
+    thisMonthIndex,
+    timeZone,
+  );
   const emptySpacesCount =
     7 - ((datesLastMonth.length + datesThisMonth.length) % 7);
   const datesNextMonth = range(
@@ -48,53 +65,51 @@ export const Calendar: React.FC<ICalendarProps> = ({
     emptySpacesCount,
     thisYear,
     thisMonthIndex + 1,
+    timeZone,
   );
+  console.log('thisYear: ', thisYear);
   const yearsIdx = Array.from(Array(thisYear - 1970 + 16).keys());
   const onMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCalendarDate((prev) => {
-      const updated = new Date(
-        prev.getFullYear(),
-        +e.target.value,
-        prev.getDate(),
-      );
+      const updated = moment.tz(prev, timeZone).set('month', +e.target.value);
       return updated;
     });
   };
   const onYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCalendarDate((prev) => {
-      const updated = new Date(
-        +e.target.value,
-        prev.getMonth(),
-        prev.getDate(),
-      );
+      const updated = moment.tz(prev, timeZone).set('year', +e.target.value);
       return updated;
     });
   };
-  const onDateClick = (date: Date) => {
-    setSelectedDate(date);
+  const onDateClick = (date: moment.Moment) => {
+    const prev = getValues(name);
+    let updated: string;
+    if (prev) {
+      updated = moment
+        .tz(prev, timeZone)
+        .set('years', date.get('years'))
+        .set('months', date.get('months'))
+        .set('dates', date.get('dates'))
+        .format();
+    } else {
+      updated = date.tz(timeZone).format();
+    }
+    setValue(name, updated, { shouldValidate: true });
   };
   const onPrevMonthClick = () => {
     setCalendarDate((prev) => {
-      const updated = new Date(
-        prev.getFullYear(),
-        prev.getMonth() - 1,
-        prev.getDate(),
-      );
+      const updated = moment.tz(prev, timeZone).subtract(1, 'months');
       return updated;
     });
   };
   const onNextMonthClick = () => {
     setCalendarDate((prev) => {
-      const updated = new Date(
-        prev.getFullYear(),
-        prev.getMonth() + 1,
-        prev.getDate(),
-      );
+      const updated = moment.tz(prev, timeZone).add(1, 'months');
       return updated;
     });
   };
   return (
-    <div className="absolute top-14 left-1/2 transform -translate-x-1/2 z-10 px-1 py-5 bg-myGray-darkest rounded-2xl">
+    <div className="absolute top-14 left-1/2 transform -translate-x-1/2 z-10 px-1 py-5 bg-myGray-darkest rounded-2xl cursor-pointer">
       <div
         style={{
           top: '-19px',
@@ -149,91 +164,75 @@ export const Calendar: React.FC<ICalendarProps> = ({
         ))}
       </div>
       <div className="grid grid-cols-7 justify-items-center text-myGray-dark text-xs">
-        {datesLastMonth.map((date, i) => {
-          if (
-            (effectiveSince && date.getTime() <= effectiveSince?.getTime()) ||
-            (effectiveUntil && date.getTime() >= effectiveUntil?.getTime())
-          ) {
-            return (
-              <span
-                key={i}
-                className="w-8 h-8 rounded-full flex items-center justify-center opacity-5"
-              >
-                {date.getDate()}
-              </span>
+        {datesLastMonth.map((date: moment.Moment, i) => {
+          const isSelectedDate = date.isSame(selectedDate, 'day');
+          let isValid;
+          if (effectiveSince && effectiveUntil) {
+            isValid = date.isBetween(
+              moment.tz(effectiveSince, timeZone),
+              moment.tz(effectiveUntil, timeZone),
             );
           } else {
-            return (
-              <span
-                key={i}
-                onClick={() => onDateClick(date)}
-                className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
-              >
-                {date.getDate()}
-              </span>
-            );
+            isValid = true;
           }
+          return (
+            <Day
+              key={i}
+              isValid={isValid}
+              isSelectedDate={isSelectedDate}
+              date={date.get('dates')}
+              onClick={() => onDateClick(date)}
+            />
+          );
         })}
-        {datesThisMonth.map((date, i) => {
-          if (
-            (effectiveSince && date.getTime() <= effectiveSince?.getTime()) ||
-            (effectiveUntil && date.getTime() >= effectiveUntil?.getTime())
-          ) {
-            return (
-              <span
-                key={i}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-white opacity-5 `}
-              >
-                {date.getDate()}
-              </span>
+        {datesThisMonth.map((date: moment.Moment, i) => {
+          const isSelectedDate = date.isSame(selectedDate, 'day');
+          let isValid;
+          if (effectiveSince && effectiveUntil) {
+            isValid = date.isBetween(
+              moment.tz(effectiveSince, timeZone),
+              moment.tz(effectiveUntil, timeZone),
             );
           } else {
-            return (
-              <span
-                key={i}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-white cursor-pointer ${
-                  date.getFullYear() === selectedDate?.getFullYear() &&
-                  date.getMonth() === selectedDate?.getMonth() &&
-                  date.getDate() === selectedDate?.getDate() &&
-                  'bg-myBlue'
-                }`}
-                onClick={() => onDateClick(date)}
-              >
-                {date.getDate()}
-              </span>
-            );
+            isValid = true;
           }
+          return (
+            <Day
+              key={i}
+              isValid={isValid}
+              isSelectedDate={isSelectedDate}
+              date={date.get('dates')}
+              isThisMonth={true}
+              onClick={() => onDateClick(date)}
+            />
+          );
         })}
         {datesNextMonth.map((date, i) => {
-          if (
-            (effectiveSince && date.getTime() <= effectiveSince?.getTime()) ||
-            (effectiveUntil && date.getTime() >= effectiveUntil?.getTime())
-          ) {
-            return (
-              <span
-                key={i}
-                className="w-8 h-8 rounded-full flex items-center justify-center opacity-5"
-              >
-                {date.getDate()}
-              </span>
+          const isSelectedDate = date.isSame(selectedDate, 'day');
+          let isValid;
+          if (effectiveSince && effectiveUntil) {
+            isValid = date.isBetween(
+              moment.tz(effectiveSince, timeZone),
+              moment.tz(effectiveUntil, timeZone),
             );
           } else {
-            return (
-              <span
-                key={i}
-                onClick={() => onDateClick(date)}
-                className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
-              >
-                {date.getDate()}
-              </span>
-            );
+            isValid = true;
           }
+          return (
+            <Day
+              key={i}
+              isValid={isValid}
+              isSelectedDate={isSelectedDate}
+              date={date.get('dates')}
+              onClick={() => onDateClick(date)}
+            />
+          );
         })}
       </div>
       {nullable && (
         <div className="mt-4 flex items-center justify-center">
           <div
-            onClick={() => setSelectedDate(null)}
+            onClick={() => setValue(name, '')}
             className="font-semibold rounded-full px-3.5 py-1.5 text-xs border border-myGray-dark text-white cursor-pointer"
           >
             I don't know yet

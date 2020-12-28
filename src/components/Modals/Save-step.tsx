@@ -16,7 +16,7 @@ import { useUpdateStep } from '../../hooks/useUpdateStep';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
 import { Button } from '../Button';
 import { Clock } from '../Tooltips/Clock';
-import { NewCalendar } from '../Tooltips/NewCalendar';
+import { NewCalendar } from '../Tooltips/Calendar';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { FilesArea } from './partials/FilesArea';
 
