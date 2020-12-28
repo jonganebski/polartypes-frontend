@@ -40,6 +40,7 @@ export const StepCard: React.FC<IStepProps> = ({
   setIsSaveStepModal,
 }) => {
   const { data: userData } = useWhoAmI();
+  const isSelf = userData?.whoAmI.id === step.traveler.id;
   const [isCommentBox, setIsCommentBox] = useState(false);
   const commentsCount = step.comments.length;
 
@@ -125,9 +126,9 @@ export const StepCard: React.FC<IStepProps> = ({
         ))}
       </div>
       {step.likes.length !== 0 && (
-        <div className="p-3 flex border-t border-b border-myGray-light">
-          <Avatar size={8} />
-          <span className="text-sm text-myGray-darkest">
+        <div className="p-3 flex items-center border-t border-b border-myGray-light">
+          <Avatar avatarUrl={step.likes[0].user.avatarUrl} size={8} />
+          <span className="ml-3 text-sm text-myGray-darkest">
             {step.likes.slice(0, 5).map((like, i) => (
               <Link key={i} to="#" className="text-myGreen-darkest">
                 {i === step.likes.slice(0, 5).length - 1
@@ -135,7 +136,9 @@ export const StepCard: React.FC<IStepProps> = ({
                   : like.user.username + ', '}
               </Link>
             ))}
-            and {step.likes.length - 5} others like this step.
+            {step.likes.length - 5 < 0
+              ? 'like this trip'
+              : `and ${step.likes.length - 5} others like this step.`}
           </span>
         </div>
       )}
@@ -179,15 +182,17 @@ export const StepCard: React.FC<IStepProps> = ({
             }
           />
         </div>
-        <Button
-          text="Edit step"
-          type="blue-solid"
-          size="sm"
-          onClick={() => {
-            setIsSaveStepModal(true);
-            setEditingStep(step);
-          }}
-        />
+        {isSelf && (
+          <Button
+            text="Edit step"
+            type="blue-solid"
+            size="sm"
+            onClick={() => {
+              setIsSaveStepModal(true);
+              setEditingStep(step);
+            }}
+          />
+        )}
       </div>
       {isCommentBox && <Comments step={step} />}
     </li>

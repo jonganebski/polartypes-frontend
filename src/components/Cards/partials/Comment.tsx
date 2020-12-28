@@ -95,7 +95,7 @@ export const Comment: React.FC<ICommentProps> = ({ step, comment }) => {
 
   return (
     <li className="flex items-center">
-      <Avatar size={8} />
+      <Avatar avatarUrl={comment.creator.avatarUrl} size={8} />
       <div className="w-full ml-3 text-sm">
         <Link to="#" className="mr-1 text-myGreen-darkest font-semibold">
           {comment.creator.username}

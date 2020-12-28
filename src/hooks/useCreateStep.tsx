@@ -11,6 +11,7 @@ import {
   readTripQuery,
   readTripQueryVariables,
 } from '../__generated__/readTripQuery';
+import { useWhoAmI } from './useWhoAmI';
 
 const CREATE_STEP_MUTAION = gql`
   mutation createStepMutation($input: CreateStepInput!) {
@@ -28,6 +29,7 @@ export const useCreateStep = (
   images: TImage[],
   setIsCreateStepModal: (value: React.SetStateAction<boolean>) => void,
 ) => {
+  const { data: userData } = useWhoAmI();
   const updateApolloCache = (stepId: number) => {
     const { lat, lon, ...values } = f.getValues();
     const imgUrls = images.reduce((acc, img) => {
@@ -42,6 +44,7 @@ export const useCreateStep = (
       variables: { input: { tripId: +tripId } },
     });
     prevQuery &&
+      userData &&
       client.writeQuery<readTripQuery, readTripQueryVariables>({
         query: READ_TRIP_QUERY,
         variables: { input: { tripId: +tripId } },
@@ -58,6 +61,7 @@ export const useCreateStep = (
                   lat: +lat,
                   lon: +lon,
                   imgUrls,
+                  traveler: { __typename: 'Users', id: userData.whoAmI.id },
                   likes: [],
                   comments: [],
                 },

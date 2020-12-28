@@ -112,16 +112,18 @@ export const Comments: React.FC<ICommentProps> = ({ step }) => {
 
   return (
     <div className="py-4 border-t border-myGray-light">
-      <form className="flex items-center" onSubmit={handleSubmit(onSubmit)}>
-        <Avatar size={8} />
-        <input
-          ref={register({ required: true })}
-          name="text"
-          type="text"
-          className="input ml-3 w-full"
-          placeholder="Write a comment..."
-        />
-      </form>
+      {userData && (
+        <form className="flex items-center" onSubmit={handleSubmit(onSubmit)}>
+          <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={8} />
+          <input
+            ref={register({ required: true })}
+            name="text"
+            type="text"
+            className="input ml-3 w-full"
+            placeholder="Write a comment..."
+          />
+        </form>
+      )}
       <ul className="py-4 grid gap-y-4">
         {step.comments.map((comment, i) => (
           <Comment key={i} step={step} comment={comment} />

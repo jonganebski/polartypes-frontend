@@ -1,4 +1,6 @@
 import { gql, useQuery } from '@apollo/client';
+import { faUserCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
@@ -54,7 +56,10 @@ export const Trips = () => {
     READ_TRIPS_QUERY,
     { variables: { input: { targetUsername: targetUsername.toLowerCase() } } },
   );
-  // const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
+  const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
+  if (!data) {
+    return null;
+  }
   return (
     <div>
       {isCreateTrip && userData?.whoAmI.timeZone && (
@@ -87,7 +92,10 @@ export const Trips = () => {
               style={{ zIndex: -1 }}
               className="absolute top-0 w-full h-full bg-myGreen-darkest opacity-80"
             ></div>
-            <Avatar size={16} />
+            <Avatar
+              avatarUrl={data?.readTrips.targetUser?.avatarUrl ?? null}
+              size={16}
+            />
             <h2 className="mt-2 mb-1 text-white text-xl font-semibold">
               {data?.readTrips.targetUser?.firstName}{' '}
               {data?.readTrips.targetUser?.lastName}
@@ -117,6 +125,29 @@ export const Trips = () => {
                 type="white-regular"
                 size="sm"
               />
+              {!isSelf &&
+                !data.readTrips.targetUser?.followings.some(
+                  (user) => user.id === userData?.whoAmI.id,
+                ) && (
+                  <Button
+                    text="Follow"
+                    type="void"
+                    className="text-white border border-myBlue ml-2"
+                    size="sm"
+                  />
+                )}
+              {!isSelf &&
+                data.readTrips.targetUser?.followings.some(
+                  (user) => user.id === userData?.whoAmI.id,
+                ) && (
+                  <Button
+                    text=""
+                    type="blue-solid"
+                    size="sm"
+                    className="ml-2"
+                    icon={<FontAwesomeIcon icon={faUserCheck} />}
+                  />
+                )}
             </div>
           </div>
           <div className="bg-gradient-to-br from-myBlue to-myBlue-light">
@@ -129,16 +160,18 @@ export const Trips = () => {
           </div>
           <div className="px-3 py-5">
             <div className="w-full mb-5 flex justify-center">
-              <Button
-                text="Add a past, current or future trip"
-                type="blue-regular"
-                size="sm"
-                onClick={() => {
-                  userData?.whoAmI.timeZone
-                    ? setIsCreateTrip(true)
-                    : setIsAskTimeZone(true);
-                }}
-              />
+              {isSelf && (
+                <Button
+                  text="Add a past, current or future trip"
+                  type="blue-regular"
+                  size="sm"
+                  onClick={() => {
+                    userData?.whoAmI.timeZone
+                      ? setIsCreateTrip(true)
+                      : setIsAskTimeZone(true);
+                  }}
+                />
+              )}
             </div>
             <ul className="grid gap-y-3">
               {data?.readTrips.targetUser?.trips

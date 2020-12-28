@@ -13,12 +13,21 @@ export interface readTripQuery_readTrip_trip_traveler {
   __typename: "Users";
   id: number;
   username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
   timeZone: string | null;
+}
+
+export interface readTripQuery_readTrip_trip_steps_traveler {
+  __typename: "Users";
+  id: number;
 }
 
 export interface readTripQuery_readTrip_trip_steps_likes_user {
   __typename: "Users";
   username: string;
+  avatarUrl: string | null;
 }
 
 export interface readTripQuery_readTrip_trip_steps_likes {
@@ -53,6 +62,7 @@ export interface readTripQuery_readTrip_trip_steps {
   lon: number;
   story: string | null;
   imgUrls: string[] | null;
+  traveler: readTripQuery_readTrip_trip_steps_traveler;
   likes: readTripQuery_readTrip_trip_steps_likes[];
   comments: readTripQuery_readTrip_trip_steps_comments[];
 }

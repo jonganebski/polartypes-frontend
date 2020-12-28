@@ -17,13 +17,14 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
 import { SaveStepModal } from '../components/Modals/Save-step';
+import { useWhoAmI } from '../hooks/useWhoAmI';
 import {
   readTripQuery,
   readTripQueryVariables,
@@ -41,6 +42,9 @@ export const READ_TRIP_QUERY = gql`
         traveler {
           id
           username
+          firstName
+          lastName
+          avatarUrl
           timeZone
         }
         steps {
@@ -54,9 +58,13 @@ export const READ_TRIP_QUERY = gql`
           lon
           story
           imgUrls
+          traveler {
+            id
+          }
           likes {
             user {
               username
+              avatarUrl
             }
           }
           comments {
@@ -81,6 +89,7 @@ interface IParams {
 
 export const Trip = () => {
   const { tripId } = useParams<IParams>();
+  const { data: userData } = useWhoAmI();
   const [isSaveStepModal, setIsSaveStepModal] = useState(false);
   const [
     editingStep,
@@ -94,6 +103,7 @@ export const Trip = () => {
       variables: { input: { tripId: +tripId } },
     },
   );
+  const isSelf = data?.readTrip.trip?.traveler.id === userData?.whoAmI.id;
   const startDateData = data?.readTrip.trip?.startDate;
   const endDateData = data?.readTrip.trip?.endDate;
   const timeZoneData = data?.readTrip.trip?.traveler.timeZone;
@@ -102,12 +112,15 @@ export const Trip = () => {
       setEditingStep(null);
     }
   }, [isSaveStepModal]);
+  if (!data?.readTrip.trip) {
+    return null;
+  }
   return (
     <div>
       <CommonHeader />
       <div className="h-screenExceptHeader flex">
         <section className="relative w-1/2 h-full min-w-px600">
-          {isSaveStepModal && data?.readTrip.trip && (
+          {isSaveStepModal && (
             <SaveStepModal
               tripId={tripId}
               tripStartDate={data.readTrip.trip.startDate}
@@ -119,25 +132,35 @@ export const Trip = () => {
             />
           )}
           <div className="h-tripHeader px-2 flex items-center justify-between">
-            <div className="flex items-center">
-              <Avatar size={8} />
-              <span className="ml-2 text-sm font-semibold text-myGreen-darkest">
-                firstname lastname
-              </span>
-            </div>
-            <div>
-              <Button
-                text="Create Travel Book"
-                type="white-solid"
-                size="sm"
-                className="mr-2"
-                icon={
-                  <FontAwesomeIcon
-                    icon={faBook}
-                    className="mr-2 text-myBlue text-sm"
-                  />
-                }
+            <Link
+              to={`/${data.readTrip.trip.traveler.username}`}
+              className="flex items-center"
+            >
+              <Avatar
+                avatarUrl={data.readTrip.trip.traveler.avatarUrl ?? null}
+                size={8}
               />
+              <span className="ml-2 text-sm font-semibold text-myGreen-darkest">
+                {data.readTrip.trip.traveler.firstName +
+                  ' ' +
+                  data.readTrip.trip.traveler.lastName}
+              </span>
+            </Link>
+            <div>
+              {isSelf && (
+                <Button
+                  text="Create Travel Book"
+                  type="white-solid"
+                  size="sm"
+                  className="mr-2"
+                  icon={
+                    <FontAwesomeIcon
+                      icon={faBook}
+                      className="mr-2 text-myBlue text-sm"
+                    />
+                  }
+                />
+              )}
               <Button
                 text="Share"
                 type="white-solid"
@@ -150,17 +173,19 @@ export const Trip = () => {
                   />
                 }
               />
-              <Button
-                text="Trip settings"
-                type="white-solid"
-                size="sm"
-                icon={
-                  <FontAwesomeIcon
-                    icon={faCog}
-                    className="mr-2 text-myBlue text-sm"
-                  />
-                }
-              />
+              {isSelf && (
+                <Button
+                  text="Trip settings"
+                  type="white-solid"
+                  size="sm"
+                  icon={
+                    <FontAwesomeIcon
+                      icon={faCog}
+                      className="mr-2 text-myBlue text-sm"
+                    />
+                  }
+                />
+              )}
             </div>
           </div>
           <article className="h-tripBody overflow-y-scroll">
@@ -276,12 +301,14 @@ export const Trip = () => {
                   return (
                     <React.Fragment key={step.id}>
                       <AddStepButton
+                        isSelf={isSelf}
                         onClick={() => {
                           setBelowStepDate(step.arrivedAt);
                           setBelowStepTimeZone(step.timeZone);
                           setIsSaveStepModal(true);
                         }}
                       />
+
                       <StepCard
                         step={step}
                         setEditingStep={setEditingStep}
@@ -291,6 +318,7 @@ export const Trip = () => {
                   );
                 })}
               <AddStepButton
+                isSelf={isSelf}
                 onClick={() => {
                   console.log(
                     data?.readTrip.trip?.endDate,

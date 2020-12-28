@@ -11,9 +11,9 @@ interface IPrams {
 }
 
 export const CommonHeader = () => {
-  const { data } = useWhoAmI();
+  const { data: userData } = useWhoAmI();
   const { username: usernameParam } = useParams<IPrams>();
-  const isSelf = usernameParam.toLowerCase() === data?.whoAmI.slug;
+  const isSelf = usernameParam.toLowerCase() === userData?.whoAmI.slug;
   return (
     <header className="h-commonHeader flex justify-between bg-myGreen-darkest">
       <div className="px-3 flex items-center">
@@ -31,15 +31,17 @@ export const CommonHeader = () => {
         </form>
       </div>
       <div className="grid grid-cols-3 gap-x-px border-l border-myGray-darkest bg-myGray-darkest text-white text-sm font-semibold">
-        <Link
-          to={`/username`}
-          className={`h-full px-3 flex items-center justify-center bg-myGreen-darkest ${
-            isSelf ? 'border-b-4 border-myRed text-center' : ''
-          }`}
-        >
-          <Avatar size={8} />
-          <span className="ml-3">{data?.whoAmI.firstName}</span>
-        </Link>
+        {userData && (
+          <Link
+            to={`/${userData.whoAmI.username}`}
+            className={`h-full px-3 flex items-center justify-center bg-myGreen-darkest ${
+              isSelf ? 'border-b-4 border-myRed text-center' : ''
+            }`}
+          >
+            <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={8} />
+            <span className="ml-3">{userData.whoAmI.firstName}</span>
+          </Link>
+        )}
         <div className="h-full px-3 flex items-center justify-center bg-myGreen-darkest">
           Travel Books
         </div>
