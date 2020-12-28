@@ -4,20 +4,20 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: step
+// GraphQL fragment: toggledLikeStep
 // ====================================================
 
-export interface step_likes_user {
+export interface toggledLikeStep_likes_user {
   __typename: "Users";
   username: string;
 }
 
-export interface step_likes {
+export interface toggledLikeStep_likes {
   __typename: "Like";
-  user: step_likes_user;
+  user: toggledLikeStep_likes_user;
 }
 
-export interface step {
+export interface toggledLikeStep {
   __typename: "Step";
-  likes: step_likes[];
+  likes: toggledLikeStep_likes[];
 }

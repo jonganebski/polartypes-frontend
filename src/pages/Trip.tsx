@@ -39,6 +39,7 @@ export const READ_TRIP_QUERY = gql`
         startDate
         endDate
         traveler {
+          id
           username
           timeZone
         }
@@ -60,6 +61,13 @@ export const READ_TRIP_QUERY = gql`
           }
           comments {
             id
+            createdAt
+            text
+            creator {
+              id
+              username
+              avatarUrl
+            }
           }
         }
       }

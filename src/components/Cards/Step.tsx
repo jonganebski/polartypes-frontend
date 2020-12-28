@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { client } from '../../apollo';
 import { useWhoAmI } from '../../hooks/useWhoAmI';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
-import { step } from '../../__generated__/step';
+import { toggledLikeStep } from '../../__generated__/toggledLikeStep';
 import {
   toggleLikeMutation,
   toggleLikeMutationVariables,
@@ -48,10 +48,10 @@ export const StepCard: React.FC<IStepProps> = ({
       toggleLike: { ok, error, toggle },
     } = data;
     if (ok && !error && toggle) {
-      const prevStep = client.readFragment<step>({
+      const prevStep = client.readFragment<toggledLikeStep>({
         id: `Step:${step.id}`,
         fragment: gql`
-          fragment step on Step {
+          fragment toggledLikeStep on Step {
             likes {
               user {
                 username
@@ -72,11 +72,15 @@ export const StepCard: React.FC<IStepProps> = ({
         } else {
           likes = likes.filter((like) => like.user.username !== username);
         }
-        client.writeFragment<step>({
+        client.writeFragment<toggledLikeStep>({
           id: `Step:${step.id}`,
           fragment: gql`
             fragment toggledLikeStep on Step {
-              likes
+              likes {
+                user {
+                  username
+                }
+              }
             }
           `,
           data: {
@@ -185,7 +189,7 @@ export const StepCard: React.FC<IStepProps> = ({
           }}
         />
       </div>
-      {isCommentBox && <Comments />}
+      {isCommentBox && <Comments step={step} />}
     </li>
   );
 };

@@ -26,6 +26,11 @@ export interface CreateAccountInput {
   lastName: string;
 }
 
+export interface CreateCommentInput {
+  text: string;
+  stepId: number;
+}
+
 export interface CreateStepInput {
   location: string;
   country: string;
@@ -45,6 +50,10 @@ export interface CreateTripInput {
   availability: Availability;
   summary?: string | null;
   endDate?: string | null;
+}
+
+export interface DeleteCommentInput {
+  id: number;
 }
 
 export interface DeleteStepInput {

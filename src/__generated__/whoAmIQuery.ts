@@ -9,10 +9,12 @@
 
 export interface whoAmIQuery_whoAmI {
   __typename: "Users";
+  id: number;
   firstName: string;
   username: string;
   slug: string;
   timeZone: string | null;
+  avatarUrl: string | null;
 }
 
 export interface whoAmIQuery {

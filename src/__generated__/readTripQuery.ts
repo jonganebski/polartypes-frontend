@@ -11,6 +11,7 @@ import { ReadTripInput } from "./globalTypes";
 
 export interface readTripQuery_readTrip_trip_traveler {
   __typename: "Users";
+  id: number;
   username: string;
   timeZone: string | null;
 }
@@ -25,9 +26,19 @@ export interface readTripQuery_readTrip_trip_steps_likes {
   user: readTripQuery_readTrip_trip_steps_likes_user;
 }
 
+export interface readTripQuery_readTrip_trip_steps_comments_creator {
+  __typename: "Users";
+  id: number;
+  username: string;
+  avatarUrl: string | null;
+}
+
 export interface readTripQuery_readTrip_trip_steps_comments {
   __typename: "Comment";
   id: number;
+  createdAt: any;
+  text: string;
+  creator: readTripQuery_readTrip_trip_steps_comments_creator;
 }
 
 export interface readTripQuery_readTrip_trip_steps {
