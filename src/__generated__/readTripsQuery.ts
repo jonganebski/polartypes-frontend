@@ -21,6 +21,7 @@ export interface readTripsQuery_readTrips_targetUser_followings {
 
 export interface readTripsQuery_readTrips_targetUser_trips_steps {
   __typename: "Step";
+  id: number;
   lat: number;
   lon: number;
   arrivedAt: string;
@@ -37,6 +38,7 @@ export interface readTripsQuery_readTrips_targetUser_trips {
 
 export interface readTripsQuery_readTrips_targetUser {
   __typename: "Users";
+  username: string;
   firstName: string;
   lastName: string;
   about: string | null;

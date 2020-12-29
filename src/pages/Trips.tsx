@@ -6,7 +6,7 @@ import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { TripCard } from '../components/Cards/Trip';
 import { CommonHeader } from '../components/Headers/CommonHeader';
-import { Map } from '../components/Map';
+import { Map } from '../components/Map/Map';
 import { CreateTripModal } from '../components/Modals/Create-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
 import { useTrips } from '../hooks/useTrips';

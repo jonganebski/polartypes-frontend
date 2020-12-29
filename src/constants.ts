@@ -14,5 +14,3 @@ export const INITIAL_DATE_STATE = new Date(
 );
 
 export const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
-
-export const IDs = { STEP: 'step', MARKER: 'marker' };

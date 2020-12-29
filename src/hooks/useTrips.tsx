@@ -10,6 +10,7 @@ const READ_TRIPS_QUERY = gql`
       ok
       error
       targetUser {
+        username
         firstName
         lastName
         about
@@ -27,6 +28,7 @@ const READ_TRIPS_QUERY = gql`
           startDate
           endDate
           steps {
+            id
             lat
             lon
             arrivedAt

@@ -23,7 +23,7 @@ import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
-import { Map } from '../components/Map';
+import { Map } from '../components/Map/Map';
 import { SaveStepModal } from '../components/Modals/Save-step';
 import { sortSteps } from '../helpers';
 import { useTrip } from '../hooks/useTrip';
