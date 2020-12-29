@@ -19,11 +19,13 @@
     "autoprefixer": "^10.1.0",
     "axios": "^0.21.1",
     "graphql": "^15.4.0",
+    "leaflet": "^1.7.1",
     "moment-timezone": "^0.5.32",
     "postcss": "^8.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-hook-form": "^6.13.1",
+    "react-leaflet": "^3.0.5",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "tailwindcss": "^2.0.2",
@@ -58,6 +60,7 @@
     ]
   },
   "devDependencies": {
+    "@types/leaflet": "^1.5.19",
     "@types/react-router-dom": "^5.1.6",
     "@types/uuid": "^8.3.0"
   }

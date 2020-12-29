@@ -19,12 +19,20 @@ export interface readTripsQuery_readTrips_targetUser_followings {
   id: number;
 }
 
+export interface readTripsQuery_readTrips_targetUser_trips_steps {
+  __typename: "Step";
+  lat: number;
+  lon: number;
+  arrivedAt: string;
+}
+
 export interface readTripsQuery_readTrips_targetUser_trips {
   __typename: "Trip";
   id: number;
   name: string;
   startDate: string;
   endDate: string | null;
+  steps: readTripsQuery_readTrips_targetUser_trips_steps[];
 }
 
 export interface readTripsQuery_readTrips_targetUser {

@@ -60,7 +60,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
   const f = useForm<IFormProps>({
     mode: 'onChange',
     defaultValues: {
-      startDate: moment.tz(new Date(), timeZone).format(),
+      startDate: moment().tz(timeZone).format(),
       endDate: '',
     },
   });
@@ -243,7 +243,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
               {isStartDateCalendar && (
                 <NewCalendar
                   name="startDate"
-                  selectedDate={moment.tz(f.getValues('startDate'), timeZone)}
+                  selectedDate={f.getValues('startDate')}
                   timeZone={timeZone}
                 />
               )}
@@ -277,11 +277,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
                 <NewCalendar
                   name="endDate"
                   nullable={true}
-                  selectedDate={
-                    f.getValues('endDate')
-                      ? moment.tz(f.getValues('endDate'), timeZone)
-                      : null
-                  }
+                  selectedDate={f.getValues('endDate')}
                   timeZone={timeZone}
                 />
               )}

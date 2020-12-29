@@ -1,4 +1,3 @@
-import { gql, useQuery } from '@apollo/client';
 import {
   faCalendar,
   faEye,
@@ -17,74 +16,33 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
+import { Map } from '../components/Map';
 import { SaveStepModal } from '../components/Modals/Save-step';
+import { sortSteps } from '../helpers';
+import { useTrip } from '../hooks/useTrip';
 import { useWhoAmI } from '../hooks/useWhoAmI';
-import {
-  readTripQuery,
-  readTripQueryVariables,
-  readTripQuery_readTrip_trip_steps,
-} from '../__generated__/readTripQuery';
-
-export const READ_TRIP_QUERY = gql`
-  query readTripQuery($input: ReadTripInput!) {
-    readTrip(input: $input) {
-      ok
-      error
-      trip {
-        startDate
-        endDate
-        traveler {
-          id
-          username
-          firstName
-          lastName
-          avatarUrl
-          timeZone
-        }
-        steps {
-          id
-          name
-          location
-          country
-          arrivedAt
-          timeZone
-          lat
-          lon
-          story
-          imgUrls
-          traveler {
-            id
-          }
-          likes {
-            user {
-              username
-              avatarUrl
-            }
-          }
-          comments {
-            id
-            createdAt
-            text
-            creator {
-              id
-              username
-              avatarUrl
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+import { readTripQuery_readTrip_trip_steps } from '../__generated__/readTripQuery';
 
 interface IParams {
   tripId: string;
+}
+
+export interface ICreateStepFormProps {
+  location: string;
+  name: string;
+  country: string;
+  lat: string;
+  lon: string;
+  story: string;
+  arrivedAt: string;
+  timeZone: string;
 }
 
 export const Trip = () => {
@@ -95,14 +53,14 @@ export const Trip = () => {
     editingStep,
     setEditingStep,
   ] = useState<readTripQuery_readTrip_trip_steps | null>(null);
+
   const [belowStepDate, setBelowStepDate] = useState<string>('');
+  const f = useForm<ICreateStepFormProps>({
+    mode: 'onChange',
+    defaultValues: {},
+  });
   const [belowStepTimeZone, setBelowStepTimeZone] = useState('');
-  const { data } = useQuery<readTripQuery, readTripQueryVariables>(
-    READ_TRIP_QUERY,
-    {
-      variables: { input: { tripId: +tripId } },
-    },
-  );
+  const { data } = useTrip(tripId);
   const isSelf = data?.readTrip.trip?.traveler.id === userData?.whoAmI.id;
   const startDateData = data?.readTrip.trip?.startDate;
   const endDateData = data?.readTrip.trip?.endDate;
@@ -116,7 +74,7 @@ export const Trip = () => {
     return null;
   }
   return (
-    <div>
+    <FormProvider {...f}>
       <CommonHeader />
       <div className="h-screenExceptHeader flex">
         <section className="relative w-1/2 h-full min-w-px600">
@@ -291,12 +249,7 @@ export const Trip = () => {
               </li>
               {data?.readTrip.trip?.steps
                 .slice()
-                .sort((a, b) => {
-                  return (
-                    new Date(a.arrivedAt).getTime() -
-                    new Date(b.arrivedAt).getTime()
-                  );
-                })
+                .sort(sortSteps)
                 .map((step) => {
                   return (
                     <React.Fragment key={step.id}>
@@ -350,8 +303,10 @@ export const Trip = () => {
             </ul>
           </article>
         </section>
-        <section className="w-1/2 h-tripBody bg-green-700"></section>
+        <section className="w-1/2 h-screenExceptHeader">
+          <Map isSaveStepModal={isSaveStepModal} />
+        </section>
       </div>
-    </div>
+    </FormProvider>
   );
 };

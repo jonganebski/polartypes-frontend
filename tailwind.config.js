@@ -69,6 +69,8 @@ module.exports = {
       },
       boxShadow: {
         surround: '0 2px 8px 0 rgba(0,0,0,0.12)',
+        imageMarker:
+          '0px 0px 0px 4px #09c, 0px 0px 0px 8px rgba(0,153,204,0.5);',
       },
     },
   },

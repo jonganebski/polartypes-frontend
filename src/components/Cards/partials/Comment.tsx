@@ -102,7 +102,9 @@ export const Comment: React.FC<ICommentProps> = ({ step, comment }) => {
         </Link>
         <p className="inline text-myGray-darkest">{comment.text}</p>
         <span className="block text-xs text-myGray-dark">
-          {moment(comment.createdAt).format('D MMMM YYYY')}
+          {moment(comment.createdAt).format('D MMMM YYYY') === 'Invalid date'
+            ? comment.createdAt
+            : moment(comment.createdAt).format('D MMMM YYYY')}
         </span>
       </div>
       {userData?.whoAmI.id === comment.creator.id && (

@@ -13,13 +13,15 @@ const range = (
   timeZone: string,
 ) =>
   Array.from({ length: stop - start + 1 }, (_, i) =>
-    moment.tz(new Date(year, month, start + i), timeZone),
+    moment()
+      .tz(timeZone)
+      .set({ year, month, date: start + i }),
   );
 
 interface ICalendarProps {
   name: string;
   timeZone: string;
-  selectedDate: moment.Moment | null;
+  selectedDate: string;
   effectiveSince?: string | null;
   effectiveUntil?: string | null;
   nullable?: boolean;
@@ -35,15 +37,25 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
 }) => {
   const { getValues, setValue } = useFormContext();
   const [calendarDate, setCalendarDate] = useState(
-    selectedDate ?? moment(new Date()).tz(timeZone),
+    selectedDate ? selectedDate : moment(new Date()).tz(timeZone).format(),
   );
-  console.log('selectedDate: ', selectedDate);
-  console.log('calendarDate: ', calendarDate);
-  const thisYear = calendarDate.get('years');
-  const thisMonthIndex = calendarDate.get('months');
-  const lastDateLastMonth = new Date(thisYear, thisMonthIndex, 0).getDate();
-  const lastDateThisMonth = new Date(thisYear, thisMonthIndex + 1, 0).getDate();
-  const firstDayIdxThisMonth = new Date(thisYear, thisMonthIndex, 1).getDay();
+  const thisYear = moment.tz(calendarDate, timeZone).get('year');
+  const thisMonthIndex = moment.tz(calendarDate, timeZone).get('month');
+  const lastDateLastMonth = moment
+    .tz(calendarDate, timeZone)
+    .month(thisMonthIndex - 1)
+    .endOf('month')
+    .date();
+  const lastDateThisMonth = moment
+    .tz(calendarDate, timeZone)
+    .month(thisMonthIndex)
+    .endOf('month')
+    .date();
+  const firstDayIdxThisMonth = moment
+    .tz(calendarDate, timeZone)
+    .month(thisMonthIndex)
+    .startOf('month')
+    .day();
   const datesLastMonth = range(
     lastDateLastMonth - firstDayIdxThisMonth + 1,
     lastDateLastMonth,
@@ -67,17 +79,22 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
     thisMonthIndex + 1,
     timeZone,
   );
-  console.log('thisYear: ', thisYear);
   const yearsIdx = Array.from(Array(thisYear - 1970 + 16).keys());
   const onMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCalendarDate((prev) => {
-      const updated = moment.tz(prev, timeZone).set('month', +e.target.value);
+      const updated = moment
+        .tz(prev, timeZone)
+        .set('month', +e.target.value)
+        .format();
       return updated;
     });
   };
   const onYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setCalendarDate((prev) => {
-      const updated = moment.tz(prev, timeZone).set('year', +e.target.value);
+      const updated = moment
+        .tz(prev, timeZone)
+        .set('year', +e.target.value)
+        .format();
       return updated;
     });
   };
@@ -98,16 +115,20 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
   };
   const onPrevMonthClick = () => {
     setCalendarDate((prev) => {
-      const updated = moment.tz(prev, timeZone).subtract(1, 'months');
+      const updated = moment
+        .tz(prev, timeZone)
+        .subtract(moment.duration({ months: 1 }))
+        .format();
       return updated;
     });
   };
   const onNextMonthClick = () => {
     setCalendarDate((prev) => {
-      const updated = moment.tz(prev, timeZone).add(1, 'months');
+      const updated = moment(prev).add(1, 'months').tz(timeZone).format();
       return updated;
     });
   };
+
   return (
     <div className="absolute top-14 left-1/2 transform -translate-x-1/2 z-10 px-1 py-5 bg-myGray-darkest rounded-2xl cursor-pointer">
       <div

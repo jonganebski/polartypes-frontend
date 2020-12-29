@@ -1,4 +1,3 @@
-import { gql, useQuery } from '@apollo/client';
 import { faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
@@ -7,41 +6,11 @@ import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { TripCard } from '../components/Cards/Trip';
 import { CommonHeader } from '../components/Headers/CommonHeader';
+import { Map } from '../components/Map';
 import { CreateTripModal } from '../components/Modals/Create-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
+import { useTrips } from '../hooks/useTrips';
 import { useWhoAmI } from '../hooks/useWhoAmI';
-import {
-  readTripsQuery,
-  readTripsQueryVariables,
-} from '../__generated__/readTripsQuery';
-
-const READ_TRIPS_QUERY = gql`
-  query readTripsQuery($input: ReadTripsInput!) {
-    readTrips(input: $input) {
-      ok
-      error
-      targetUser {
-        firstName
-        lastName
-        about
-        city
-        avatarUrl
-        followers {
-          id
-        }
-        followings {
-          id
-        }
-        trips {
-          id
-          name
-          startDate
-          endDate
-        }
-      }
-    }
-  }
-`;
 
 interface IPrams {
   username: string;
@@ -52,10 +21,7 @@ export const Trips = () => {
   const [isCreateTrip, setIsCreateTrip] = useState(false);
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
   const { username: targetUsername } = useParams<IPrams>();
-  const { data } = useQuery<readTripsQuery, readTripsQueryVariables>(
-    READ_TRIPS_QUERY,
-    { variables: { input: { targetUsername: targetUsername.toLowerCase() } } },
-  );
+  const { data } = useTrips(targetUsername);
   const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
   if (!data) {
     return null;
@@ -77,7 +43,7 @@ export const Trips = () => {
       )}
       <CommonHeader />
       <div className="grid grid-cols-tripsPage">
-        <section className="grid overflow-y-scroll">
+        <section className="overflow-y-scroll">
           <div className="relative p-5 flex flex-col items-center">
             <div
               style={{
@@ -191,7 +157,9 @@ export const Trips = () => {
             </ul>
           </div>
         </section>
-        <section>map</section>
+        <section className="relative z-0 h-screenExceptHeader">
+          <Map />
+        </section>
       </div>
     </div>
   );

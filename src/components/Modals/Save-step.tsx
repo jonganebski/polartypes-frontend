@@ -7,7 +7,7 @@ import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { deleteFiles, getTimeZone } from '../../helpers';
 import { useCreateStep } from '../../hooks/useCreateStep';
 import { useDeleteStep } from '../../hooks/useDeleteStep';
@@ -19,6 +19,7 @@ import { Clock } from '../Tooltips/Clock';
 import { NewCalendar } from '../Tooltips/Calendar';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { FilesArea } from './partials/FilesArea';
+import { ICreateStepFormProps } from '../../pages/Trip';
 
 interface ISaveStepModalProps {
   tripId: string;
@@ -28,17 +29,6 @@ interface ISaveStepModalProps {
   belowStepTimeZone: string;
   setIsSaveStepModal: React.Dispatch<React.SetStateAction<boolean>>;
   editingStep: readTripQuery_readTrip_trip_steps | null;
-}
-
-export interface ICreateStepFormProps {
-  location: string;
-  name: string;
-  country: string;
-  lat: string;
-  lon: string;
-  story: string;
-  arrivedAt: string;
-  timeZone: string;
 }
 
 export type TImage = { id?: string; src?: string; url?: string };
@@ -61,21 +51,8 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
     editingStep?.imgUrls?.map((url) => ({ url })) ?? [],
   );
   const [imagesRecord, setImagesRecord] = useState<TImage[]>(images);
-  console.log('images: ', images);
-  console.log('imagesRecord: ', imagesRecord);
-  const f = useForm<ICreateStepFormProps>({
-    mode: 'onChange',
-    defaultValues: {
-      arrivedAt: editingStep?.arrivedAt ?? belowStepDate,
-      country: editingStep?.country,
-      lat: editingStep?.lat.toString(),
-      lon: editingStep?.lon.toString(),
-      location: editingStep?.location,
-      name: editingStep?.name,
-      story: editingStep?.story ?? '',
-      timeZone: editingStep?.timeZone,
-    },
-  });
+  const f = useFormContext<ICreateStepFormProps>();
+  const { setValue, getValues, handleSubmit, register, watch, formState } = f;
   const [
     createStepMutation,
     { loading: createStepMutationLoading },
@@ -144,7 +121,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
   };
 
   const onSubmit = () => {
-    const { lat, lon, ...values } = f.getValues();
+    const { lat, lon, ...values } = getValues();
     const imgUrls = images.reduce((acc, img) => {
       if (img.url) {
         return [...acc, img.url];
@@ -199,23 +176,37 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
       );
   }, [cleanupUnusedImageFilesOnCancel]);
 
+  useEffect(() => {
+    if (editingStep) {
+      setValue('arrivedAt', editingStep.arrivedAt);
+      setValue('country', editingStep.country);
+      setValue('lat', editingStep.lat.toString());
+      setValue('lon', editingStep.lon.toString());
+      setValue('location', editingStep.location);
+      setValue('name', editingStep.name);
+      setValue('story', editingStep.story ?? '');
+      setValue('timeZone', editingStep.timeZone);
+    } else {
+      setValue('arrivedAt', belowStepDate);
+    }
+  }, [belowStepDate, editingStep, setValue]);
   return (
-    <FormProvider {...f}>
+    <>
       <div className="absolute z-50 top-0 left-0 w-full h-full bg-myGreen-darkest bg-opacity-80"></div>
       <div className="absolute z-50 top-0 left-0 w-full h-screenExceptHeader overflow-y-scroll">
         <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-11/12 bg-white rounded-2xl">
           <ModalCloseIcon onClick={onModalClose} />
           <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
-            New Trip
+            {editingStep ? 'Edit step' : 'New Trip'}
           </div>
-          <form onSubmit={f.handleSubmit(onSubmit)} className="p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6">
             <section className="relative p-6 mb-4 grid grid-cols-oneToTwo bg-myGray-dark rounded-2xl">
               <h3 className="text-white font-semibold">Location</h3>
               <div className="rounded-sm">
                 <div className="relative">
                   <input
                     onChange={onLocationChange}
-                    ref={f.register({ required: true })}
+                    ref={register({ required: true })}
                     name="location"
                     placeholder="Enter a location"
                     autoComplete="off"
@@ -229,12 +220,12 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                           onClick={async () => {
                             const lat = (+d.point?.lat)?.toFixed(6);
                             const lon = (+d.point?.lng)?.toFixed(6);
-                            f.setValue('location', d.name, {
+                            setValue('location', d.name, {
                               shouldValidate: true,
                             });
-                            f.setValue('lat', lat, { shouldValidate: true });
-                            f.setValue('lon', lon, { shouldValidate: true });
-                            f.setValue('country', d.country, {
+                            setValue('lat', lat, { shouldValidate: true });
+                            setValue('lon', lon, { shouldValidate: true });
+                            setValue('country', d.country, {
                               shouldValidate: true,
                             });
                             setGeocodeData(null);
@@ -252,7 +243,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                   <div className="flex items-center border-r border-myGray-light">
                     <span className="font-semibold">Lat:</span>
                     <input
-                      ref={f.register({ required: true })}
+                      ref={register({ required: true })}
                       name="lat"
                       placeholder="00,000000"
                       className="ml-1 w-full focus:outline-none"
@@ -261,7 +252,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                   <div className="pl-4 flex items-center">
                     <span className="font-semibold">Lon:</span>
                     <input
-                      ref={f.register({ required: true })}
+                      ref={register({ required: true })}
                       name="lon"
                       placeholder="00,000000"
                       className="ml-1 w-full focus:outline-none"
@@ -269,14 +260,14 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                   </div>
                   <div
                     onClick={async () => {
-                      const { location, lat, lon } = f.getValues();
+                      const { location, lat, lon } = getValues();
                       if (location && lat && lon) {
                         const { ok, error, timeZone } = await getTimeZone(
                           lat,
                           lon,
                         );
                         if (ok && !error && timeZone) {
-                          f.setValue('timeZone', timeZone);
+                          setValue('timeZone', timeZone);
                         }
                         setIsLocationBlock(true);
                       }
@@ -307,17 +298,17 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
               </h3>
               <div className="flex">
                 <input
-                  ref={f.register({ required: true })}
+                  ref={register({ required: true })}
                   name="name"
                   placeholder="-"
                   className="input w-full rounded-r-none"
                 />
                 <input
-                  ref={f.register({ required: true })}
+                  ref={register({ required: true })}
                   name="country"
                   readOnly
                   style={{
-                    width: f.watch('country')?.length + 2 + 'ch',
+                    width: watch('country')?.length + 2 + 'ch',
                   }}
                   className="px-2 py-3 w-0 text-myGray-dark border border-l-0 border-myGray bg-myGray-light rounded-r-md rounded-l-none focus:outline-none"
                 />
@@ -327,7 +318,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
               </h3>
               <div className="flex">
                 <input
-                  ref={f.register({ required: true })}
+                  ref={register({ required: true })}
                   name="arrivedAt"
                   className="hidden"
                   readOnly
@@ -344,9 +335,9 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                     }
                   >
                     <span>
-                      {f.getValues().arrivedAt && f.getValues().timeZone
+                      {getValues().arrivedAt && getValues().timeZone
                         ? moment
-                            .tz(f.watch('arrivedAt'), f.watch('timeZone'))
+                            .tz(watch('arrivedAt'), watch('timeZone'))
                             .format('MMM D YYYY')
                         : ''}
                     </span>
@@ -355,14 +346,11 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                       className="text-myBlue text-xl"
                     />
                   </div>
-                  {isPopupCalendar && f.getValues('timeZone') && (
+                  {isPopupCalendar && getValues('timeZone') && (
                     <NewCalendar
                       name="arrivedAt"
-                      timeZone={f.getValues('timeZone')}
-                      selectedDate={moment.tz(
-                        f.getValues('arrivedAt'),
-                        f.getValues('timeZone'),
-                      )}
+                      timeZone={getValues('timeZone')}
+                      selectedDate={getValues('arrivedAt')}
                       effectiveSince={tripStartDate}
                       effectiveUntil={moment(tripEndDate)
                         .add(1, 'days')
@@ -386,9 +374,9 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                     className="mr-3 w-full flex items-center justify-between whitespace-nowrap"
                   >
                     <span>
-                      {f.getValues().arrivedAt && f.getValues().timeZone
+                      {getValues().arrivedAt && getValues().timeZone
                         ? moment
-                            .tz(f.watch('arrivedAt'), f.watch('timeZone'))
+                            .tz(watch('arrivedAt'), watch('timeZone'))
                             .format('HH : mm')
                         : ''}
                     </span>
@@ -398,10 +386,10 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                     />
                   </div>
                   {isPopupCalendar === false && (
-                    <Clock timeZone={f.watch('timeZone')} />
+                    <Clock timeZone={watch('timeZone')} />
                   )}
                   <input
-                    ref={f.register()}
+                    ref={register()}
                     name="timeZone"
                     readOnly
                     className="hidden"
@@ -412,7 +400,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                 Your story
               </h3>
               <textarea
-                ref={f.register()}
+                ref={register()}
                 name="story"
                 placeholder="What have you been up to?"
                 className="resize-none px-4 py-3 h-48 border border-myGray rounded-sm focus:outline-none focus:border-myBlue"
@@ -442,7 +430,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                       lon,
                       country,
                       timeZone,
-                    } = f.getValues();
+                    } = getValues();
                     if (location && lat && lon && country && timeZone) {
                       setIsLocationBlock((prev) => !prev);
                     }
@@ -465,7 +453,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                     createStepMutationLoading || updateStepMutaionLoading
                   }
                   disabled={
-                    !f.formState.isValid ||
+                    formState.isValid ||
                     isUploading ||
                     createStepMutationLoading ||
                     updateStepMutaionLoading
@@ -509,6 +497,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
           </form>
         </div>
       </div>
-    </FormProvider>
+    </>
   );
 };

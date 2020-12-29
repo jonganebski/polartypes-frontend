@@ -1,4 +1,5 @@
 import Axios from 'axios';
+import { readTripsQuery_readTrips_targetUser_trips_steps } from './__generated__/readTripsQuery';
 
 interface IGetTimeZoneOutput {
   ok: boolean;
@@ -23,15 +24,6 @@ export const getTimeZone = async (
   }
 };
 
-export const formatDate = (date: Date | null, monthType: 'long' | 'short') => {
-  const format = date?.toLocaleDateString('en-GB', {
-    year: 'numeric',
-    month: monthType,
-    day: 'numeric',
-  });
-  return format;
-};
-
 export const deleteFiles = async (urls: string[]) => {
   if (urls.length === 0) {
     return;
@@ -45,3 +37,8 @@ export const deleteFiles = async (urls: string[]) => {
   const data = await response.json();
   console.log(data);
 };
+
+export const sortSteps = (
+  a: readTripsQuery_readTrips_targetUser_trips_steps,
+  b: readTripsQuery_readTrips_targetUser_trips_steps,
+) => new Date(a.arrivedAt).getTime() - new Date(b.arrivedAt).getTime();

@@ -71,6 +71,7 @@ export interface readTripQuery_readTrip_trip {
   __typename: "Trip";
   startDate: string;
   endDate: string | null;
+  coverUrl: string | null;
   traveler: readTripQuery_readTrip_trip_traveler;
   steps: readTripQuery_readTrip_trip_steps[];
 }

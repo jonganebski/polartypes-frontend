@@ -1,9 +1,9 @@
 import { gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
 import { client } from '../apollo';
-import { ICreateStepFormProps, TImage } from '../components/Modals/Save-step';
+import { TImage } from '../components/Modals/Save-step';
 import { deleteFiles } from '../helpers';
-import { READ_TRIP_QUERY } from '../pages/Trip';
+import { ICreateStepFormProps } from '../pages/Trip';
 import {
   deleteStepMutation,
   deleteStepMutationVariables,
@@ -12,6 +12,7 @@ import {
   readTripQuery,
   readTripQueryVariables,
 } from '../__generated__/readTripQuery';
+import { READ_TRIP_QUERY } from './useTrip';
 
 const DELETE_STEP_MUTATION = gql`
   mutation deleteStepMutation($input: DeleteStepInput!) {
