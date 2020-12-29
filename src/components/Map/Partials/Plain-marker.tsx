@@ -29,6 +29,9 @@ export const PlainMarker: React.FC<IPlainMarker> = ({
     element?.scrollIntoView();
     setReadingStepId && setReadingStepId(step.id);
   };
+  if (!step.lat || !step.lon) {
+    return null;
+  }
 
   return (
     <Marker
