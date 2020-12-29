@@ -15,7 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
@@ -46,8 +46,10 @@ export interface ICreateStepFormProps {
 }
 
 export const Trip = () => {
+  const articleRef = useRef<HTMLElement | null>(null);
   const { tripId } = useParams<IParams>();
   const { data: userData } = useWhoAmI();
+  const [readingStepId, setReadingStepId] = useState<number | null>(null);
   const [isSaveStepModal, setIsSaveStepModal] = useState(false);
   const [
     editingStep,
@@ -70,6 +72,7 @@ export const Trip = () => {
       setEditingStep(null);
     }
   }, [isSaveStepModal]);
+
   if (!data?.readTrip.trip) {
     return null;
   }
@@ -146,7 +149,7 @@ export const Trip = () => {
               )}
             </div>
           </div>
-          <article className="h-tripBody overflow-y-scroll">
+          <article ref={articleRef} className="h-tripBody overflow-y-scroll">
             <div
               style={{
                 backgroundImage:
@@ -261,11 +264,11 @@ export const Trip = () => {
                           setIsSaveStepModal(true);
                         }}
                       />
-
                       <StepCard
                         step={step}
                         setEditingStep={setEditingStep}
                         setIsSaveStepModal={setIsSaveStepModal}
+                        setReadingStepId={setReadingStepId}
                       />
                     </React.Fragment>
                   );
@@ -304,7 +307,11 @@ export const Trip = () => {
           </article>
         </section>
         <section className="w-1/2 h-screenExceptHeader">
-          <Map isSaveStepModal={isSaveStepModal} />
+          <Map
+            isSaveStepModal={isSaveStepModal}
+            readingStepId={readingStepId}
+            setReadingStepId={setReadingStepId}
+          />
         </section>
       </div>
     </FormProvider>

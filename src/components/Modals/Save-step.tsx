@@ -178,18 +178,19 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
 
   useEffect(() => {
     if (editingStep) {
-      setValue('arrivedAt', editingStep.arrivedAt);
-      setValue('country', editingStep.country);
-      setValue('lat', editingStep.lat.toString());
-      setValue('lon', editingStep.lon.toString());
-      setValue('location', editingStep.location);
-      setValue('name', editingStep.name);
-      setValue('story', editingStep.story ?? '');
-      setValue('timeZone', editingStep.timeZone);
+      setValue('arrivedAt', editingStep.arrivedAt, { shouldValidate: true });
+      setValue('country', editingStep.country, { shouldValidate: true });
+      setValue('lat', editingStep.lat.toString(), { shouldValidate: true });
+      setValue('lon', editingStep.lon.toString(), { shouldValidate: true });
+      setValue('location', editingStep.location, { shouldValidate: true });
+      setValue('name', editingStep.name, { shouldValidate: true });
+      setValue('story', editingStep.story ?? '', { shouldValidate: true });
+      setValue('timeZone', editingStep.timeZone, { shouldValidate: true });
     } else {
-      setValue('arrivedAt', belowStepDate);
+      setValue('arrivedAt', belowStepDate, { shouldValidate: true });
     }
   }, [belowStepDate, editingStep, setValue]);
+  console.log(formState.isValid);
   return (
     <>
       <div className="absolute z-50 top-0 left-0 w-full h-full bg-myGreen-darkest bg-opacity-80"></div>
@@ -201,7 +202,15 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="p-6">
             <section className="relative p-6 mb-4 grid grid-cols-oneToTwo bg-myGray-dark rounded-2xl">
-              <h3 className="text-white font-semibold">Location</h3>
+              <div>
+                <h3 className="text-white font-semibold">Location</h3>
+                <span className="block text-sm font-medium text-myGray-light">
+                  Search
+                </span>
+                <span className="text-sm font-medium text-myGray-light">
+                  or click the map
+                </span>
+              </div>
               <div className="rounded-sm">
                 <div className="relative">
                   <input
@@ -453,7 +462,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                     createStepMutationLoading || updateStepMutaionLoading
                   }
                   disabled={
-                    formState.isValid ||
+                    !formState.isValid ||
                     isUploading ||
                     createStepMutationLoading ||
                     updateStepMutaionLoading

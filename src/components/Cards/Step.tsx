@@ -2,7 +2,7 @@ import { gql, useMutation } from '@apollo/client';
 import { faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { client } from '../../apollo';
 import { useWhoAmI } from '../../hooks/useWhoAmI';
@@ -32,18 +32,50 @@ interface IStepProps {
     React.SetStateAction<readTripQuery_readTrip_trip_steps | null>
   >;
   setIsSaveStepModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setReadingStepId: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 export const StepCard: React.FC<IStepProps> = ({
   step,
   setEditingStep,
   setIsSaveStepModal,
+  setReadingStepId,
 }) => {
   const { data: userData } = useWhoAmI();
   const isSelf = userData?.whoAmI.id === step.traveler.id;
+  const liRef = useRef<HTMLLIElement | null>(null);
+  useEffect(() => {
+    const buildThresholdList = () => {
+      let thresholds = [];
+      let numSteps = 20;
+      for (let i = 1.0; i <= numSteps; i++) {
+        let ratio = i / numSteps;
+        thresholds.push(ratio);
+      }
+      thresholds.push(0);
+      return thresholds;
+    };
+    if (liRef.current) {
+      let prevRatio = 0.5;
+      const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+        entries.forEach((entry) => {
+          if (
+            entry.intersectionRatio > prevRatio &&
+            entry.intersectionRatio > 0.5
+          ) {
+            setReadingStepId(+entry.target.id);
+          }
+          prevRatio = entry.intersectionRatio;
+        });
+      };
+      const intersectionObserver = new IntersectionObserver(handleIntersect, {
+        threshold: buildThresholdList(),
+      });
+      intersectionObserver.observe(liRef.current);
+    }
+  }, []);
   const [isCommentBox, setIsCommentBox] = useState(false);
   const commentsCount = step.comments.length;
-
   const onCompleted = (data: toggleLikeMutation) => {
     const {
       toggleLike: { ok, error, toggle },
@@ -98,7 +130,11 @@ export const StepCard: React.FC<IStepProps> = ({
     toggleLikeMutationVariables
   >(TOGGLE_LIKE_MUTATION, { onCompleted });
   return (
-    <li className="pt-6 px-6 border bg-white border-myGray-light rounded-xl">
+    <li
+      id={step.id + ''}
+      ref={liRef}
+      className="pt-6 px-6 border bg-white border-myGray-light rounded-xl"
+    >
       <div>
         <h2 className="mb-1 text-myGreen-darkest text-2xl font-semibold">
           {step.name}
