@@ -1,6 +1,11 @@
 import L from 'leaflet';
 import React, { useEffect, useState } from 'react';
-import { MapContainer, Polyline, TileLayer } from 'react-leaflet';
+import {
+  MapContainer,
+  MapContainerProps,
+  Polyline,
+  TileLayer,
+} from 'react-leaflet';
 import { useHistory, useParams } from 'react-router-dom';
 import { sortSteps } from '../../helpers';
 import { useLazyTrip } from '../../hooks/useTrip';
@@ -24,14 +29,10 @@ interface IMapProps {
   setReadingStepId?: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-export const Map: React.FC<IMapProps> = ({
-  isSaveStepModal = false,
-  readingStepId,
-  setReadingStepId,
-}) => {
+export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
   const { username: targetUsername, tripId } = useParams<IParams>();
   const history = useHistory();
-  const [center, setCenter] = useState<L.LatLng | undefined>();
+  const [bounds, setBounds] = useState<L.LatLngTuple[] | undefined>();
   const [lazyTripQuery, { data: trip, called: tripCalled }] = useLazyTrip();
   const [lazyTripsQuery, { data: trips, called: tripsCalled }] = useLazyTrips();
 
@@ -44,31 +45,28 @@ export const Map: React.FC<IMapProps> = ({
   }, [lazyTripQuery, lazyTripsQuery, targetUsername, tripId]);
 
   useEffect(() => {
-    const computeCenter = () => {
-      let lat = 0;
-      let lon = 0;
-      let count = 0;
-      tripCalled &&
-        trip?.readTrip.trip?.steps.forEach((step) => {
-          lat = lat + step.lat;
-          lon = lon + step.lon;
-          ++count;
-        });
-      tripsCalled &&
-        trips?.readTrips.targetUser?.trips.forEach((trip) => {
-          trip.steps.forEach((step) => {
-            lat = lat + step.lat;
-            lon = lon + step.lon;
-            ++count;
-          });
-        });
-      if (count === 0) {
-        setCenter(new L.LatLng(0, 0));
-      } else {
-        setCenter(new L.LatLng(lat / count, lon / count));
+    const getBounds = () => {
+      let bounds: L.LatLngTuple[] = [];
+      if (
+        tripsCalled &&
+        trips?.readTrips.targetUser?.trips &&
+        trips?.readTrips.targetUser?.trips.length !== 0
+      ) {
+        bounds = trips.readTrips.targetUser.trips.flatMap((trip) =>
+          getPositionsTripsCalled(trip.steps),
+        );
+        setBounds(bounds);
+      }
+      if (
+        tripCalled &&
+        trip?.readTrip.trip?.steps &&
+        trip?.readTrip.trip?.steps.length !== 0
+      ) {
+        bounds = getPositionsTripCalled(trip.readTrip.trip.steps);
+        setBounds(bounds);
       }
     };
-    (trips || trip) && computeCenter();
+    (trips || trip) && getBounds();
   }, [
     trip,
     tripCalled,
@@ -101,35 +99,16 @@ export const Map: React.FC<IMapProps> = ({
       });
   };
 
-  const getBounds = () => {
-    let bounds: L.LatLngTuple[] = [];
-    if (
-      tripsCalled &&
-      trips?.readTrips.targetUser?.trips &&
-      trips?.readTrips.targetUser?.trips.length !== 0
-    ) {
-      bounds = trips.readTrips.targetUser.trips.flatMap((trip) =>
-        getPositionsTripsCalled(trip.steps),
-      );
-      return bounds;
-    }
-    if (
-      tripCalled &&
-      trip?.readTrip.trip?.steps &&
-      trip?.readTrip.trip?.steps.length !== 0
-    ) {
-      bounds = getPositionsTripCalled(trip.readTrip.trip.steps);
-      return bounds;
-    }
-  };
+  const mapContainerOptions: MapContainerProps = bounds
+    ? { bounds }
+    : { center: [20, 20], zoom: 3 };
 
-  if (!center) {
+  if (!bounds) {
     return null;
   }
   return (
     <MapContainer
-      center={center}
-      zoom={5}
+      {...mapContainerOptions}
       style={{ height: '100%', width: '100%' }}
     >
       <TileLayer
@@ -137,11 +116,7 @@ export const Map: React.FC<IMapProps> = ({
         url={`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}`}
         attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
       />
-      <MapEventFns
-        center={center}
-        bounds={getBounds()}
-        isSaveStepModal={isSaveStepModal}
-      />
+      <MapEventFns isSaveStepModal={isSaveStepModal} />
       {tripCalled &&
         trip?.readTrip.trip?.steps &&
         trip?.readTrip.trip?.steps.length !== 0 && (
@@ -175,15 +150,7 @@ export const Map: React.FC<IMapProps> = ({
           if (step.imgUrls && step.imgUrls.length !== 0) {
             imgUrl = step.imgUrls[0];
           }
-          return (
-            <ImageMarker
-              key={i}
-              imgUrl={imgUrl}
-              step={step}
-              readingStepId={readingStepId}
-              setReadingStepId={setReadingStepId}
-            />
-          );
+          return <ImageMarker key={i} imgUrl={imgUrl} step={step} />;
         })}
       {tripsCalled &&
         trips?.readTrips.targetUser?.trips &&
@@ -196,7 +163,6 @@ export const Map: React.FC<IMapProps> = ({
                 targetUsername={targetUsername}
                 tripId={trip.id + ''}
                 step={step}
-                setReadingStepId={setReadingStepId}
               />
             );
           });

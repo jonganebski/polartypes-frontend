@@ -1,23 +1,22 @@
 import L from 'leaflet';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Marker, useMap } from 'react-leaflet';
+import { useStepIdContext } from '../../../context';
 import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
 
 interface IImageMarkerProps {
   imgUrl: string;
   step: readTripQuery_readTrip_trip_steps;
-  readingStepId?: number | null;
-  setReadingStepId?: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-export const ImageMarker: React.FC<IImageMarkerProps> = ({
-  imgUrl,
-  step,
-  readingStepId,
-  setReadingStepId,
-}) => {
+export const ImageMarker: React.FC<IImageMarkerProps> = ({ imgUrl, step }) => {
   const map = useMap();
-  const isReadingThisStep = readingStepId === step.id;
+  const { idFromDrag, setIdFromMap } = useStepIdContext();
+  const isReadingThisStep = idFromDrag === step.id + '';
+
+  if (isReadingThisStep) {
+    map.setView(new L.LatLng(step.lat, step.lon), 7);
+  }
 
   const generateIcon = () => {
     const imageIcon = L.icon({
@@ -31,10 +30,8 @@ export const ImageMarker: React.FC<IImageMarkerProps> = ({
   };
 
   const handleClick = () => {
-    map.setView(new L.LatLng(step.lat, step.lon), 5);
-    const element = document.getElementById(step.id + '');
-    element?.scrollIntoView();
-    setReadingStepId && setReadingStepId(step.id);
+    setIdFromMap(step.id + '');
+    map.setView(new L.LatLng(step.lat, step.lon), 7);
   };
 
   return (

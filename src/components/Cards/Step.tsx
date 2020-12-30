@@ -2,9 +2,10 @@ import { gql, useMutation } from '@apollo/client';
 import { faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { client } from '../../apollo';
+import { useStepIdContext } from '../../context';
 import { useWhoAmI } from '../../hooks/useWhoAmI';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
 import { toggledLikeStep } from '../../__generated__/toggledLikeStep';
@@ -32,16 +33,15 @@ interface IStepProps {
     React.SetStateAction<readTripQuery_readTrip_trip_steps | null>
   >;
   setIsSaveStepModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setReadingStepId: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 export const StepCard: React.FC<IStepProps> = ({
   step,
   setEditingStep,
   setIsSaveStepModal,
-  setReadingStepId,
 }) => {
   const { data: userData } = useWhoAmI();
+  const { setIdFromDrag } = useStepIdContext();
   const isSelf = userData?.whoAmI.id === step.traveler.id;
   const liRef = useRef<HTMLLIElement | null>(null);
   useEffect(() => {
@@ -63,7 +63,7 @@ export const StepCard: React.FC<IStepProps> = ({
             entry.intersectionRatio > prevRatio &&
             entry.intersectionRatio > 0.5
           ) {
-            setReadingStepId(+entry.target.id);
+            setIdFromDrag(entry.target.id);
           }
           prevRatio = entry.intersectionRatio;
         });
@@ -73,7 +73,7 @@ export const StepCard: React.FC<IStepProps> = ({
       });
       intersectionObserver.observe(liRef.current);
     }
-  }, []);
+  }, [setIdFromDrag]);
   const [isCommentBox, setIsCommentBox] = useState(false);
   const commentsCount = step.comments.length;
   const onCompleted = (data: toggleLikeMutation) => {

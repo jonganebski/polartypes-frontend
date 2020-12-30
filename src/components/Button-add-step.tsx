@@ -11,7 +11,11 @@ export const AddStepButton: React.FC<IAddStepButton> = ({
   isSelf,
   onClick,
 }) => (
-  <li role="button" onClick={onClick} className="relative group">
+  <li
+    role={isSelf ? 'button' : 'list'}
+    onClick={onClick}
+    className="relative group"
+  >
     <div className="w-8 h-16 border-r border-myGray"></div>
     {isSelf && (
       <div className="absolute top-1/2 left-6 transform -translate-y-1/2 w-full flex items-center">

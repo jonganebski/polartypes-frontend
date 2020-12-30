@@ -3,13 +3,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { client } from './apollo';
 import App from './components/App';
+import { StepIdContextProvider } from './context';
 import reportWebVitals from './reportWebVitals';
 import './styles/styles.css';
 
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App />
+      <StepIdContextProvider>
+        <App />
+      </StepIdContextProvider>
     </ApolloProvider>
   </React.StrictMode>,
   document.getElementById('root'),
