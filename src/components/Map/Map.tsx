@@ -12,6 +12,7 @@ import { useLazyTrip } from '../../hooks/useTrip';
 import { useLazyTrips } from '../../hooks/useTrips';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
 import { readTripsQuery_readTrips_targetUser_trips_steps } from '../../__generated__/readTripsQuery';
+import { DynamicPolylines } from './Partials/Dynamic-polylines';
 import { ImageMarker } from './Partials/Image-marker';
 import { MapEventFns } from './Partials/Map-event-fns';
 import { PlainMarker } from './Partials/Plain-marker';
@@ -87,17 +88,13 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
       });
   };
 
-  const getPositionsTripCalled = (
-    steps: readTripQuery_readTrip_trip_steps[],
-  ) => {
-    return steps
+  const getPositionsTripCalled = (steps: readTripQuery_readTrip_trip_steps[]) =>
+    steps
       .slice()
       .sort(sortSteps)
       .map((step) => {
-        const { lat, lon } = step;
-        return [lat, lon] as L.LatLngTuple;
+        return [step.lat, step.lon] as L.LatLngTuple;
       });
-  };
 
   const mapContainerOptions: MapContainerProps = bounds
     ? { bounds }
@@ -124,10 +121,7 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
               isSaveStepModal={isSaveStepModal}
               positions={getPositionsTripCalled(trip.readTrip.trip.steps)}
             />
-            <Polyline
-              pathOptions={{ color: 'white', weight: 2 }}
-              positions={getPositionsTripCalled(trip.readTrip.trip.steps)}
-            />
+            <DynamicPolylines steps={trip.readTrip.trip.steps} />
             {trip?.readTrip.trip?.steps.map((step, i) => {
               let imgUrl = '/blank-profile.webp';
               if (step.imgUrls && step.imgUrls.length !== 0) {
