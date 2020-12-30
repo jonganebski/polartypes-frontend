@@ -80,6 +80,7 @@ module.exports = {
       translate: ['group-hover'],
       backgroundColor: ['active'],
       backgroundOpacity: ['active'],
+      textColor: ['active'],
     },
   },
   plugins: [],

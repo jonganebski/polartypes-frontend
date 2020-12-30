@@ -22,7 +22,6 @@ export const PlainMarker: React.FC<IPlainMarker> = ({
     className: `border-2 border-white bg-myRed rounded-full`,
     iconSize: L.point(15, 15),
   });
-  console.log('ctx: ', ctx);
   const handleClick = () => {
     ctx?.setIdFromMap(step.id + '');
     history.push(`/${targetUsername}/${tripId}`);

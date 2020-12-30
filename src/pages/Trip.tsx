@@ -27,7 +27,9 @@ import { Map } from '../components/Map/Map';
 import { SaveStepModal } from '../components/Modals/Save-step';
 import { useStepIdContext } from '../context';
 import { sortSteps } from '../helpers';
+import { useFollow } from '../hooks/useFollow';
 import { useTrip } from '../hooks/useTrip';
+import { useUnfollow } from '../hooks/useUnfollow';
 import { useWhoAmI } from '../hooks/useWhoAmI';
 import { readTripQuery_readTrip_trip_steps } from '../__generated__/readTripQuery';
 
@@ -64,6 +66,8 @@ export const Trip = () => {
   });
   const [belowStepTimeZone, setBelowStepTimeZone] = useState('');
   const { data } = useTrip(tripId);
+  const [followMutation] = useFollow(data?.readTrip.trip?.traveler.id);
+  const [unfollowMutation] = useUnfollow(data?.readTrip.trip?.traveler.id);
   const isSelf = data?.readTrip.trip?.traveler.id === userData?.whoAmI.id;
   const startDateData = data?.readTrip.trip?.startDate;
   const endDateData = data?.readTrip.trip?.endDate;
@@ -78,12 +82,9 @@ export const Trip = () => {
   const element = document.getElementById(readingStepId);
   useEffect(() => {
     if (readingStepId) {
-      console.log('foo');
-      console.log(element);
       element?.scrollIntoView();
     }
   }, [element, readingStepId]);
-
   if (!data?.readTrip.trip) {
     return null;
   }
@@ -148,6 +149,42 @@ export const Trip = () => {
                     />
                   }
                 />
+                {!isSelf &&
+                  !data.readTrip.trip.traveler.followers.some(
+                    (follower) => follower.id === userData?.whoAmI.id,
+                  ) && (
+                    <Button
+                      text="Follow"
+                      type="blue-regular"
+                      size="sm"
+                      onClick={() => {
+                        data.readTrip.trip?.traveler.id &&
+                          followMutation({
+                            variables: {
+                              input: { id: data.readTrip.trip?.traveler.id },
+                            },
+                          });
+                      }}
+                    />
+                  )}
+                {!isSelf &&
+                  data.readTrip.trip.traveler.followers.some(
+                    (follower) => follower.id === userData?.whoAmI.id,
+                  ) && (
+                    <Button
+                      text="Following"
+                      type="blue-solid"
+                      size="sm"
+                      onClick={() => {
+                        data.readTrip.trip?.traveler.id &&
+                          unfollowMutation({
+                            variables: {
+                              input: { id: data.readTrip.trip?.traveler.id },
+                            },
+                          });
+                      }}
+                    />
+                  )}
                 {isSelf && (
                   <Button
                     text="Trip settings"

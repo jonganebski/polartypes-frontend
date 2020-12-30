@@ -62,7 +62,10 @@ export const useCreateStep = (
                   lat: +lat,
                   lon: +lon,
                   imgUrls,
-                  traveler: { __typename: 'Users', id: userData.whoAmI.id },
+                  traveler: {
+                    __typename: 'Users',
+                    id: userData.whoAmI.id,
+                  },
                   likes: [],
                   comments: [],
                 },

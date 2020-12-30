@@ -46,11 +46,11 @@ export const Button: React.FC<IButtonProps> = ({
           : type === 'white-solid'
           ? `bg-white ${
               fontColorClass ?? 'text-myGray-darkest'
-            } border border-myGray-light`
+            } border border-myGray-light hover:bg-myGray-light active:bg-myGray`
           : type === 'blue-solid'
           ? 'bg-myBlue text-white border border-myBlue bg-opacity-90 hover:bg-opacity-100 active:bg-opacity-50'
           : type === 'blue-regular'
-          ? 'border border-myBlue text-myBlue'
+          ? 'border border-myBlue text-myBlue hover:bg-myBlue hover:text-white active:bg-myBlue-dark active:text-white'
           : type === 'white-regular'
           ? 'border border-myGray-dark text-white hover:bg-myGray-dark active:bg-myGray-darkest'
           : type === 'void'

@@ -9,6 +9,11 @@ import { ReadTripInput } from "./globalTypes";
 // GraphQL query operation: readTripQuery
 // ====================================================
 
+export interface readTripQuery_readTrip_trip_traveler_followers {
+  __typename: "Users";
+  id: number;
+}
+
 export interface readTripQuery_readTrip_trip_traveler {
   __typename: "Users";
   id: number;
@@ -17,6 +22,7 @@ export interface readTripQuery_readTrip_trip_traveler {
   lastName: string;
   avatarUrl: string | null;
   timeZone: string | null;
+  followers: readTripQuery_readTrip_trip_traveler_followers[];
 }
 
 export interface readTripQuery_readTrip_trip_steps_traveler {

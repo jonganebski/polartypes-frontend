@@ -20,6 +20,9 @@ export const READ_TRIP_QUERY = gql`
           lastName
           avatarUrl
           timeZone
+          followers {
+            id
+          }
         }
         steps {
           id
