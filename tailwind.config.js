@@ -78,6 +78,8 @@ module.exports = {
     extend: {
       scale: ['group-hover'],
       translate: ['group-hover'],
+      backgroundColor: ['active'],
+      backgroundOpacity: ['active'],
     },
   },
   plugins: [],

@@ -38,6 +38,7 @@ export interface readTripsQuery_readTrips_targetUser_trips {
 
 export interface readTripsQuery_readTrips_targetUser {
   __typename: "Users";
+  id: number;
   username: string;
   firstName: string;
   lastName: string;

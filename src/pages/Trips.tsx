@@ -1,7 +1,7 @@
 import { faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { TripCard } from '../components/Cards/Trip';
@@ -9,7 +9,9 @@ import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
 import { CreateTripModal } from '../components/Modals/Create-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
+import { useFollow } from '../hooks/useFollow';
 import { useTrips } from '../hooks/useTrips';
+import { useUnfollow } from '../hooks/useUnfollow';
 import { useWhoAmI } from '../hooks/useWhoAmI';
 
 interface IPrams {
@@ -18,14 +20,14 @@ interface IPrams {
 
 export const Trips = () => {
   const { data: userData } = useWhoAmI();
-  const history = useHistory();
   const [isCreateTrip, setIsCreateTrip] = useState(false);
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
   const { username: targetUsername } = useParams<IPrams>();
   const { data } = useTrips(targetUsername);
+  const [followMutation] = useFollow(data?.readTrips.targetUser?.id);
+  const [unfollowMutation] = useUnfollow(data?.readTrips.targetUser?.id);
   const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
-  console.log(data);
-  if (!data) {
+  if (!data?.readTrips.targetUser) {
     return null;
   }
   return (
@@ -98,18 +100,26 @@ export const Trips = () => {
                   size="sm"
                 />
                 {!isSelf &&
-                  !data.readTrips.targetUser?.followings.some(
+                  !data.readTrips.targetUser?.followers.some(
                     (user) => user.id === userData?.whoAmI.id,
                   ) && (
                     <Button
                       text="Follow"
                       type="void"
-                      className="text-white border border-myBlue ml-2"
+                      className="text-white border border-myBlue ml-2 hover:bg-myBlue active:bg-myBlue-dark"
                       size="sm"
+                      onClick={() => {
+                        data.readTrips.targetUser &&
+                          followMutation({
+                            variables: {
+                              input: { id: data.readTrips.targetUser.id },
+                            },
+                          });
+                      }}
                     />
                   )}
                 {!isSelf &&
-                  data.readTrips.targetUser?.followings.some(
+                  data.readTrips.targetUser?.followers.some(
                     (user) => user.id === userData?.whoAmI.id,
                   ) && (
                     <Button
@@ -118,6 +128,14 @@ export const Trips = () => {
                       size="sm"
                       className="ml-2"
                       icon={<FontAwesomeIcon icon={faUserCheck} />}
+                      onClick={() => {
+                        data.readTrips.targetUser &&
+                          unfollowMutation({
+                            variables: {
+                              input: { id: data.readTrips.targetUser.id },
+                            },
+                          });
+                      }}
                     />
                   )}
               </div>

@@ -10,6 +10,7 @@ const READ_TRIPS_QUERY = gql`
       ok
       error
       targetUser {
+        id
         username
         firstName
         lastName

@@ -60,6 +60,10 @@ export interface DeleteStepInput {
   stepId: number;
 }
 
+export interface FollowInput {
+  id: number;
+}
+
 export interface LikeInputType {
   userId: number;
   stepId: number;
@@ -111,6 +115,10 @@ export interface TripInputType {
   views?: number | null;
   traveler: UserInputType;
   steps: StepInputType[];
+}
+
+export interface UnfollowInput {
+  id: number;
 }
 
 export interface UpdateAccountInput {

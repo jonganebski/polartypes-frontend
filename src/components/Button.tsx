@@ -48,11 +48,11 @@ export const Button: React.FC<IButtonProps> = ({
               fontColorClass ?? 'text-myGray-darkest'
             } border border-myGray-light`
           : type === 'blue-solid'
-          ? 'bg-myBlue text-white border border-myBlue'
+          ? 'bg-myBlue text-white border border-myBlue bg-opacity-90 hover:bg-opacity-100 active:bg-opacity-50'
           : type === 'blue-regular'
           ? 'border border-myBlue text-myBlue'
           : type === 'white-regular'
-          ? 'border border-white text-white'
+          ? 'border border-myGray-dark text-white hover:bg-myGray-dark active:bg-myGray-darkest'
           : type === 'void'
           ? `bg-transparent ${fontColorClass}`
           : ''
