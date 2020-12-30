@@ -116,56 +116,58 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
         url={`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}`}
         attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
       />
-      <MapEventFns isSaveStepModal={isSaveStepModal} />
       {tripCalled &&
         trip?.readTrip.trip?.steps &&
         trip?.readTrip.trip?.steps.length !== 0 && (
-          <Polyline
-            pathOptions={{ color: 'white', weight: 2 }}
-            positions={getPositionsTripCalled(trip.readTrip.trip.steps)}
-          />
+          <>
+            <MapEventFns
+              isSaveStepModal={isSaveStepModal}
+              positions={getPositionsTripCalled(trip.readTrip.trip.steps)}
+            />
+            <Polyline
+              pathOptions={{ color: 'white', weight: 2 }}
+              positions={getPositionsTripCalled(trip.readTrip.trip.steps)}
+            />
+            {trip?.readTrip.trip?.steps.map((step, i) => {
+              let imgUrl = '/blank-profile.webp';
+              if (step.imgUrls && step.imgUrls.length !== 0) {
+                imgUrl = step.imgUrls[0];
+              }
+              return <ImageMarker key={i} imgUrl={imgUrl} step={step} />;
+            })}
+          </>
         )}
       {tripsCalled &&
         trips?.readTrips.targetUser?.trips &&
         trips?.readTrips.targetUser?.trips.length !== 0 &&
         trips.readTrips.targetUser.trips.map((trip, i) => {
           return (
-            <Polyline
-              key={i}
-              pathOptions={{ color: 'white', weight: 2 }}
-              positions={getPositionsTripsCalled(trip.steps)}
-              eventHandlers={{
-                click: () => {
-                  history.push(`/${targetUsername}/${trip.id}`);
-                },
-              }}
-            />
-          );
-        })}
-      {tripCalled &&
-        trip?.readTrip.trip?.steps &&
-        trip?.readTrip.trip?.steps.length !== 0 &&
-        trip?.readTrip.trip?.steps.map((step, i) => {
-          let imgUrl = '/blank-profile.webp';
-          if (step.imgUrls && step.imgUrls.length !== 0) {
-            imgUrl = step.imgUrls[0];
-          }
-          return <ImageMarker key={i} imgUrl={imgUrl} step={step} />;
-        })}
-      {tripsCalled &&
-        trips?.readTrips.targetUser?.trips &&
-        trips?.readTrips.targetUser?.trips.length !== 0 &&
-        trips?.readTrips.targetUser?.trips.map((trip) => {
-          return trip.steps.map((step, i) => {
-            return (
-              <PlainMarker
-                key={i}
-                targetUsername={targetUsername}
-                tripId={trip.id + ''}
-                step={step}
+            <React.Fragment key={i}>
+              <MapEventFns
+                isSaveStepModal={isSaveStepModal}
+                positions={getPositionsTripsCalled(trip.steps)}
               />
-            );
-          });
+              <Polyline
+                pathOptions={{ color: 'white', weight: 2 }}
+                positions={getPositionsTripsCalled(trip.steps)}
+                eventHandlers={{
+                  click: () => {
+                    history.push(`/${targetUsername}/${trip.id}`);
+                  },
+                }}
+              />
+              {trip.steps.map((step, i) => {
+                return (
+                  <PlainMarker
+                    key={i}
+                    targetUsername={targetUsername}
+                    tripId={trip.id + ''}
+                    step={step}
+                  />
+                );
+              })}
+            </React.Fragment>
+          );
         })}
     </MapContainer>
   );

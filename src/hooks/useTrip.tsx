@@ -13,6 +13,7 @@ export const READ_TRIP_QUERY = gql`
         startDate
         endDate
         coverUrl
+        viewCount
         traveler {
           id
           username

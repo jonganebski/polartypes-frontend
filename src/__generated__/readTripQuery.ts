@@ -78,6 +78,7 @@ export interface readTripQuery_readTrip_trip {
   startDate: string;
   endDate: string | null;
   coverUrl: string | null;
+  viewCount: number;
   traveler: readTripQuery_readTrip_trip_traveler;
   steps: readTripQuery_readTrip_trip_steps[];
 }

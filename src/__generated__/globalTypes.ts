@@ -112,7 +112,7 @@ export interface TripInputType {
   summary?: string | null;
   coverUrl?: string | null;
   availability: Availability;
-  views?: number | null;
+  viewCount?: number | null;
   traveler: UserInputType;
   steps: StepInputType[];
 }

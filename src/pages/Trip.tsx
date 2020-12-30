@@ -1,17 +1,8 @@
 import {
-  faCalendar,
-  faEye,
-  faHeart,
-} from '@fortawesome/free-regular-svg-icons';
-import {
-  faAtlas,
   faBook,
-  faCamera,
   faCog,
   faHome,
-  faPassport,
   faShareAlt,
-  faTachometerAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
@@ -25,6 +16,7 @@ import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
 import { SaveStepModal } from '../components/Modals/Save-step';
+import { TripStatus } from '../components/Trip-status';
 import { useStepIdContext } from '../context';
 import { sortSteps } from '../helpers';
 import { useFollow } from '../hooks/useFollow';
@@ -218,68 +210,7 @@ export const Trip = () => {
                     </h1>
                   </div>
                   <div className="w-full p-3 grid grid-cols-7 text-white text-center bg-myGreen-darkest bg-opacity-70">
-                    <div>
-                      <FontAwesomeIcon
-                        icon={faTachometerAlt}
-                        className="text-xl"
-                      />
-                      <span className="block mt-1.5 -mb-1.5 font-semibold">
-                        3,799
-                      </span>
-                      <span className="text-xs">kilometers</span>
-                    </div>
-                    <div>
-                      <FontAwesomeIcon icon={faEye} className="text-xl" />
-                      <span className="block mt-1.5 -mb-1.5 font-semibold">
-                        3,799
-                      </span>
-                      <span className="text-xs">views</span>
-                    </div>
-                    <div>
-                      <FontAwesomeIcon icon={faHeart} className="text-xl" />
-                      <span className="block mt-1.5 -mb-1.5 font-semibold">
-                        10
-                      </span>
-                      <span className="text-xs">likes</span>
-                    </div>
-                    <div>
-                      <FontAwesomeIcon icon={faCalendar} className="text-xl" />
-                      <span className="block mt-1.5 -mb-1.5 font-semibold">
-                        200
-                      </span>
-                      <span className="text-xs">days</span>
-                    </div>
-                    <div>
-                      <FontAwesomeIcon icon={faCamera} className="text-xl" />
-                      <span className="block mt-1.5 -mb-1.5 font-semibold">
-                        {data?.readTrip.trip?.steps.reduce((acc, v) => {
-                          if (v.imgUrls) {
-                            return acc + v.imgUrls?.length;
-                          } else {
-                            return acc;
-                          }
-                        }, 0)}
-                      </span>
-                      <span className="text-xs">photos</span>
-                    </div>
-                    <div>
-                      <FontAwesomeIcon icon={faPassport} className="text-xl" />
-                      <span className="block mt-1.5 -mb-1.5 font-semibold">
-                        12
-                      </span>
-                      <span className="text-xs">countries</span>
-                    </div>
-                    <div>
-                      <FontAwesomeIcon icon={faAtlas} className="text-xl" />
-                      <span className="block mt-1.5 -mb-1.5 font-semibold">
-                        {data?.readTrip.trip?.steps.length}
-                      </span>
-                      <span className="text-xs">
-                        {data?.readTrip.trip?.steps.length === 1
-                          ? 'step'
-                          : 'steps'}
-                      </span>
-                    </div>
+                    <TripStatus trip={data.readTrip.trip} />
                   </div>
                 </div>
               </div>
@@ -297,7 +228,7 @@ export const Trip = () => {
                         timeZoneData &&
                         moment(startDateData)
                           .tz(timeZoneData)
-                          .format('d MMMM YYYY')}
+                          .format('D MMMM YYYY')}
                     </span>
                   </div>
                 </li>
@@ -349,7 +280,7 @@ export const Trip = () => {
                         timeZoneData &&
                         moment(endDateData)
                           .tz(timeZoneData)
-                          .format('d MMMM YYYY')}
+                          .format('D MMMM YYYY')}
                     </span>
                   </div>
                 </li>
