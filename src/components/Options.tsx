@@ -1,11 +1,12 @@
 import { faCode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo';
 import { TOKEN } from '../constants';
 import { Button } from './Button';
 import { ModalCloseIcon } from './Modals/partials/CloseIcon';
+import { SettingsModal } from './Modals/Settings';
 
 interface IOptionProps {
   isOption: boolean;
@@ -14,8 +15,17 @@ interface IOptionProps {
 
 export const Options: React.FC<IOptionProps> = ({ isOption, setIsOption }) => {
   const history = useHistory();
+  const [isSettingsModal, setIsSettingModal] = useState(true);
+  const [isProfile, setIsProfile] = useState(false);
   return (
     <>
+      {isSettingsModal && (
+        <SettingsModal
+          isProfile={isProfile}
+          setIsProfile={setIsProfile}
+          setIsSettingModal={setIsSettingModal}
+        />
+      )}
       <div
         className={`fixed z-50 top-0 w-screen h-screen bg-myGreen-darkest transition-all duration-300 ${
           isOption ? 'opacity-80' : 'opacity-0 pointer-events-none'
@@ -33,10 +43,24 @@ export const Options: React.FC<IOptionProps> = ({ isOption, setIsOption }) => {
             <h5 className="mb-2 text-myGray-dark text-sm font-semibold">
               My account
             </h5>
-            <h6 className="text-myGreen-dark font-semibold">
+            <h6
+              className="text-myGreen-dark font-semibold cursor-pointer hover:text-myBlue"
+              onClick={() => {
+                setIsOption(false);
+                setIsProfile(true);
+                setIsSettingModal(true);
+              }}
+            >
               Profile settings
             </h6>
-            <h6 className="text-myGreen-dark font-semibold">
+            <h6
+              className="text-myGreen-dark font-semibold cursor-pointer hover:text-myBlue"
+              onClick={() => {
+                setIsOption(false);
+                setIsProfile(false);
+                setIsSettingModal(true);
+              }}
+            >
               Account settings
             </h6>
           </li>
@@ -48,8 +72,22 @@ export const Options: React.FC<IOptionProps> = ({ isOption, setIsOption }) => {
                 className="ml-2 text-sm text-myGray-dark"
               />
             </h5>
-            <h6 className="text-myGreen-dark font-semibold">Frontend</h6>
-            <h6 className="text-myGreen-dark font-semibold">Backend</h6>
+            <a
+              className="block text-myGreen-dark font-semibold hover:text-myBlue"
+              href="https://github.com/jonganebski/polartypes-frontend"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Frontend
+            </a>
+            <a
+              className="block text-myGreen-dark font-semibold hover:text-myBlue"
+              href="https://github.com/jonganebski/polartypes-backend"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Backend
+            </a>
           </li>
           <li className="py-8 bg-white">
             <Button
