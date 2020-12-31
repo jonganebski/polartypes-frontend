@@ -46,6 +46,7 @@ export const Trip = () => {
   const { data: userData } = useWhoAmI();
   const ctx = useStepIdContext();
   const [isSaveStepModal, setIsSaveStepModal] = useState(false);
+  const [isOption, setIsOption] = useState(false);
   const [
     editingStep,
     setEditingStep,
@@ -82,7 +83,7 @@ export const Trip = () => {
   }
   return (
     <FormProvider {...f}>
-      <CommonHeader />
+      <CommonHeader setIsOption={setIsOption} />
       {data.readTrip.error ? (
         <div>{data.readTrip.error}</div>
       ) : (

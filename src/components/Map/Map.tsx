@@ -95,19 +95,26 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
       .map((step) => {
         return [step.lat, step.lon] as L.LatLngTuple;
       });
-
-  const mapContainerOptions: MapContainerProps = bounds
-    ? { bounds }
-    : { center: [20, 20], zoom: 3 };
-
+  console.log(bounds);
+  // 여기 문제 있음.
   if (!bounds) {
-    return null;
+    return (
+      <MapContainer
+        center={[20, 20]}
+        zoom={3}
+        style={{ height: '100%', width: '100%' }}
+      >
+        <TileLayer
+          accessToken={MAPBOX_TOKEN}
+          url={`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}`}
+          attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
+        />
+      </MapContainer>
+    );
   }
+
   return (
-    <MapContainer
-      {...mapContainerOptions}
-      style={{ height: '100%', width: '100%' }}
-    >
+    <MapContainer bounds={bounds} style={{ height: '100%', width: '100%' }}>
       <TileLayer
         accessToken={MAPBOX_TOKEN}
         url={`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}`}

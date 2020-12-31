@@ -7,6 +7,7 @@ interface IButtonProps {
     | 'red-solid'
     | 'white-solid'
     | 'blue-solid'
+    | 'red-regular'
     | 'blue-regular'
     | 'white-regular'
     | 'void';
@@ -49,6 +50,8 @@ export const Button: React.FC<IButtonProps> = ({
             } border border-myGray-light hover:bg-myGray-light active:bg-myGray`
           : type === 'blue-solid'
           ? 'bg-myBlue text-white border border-myBlue bg-opacity-90 hover:bg-opacity-100 active:bg-opacity-50'
+          : type === 'red-regular'
+          ? 'border border-myRed text-myRed hover:bg-myRed hover:text-white active:bg-myRed-dark active:text-white'
           : type === 'blue-regular'
           ? 'border border-myBlue text-myBlue hover:bg-myBlue hover:text-white active:bg-myBlue-dark active:text-white'
           : type === 'white-regular'

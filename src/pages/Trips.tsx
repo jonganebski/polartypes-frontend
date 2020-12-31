@@ -9,6 +9,7 @@ import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
 import { CreateTripModal } from '../components/Modals/Create-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
+import { Options } from '../components/Options';
 import { useFollow } from '../hooks/useFollow';
 import { useTrips } from '../hooks/useTrips';
 import { useUnfollow } from '../hooks/useUnfollow';
@@ -21,6 +22,7 @@ interface IPrams {
 export const Trips = () => {
   const { data: userData } = useWhoAmI();
   const [isCreateTrip, setIsCreateTrip] = useState(false);
+  const [isOption, setIsOption] = useState(false);
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
   const { username: targetUsername } = useParams<IPrams>();
   const { data } = useTrips(targetUsername);
@@ -45,7 +47,8 @@ export const Trips = () => {
           setIsCreateTrip={setIsCreateTrip}
         />
       )}
-      <CommonHeader />
+      <Options isOption={isOption} setIsOption={setIsOption} />
+      <CommonHeader setIsOption={setIsOption} />
       {data.readTrips.error ? (
         <div>{data.readTrips.error}</div>
       ) : (

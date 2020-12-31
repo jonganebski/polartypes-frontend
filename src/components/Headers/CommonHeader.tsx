@@ -10,7 +10,11 @@ interface IPrams {
   username: string;
 }
 
-export const CommonHeader = () => {
+interface ICommonHeaderProps {
+  setIsOption: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const CommonHeader: React.FC<ICommonHeaderProps> = ({ setIsOption }) => {
   const { data: userData } = useWhoAmI();
   const { username: usernameParam } = useParams<IPrams>();
   const isSelf = usernameParam.toLowerCase() === userData?.whoAmI.slug;
@@ -34,7 +38,7 @@ export const CommonHeader = () => {
         {userData && (
           <Link
             to={`/${userData.whoAmI.username}`}
-            className={`h-full px-3 flex items-center justify-center bg-myGreen-darkest ${
+            className={`h-full px-3 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 ${
               isSelf ? 'border-b-4 border-myRed text-center' : ''
             }`}
           >
@@ -42,10 +46,13 @@ export const CommonHeader = () => {
             <span className="ml-3">{userData.whoAmI.firstName}</span>
           </Link>
         )}
-        <div className="h-full px-3 flex items-center justify-center bg-myGreen-darkest">
+        <div className="h-full px-3 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 cursor-pointer">
           Travel Books
         </div>
-        <div className="h-full px-3 flex items-center justify-center bg-myGreen-darkest">
+        <div
+          className="h-full px-3 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 cursor-pointer"
+          onClick={() => setIsOption(true)}
+        >
           <span className="mr-3">Options</span>
           <FontAwesomeIcon icon={faBars} />
         </div>

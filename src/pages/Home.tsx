@@ -60,7 +60,7 @@ export const Home = () => {
       >
         <div
           style={{ backgroundImage: 'url("splatter-white.png")' }}
-          className="absolute -top-10 w-full h-10 bg-cover"
+          className="absolute -top-12 w-full h-12 bg-cover"
         />
         <div className="bg-white w-full max-w-4xl mx-auto h-full pt-32">
           Welcome to Polartypes!
