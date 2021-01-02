@@ -6,10 +6,13 @@ export const WHO_AM_I_QUERY = gql`
     whoAmI {
       id
       firstName
+      lastName
       username
       slug
+      city
       timeZone
       avatarUrl
+      about
     }
   }
 `;

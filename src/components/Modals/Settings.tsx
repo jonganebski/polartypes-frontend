@@ -1,12 +1,20 @@
+import { gql } from '@apollo/client';
+import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { useHistory } from 'react-router-dom';
+import { client } from '../../apollo';
+import { deleteFiles, sleep } from '../../helpers';
+import { useUpdateAccount } from '../../hooks/useUpdateAccount';
 import { useWhoAmI } from '../../hooks/useWhoAmI';
-import { Avatar } from '../Avatar';
+import { updateAccountMutation } from '../../__generated__/updateAccountMutation';
+import { updatedUser } from '../../__generated__/updatedUser';
+import { Button } from '../Button';
+import { Account } from './partials/Account';
 import { ModalBackground } from './partials/Background';
 import { ModalCloseIcon } from './partials/CloseIcon';
-import moment from 'moment';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
-import { Button } from '../Button';
+import { Profile } from './partials/Profile';
 
 interface ISettingsModal {
   isProfile: boolean;
@@ -14,12 +22,142 @@ interface ISettingsModal {
   setIsSettingModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+export interface ISettingsFormProps {
+  firstName: string;
+  lastName: string;
+  username: string;
+  about: string;
+  city: string;
+  timeZone: string;
+  password: string;
+  newPasswords: string[];
+  files: FileList;
+}
+
 export const SettingsModal: React.FC<ISettingsModal> = ({
   isProfile,
   setIsProfile,
   setIsSettingModal,
 }) => {
+  const history = useHistory();
   const { data: userData } = useWhoAmI();
+  const [isLoading, setIsLoading] = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState(
+    userData?.whoAmI.avatarUrl ?? 'blank-profile.webp',
+  );
+  const [avatarUrl, setAvatarUrl] = useState(
+    userData?.whoAmI.avatarUrl ?? null,
+  );
+  const f = useForm<ISettingsFormProps>({
+    mode: 'onChange',
+    defaultValues: {
+      firstName: userData?.whoAmI.firstName,
+      lastName: userData?.whoAmI.lastName,
+      username: userData?.whoAmI.username,
+      about: userData?.whoAmI.about ?? '',
+      city: userData?.whoAmI.city ?? '',
+      timeZone: userData?.whoAmI.timeZone ?? '',
+    },
+  });
+  const onCompleted = async (data: updateAccountMutation) => {
+    const {
+      updateAccount: { ok, error },
+    } = data;
+    console.log(ok, error);
+    if (ok && !error && userData) {
+      const {
+        about,
+        city,
+        firstName,
+        lastName,
+        username,
+        timeZone,
+      } = f.getValues();
+      client.writeFragment<updatedUser>({
+        id: `Users:${userData.whoAmI.id}`,
+        fragment: gql`
+          fragment updatedUser on Users {
+            id
+            firstName
+            lastName
+            username
+            slug
+            city
+            timeZone
+            avatarUrl
+            about
+          }
+        `,
+        data: {
+          __typename: 'Users',
+          id: userData.whoAmI.id,
+          about,
+          avatarUrl,
+          city,
+          firstName,
+          lastName,
+          timeZone,
+          username,
+          slug: username.toLowerCase(),
+        },
+      });
+      await sleep(2000);
+      if (userData.whoAmI.username !== username) {
+        history.push(`/${username}`);
+      } else {
+        setIsLoading(false);
+      }
+    } else {
+      setIsLoading(false);
+    }
+  };
+  const [updateAccountMutation] = useUpdateAccount(onCompleted);
+  const onSubmit = async () => {
+    setIsLoading(true);
+    const { files, password, newPasswords, ...values } = f.getValues();
+    if (password || newPasswords[0] || newPasswords[1]) {
+      if (newPasswords[0] !== newPasswords[1]) {
+        f.setError('newPasswords[1]', {
+          message: 'Please check your new password again.',
+        });
+        return;
+      }
+    }
+    try {
+      let url = avatarUrl;
+      if (files.length !== 0) {
+        const body = new FormData();
+        body.append('file', files[0]);
+        const response = await fetch('http://localhost:4000/aws-s3/upload', {
+          body,
+          method: 'POST',
+        });
+        avatarUrl && (await deleteFiles([avatarUrl]));
+        const result = await response.json();
+        console.log(result.error);
+        if (result.ok && !result.error && result.url) {
+          url = result.url;
+        } else {
+          throw new Error();
+        }
+      }
+      setAvatarUrl(url);
+      updateAccountMutation({
+        variables: {
+          input: {
+            ...values,
+            slug: values.username.toLowerCase(),
+            avatarUrl: url,
+            password: password ? password : null,
+            newPassword: newPasswords[0] ? newPasswords[0] : null,
+          },
+        },
+      });
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
 
   if (!userData) {
     return null;
@@ -59,120 +197,32 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
               </div>
             </div>
           </div>
-          {isProfile ? (
-            <div className="w-full">
-              <div className="px-6 rounded-lg border border-myGray-light bg-white overflow-hidden">
-                <div className="py-6 text-myGreen-dark text-xl font-semibold border-b border-myGray-light">
-                  Profile
-                </div>
-                <div className="py-6 grid gap-6 grid-cols-oneToThree">
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    Profile picture
-                  </h6>
-                  <div className="flex items-center">
-                    <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={14} />
-                    <div className="ml-3">
-                      <Button
-                        text="Upload a photo"
-                        size="sm"
-                        type="blue-regular"
-                      />
-                    </div>
-                  </div>
-
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    First name
-                  </h6>
-                  <input className="input" type="text" />
-
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    Last name
-                  </h6>
-                  <input className="input" type="text" />
-
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    City
-                  </h6>
-                  <input className="input" type="text" />
-
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    Timezone
-                  </h6>
-                  <select
-                    //   ref={register({ required: true })}
-                    name="timeZone"
-                    className="input w-full"
-                    //   defaultValue={clientTimeZone}
-                  >
-                    {moment.tz.names().map((zone, i) => (
-                      <option key={i} value={zone}>
-                        {zone}
-                      </option>
-                    ))}
-                  </select>
-
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    About
-                  </h6>
-                  <textarea className="input resize-none"></textarea>
-                </div>
-              </div>
+          <FormProvider {...f}>
+            <form className="w-full" onSubmit={f.handleSubmit(onSubmit)}>
+              <Profile
+                hidden={!isProfile}
+                userData={userData}
+                avatarUrl={avatarUrl}
+                avatarSrc={avatarSrc}
+                setAvatarSrc={setAvatarSrc}
+              />
+              <Account hidden={isProfile} />
               <div className="pt-6">
-                <Button text="Save Changes" type="red-solid" className="mr-3" />
-                <Button text="cancel" type="white-solid" />
+                <Button
+                  text="Save Changes"
+                  type="red-solid"
+                  className="mr-3"
+                  loading={isLoading}
+                />
+                <Button
+                  text="cancel"
+                  type="white-solid"
+                  isSubmitBtn={false}
+                  onClick={() => setIsSettingModal(false)}
+                />
               </div>
-            </div>
-          ) : (
-            <div className="w-full">
-              <div className="px-6 mb-6 rounded-lg border border-myGray-light bg-white overflow-hidden">
-                <div className="py-6 flex items-center justify-between border-b border-myGray-light">
-                  <span className="text-myGreen-dark text-xl font-semibold">
-                    Account information
-                  </span>
-                  <span className="text-xs text-myGray underline cursor-pointer hover:text-myGray-dark">
-                    Delete account
-                  </span>
-                </div>
-                <div className="py-6 grid gap-6 grid-cols-oneToThree">
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    Personal link
-                  </h6>
-                  <div className="grid grid-cols-2">
-                    <div className="flex items-center justify-center bg-myGray-light text-myGray-dark border-t border-b border-l border-myGray rounded-l-sm">
-                      xxx.netlyfy.com/
-                    </div>
-                    <input
-                      className="px-4 py-3 border border-solid border-myGray rounded-r-sm focus:border-myBlue focus:outline-none"
-                      type="text"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="px-6 rounded-lg border border-myGray-light bg-white overflow-hidden">
-                <div className="py-6 text-myGreen-dark text-xl font-semibold border-b border-myGray-light">
-                  Password
-                </div>
-                <div className="py-6 grid gap-6 grid-cols-oneToThree">
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    Current password
-                  </h6>
-                  <input className="input" type="text" />
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    New password
-                  </h6>
-                  <input className="input" type="text" />
-                  <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-                    New password again
-                  </h6>
-                  <input className="input" type="text" />
-                </div>
-              </div>
-              <div className="pt-6">
-                <Button text="Save Changes" type="red-solid" className="mr-3" />
-                <Button text="cancel" type="white-solid" />
-              </div>
-            </div>
-          )}
+            </form>
+          </FormProvider>
         </div>
       </div>
     </>

@@ -42,3 +42,8 @@ export const sortSteps = (
   a: readTripsQuery_readTrips_targetUser_trips_steps,
   b: readTripsQuery_readTrips_targetUser_trips_steps,
 ) => new Date(a.arrivedAt).getTime() - new Date(b.arrivedAt).getTime();
+
+export const sleep = (milSec: number) =>
+  new Promise((resolve) => {
+    return setTimeout(resolve, milSec);
+  });

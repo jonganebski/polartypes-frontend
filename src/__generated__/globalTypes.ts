@@ -21,9 +21,9 @@ export interface CommentInputType {
 
 export interface CreateAccountInput {
   email: string;
-  password: string;
   firstName: string;
   lastName: string;
+  password: string;
 }
 
 export interface CreateCommentInput {
@@ -50,6 +50,10 @@ export interface CreateTripInput {
   availability: Availability;
   summary?: string | null;
   endDate?: string | null;
+}
+
+export interface DeleteAccountInput {
+  password?: string | null;
 }
 
 export interface DeleteCommentInput {
@@ -122,10 +126,6 @@ export interface UnfollowInput {
 }
 
 export interface UpdateAccountInput {
-  id?: number | null;
-  createdAt?: any | null;
-  updatedAt?: any | null;
-  email?: string | null;
   username?: string | null;
   slug?: string | null;
   password?: string | null;
@@ -135,12 +135,7 @@ export interface UpdateAccountInput {
   avatarUrl?: string | null;
   city?: string | null;
   timeZone?: string | null;
-  trips?: TripInputType[] | null;
-  steps?: StepInputType[] | null;
-  followers?: UserInputType[] | null;
-  followings?: UserInputType[] | null;
-  comments?: CommentInputType[] | null;
-  likes?: LikeInputType[] | null;
+  newPassword?: string | null;
 }
 
 export interface UpdateStepInput {

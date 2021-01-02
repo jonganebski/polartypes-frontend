@@ -16,6 +16,7 @@ import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
 import { SaveStepModal } from '../components/Modals/Save-step';
+import { Options } from '../components/Options';
 import { TripStatus } from '../components/Trip-status';
 import { useStepIdContext } from '../context';
 import { sortSteps } from '../helpers';
@@ -83,6 +84,7 @@ export const Trip = () => {
   }
   return (
     <FormProvider {...f}>
+      <Options isOption={isOption} setIsOption={setIsOption} />
       <CommonHeader setIsOption={setIsOption} />
       {data.readTrip.error ? (
         <div>{data.readTrip.error}</div>

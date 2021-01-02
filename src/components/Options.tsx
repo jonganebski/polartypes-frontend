@@ -15,7 +15,7 @@ interface IOptionProps {
 
 export const Options: React.FC<IOptionProps> = ({ isOption, setIsOption }) => {
   const history = useHistory();
-  const [isSettingsModal, setIsSettingModal] = useState(true);
+  const [isSettingsModal, setIsSettingModal] = useState(false);
   const [isProfile, setIsProfile] = useState(false);
   return (
     <>
