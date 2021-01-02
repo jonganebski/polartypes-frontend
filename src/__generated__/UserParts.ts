@@ -4,18 +4,18 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: updatedUser
+// GraphQL fragment: UserParts
 // ====================================================
 
-export interface updatedUser {
+export interface UserParts {
   __typename: "Users";
   id: number;
+  username: string;
   firstName: string;
   lastName: string;
-  username: string;
+  avatarUrl: string | null;
+  timeZone: string | null;
   slug: string;
   city: string | null;
-  timeZone: string | null;
-  avatarUrl: string | null;
   about: string | null;
 }

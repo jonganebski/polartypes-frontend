@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: updatedStep
+// GraphQL fragment: UpdatedStep
 // ====================================================
 
-export interface updatedStep {
+export interface UpdatedStep {
   __typename: "Step";
   location: string;
   lat: number;

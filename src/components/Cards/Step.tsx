@@ -2,7 +2,7 @@ import { gql, useMutation } from '@apollo/client';
 import { faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { client } from '../../apollo';
 import { useStepIdContext } from '../../context';

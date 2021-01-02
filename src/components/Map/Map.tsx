@@ -1,11 +1,6 @@
 import L from 'leaflet';
 import React, { useEffect, useState } from 'react';
-import {
-  MapContainer,
-  MapContainerProps,
-  Polyline,
-  TileLayer,
-} from 'react-leaflet';
+import { MapContainer, Polyline, TileLayer } from 'react-leaflet';
 import { useHistory, useParams } from 'react-router-dom';
 import { sortSteps } from '../../helpers';
 import { useLazyTrip } from '../../hooks/useTrip';

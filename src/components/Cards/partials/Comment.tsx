@@ -75,7 +75,7 @@ export const Comment: React.FC<ICommentProps> = ({ step, comment }) => {
           `,
           data: {
             __typename: 'Step',
-            comments: [...prevStep.comments.filter((c) => c.id !== comment.id)],
+            comments: [...step.comments.filter((c) => c.id !== comment.id)],
           },
         });
       }
@@ -92,7 +92,6 @@ export const Comment: React.FC<ICommentProps> = ({ step, comment }) => {
       deleteCommentMutation({ variables: { input: { id: commentId } } });
     }
   };
-
   return (
     <li className="flex items-center">
       <Avatar avatarUrl={comment.creator.avatarUrl} size={8} />
@@ -102,7 +101,7 @@ export const Comment: React.FC<ICommentProps> = ({ step, comment }) => {
         </Link>
         <p className="inline text-myGray-darkest">{comment.text}</p>
         <span className="block text-xs text-myGray-dark">
-          {moment(comment.createdAt).format('D MMMM YYYY') === 'Invalid date'
+          {isNaN(new Date(comment.createdAt).getTime())
             ? comment.createdAt
             : moment(comment.createdAt).format('D MMMM YYYY')}
         </span>

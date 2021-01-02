@@ -1,4 +1,5 @@
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { STEPS_FRAGMENTS, TRAVELER_FRAGMENT } from '../fragments';
 import {
   readTripQuery,
   readTripQueryVariables,
@@ -15,50 +16,16 @@ export const READ_TRIP_QUERY = gql`
         coverUrl
         viewCount
         traveler {
-          id
-          username
-          firstName
-          lastName
-          avatarUrl
-          timeZone
-          followers {
-            id
-          }
+          ...TravelerParts
         }
         steps {
-          id
-          name
-          location
-          country
-          arrivedAt
-          timeZone
-          lat
-          lon
-          story
-          imgUrls
-          traveler {
-            id
-          }
-          likes {
-            user {
-              username
-              avatarUrl
-            }
-          }
-          comments {
-            id
-            createdAt
-            text
-            creator {
-              id
-              username
-              avatarUrl
-            }
-          }
+          ...StepParts
         }
       }
     }
   }
+  ${TRAVELER_FRAGMENT}
+  ${STEPS_FRAGMENTS}
 `;
 
 export const useTrip = (tripId: string) => {

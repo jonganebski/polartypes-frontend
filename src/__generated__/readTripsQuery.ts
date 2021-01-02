@@ -42,9 +42,10 @@ export interface readTripsQuery_readTrips_targetUser {
   username: string;
   firstName: string;
   lastName: string;
+  avatarUrl: string | null;
+  timeZone: string | null;
   about: string | null;
   city: string | null;
-  avatarUrl: string | null;
   followers: readTripsQuery_readTrips_targetUser_followers[];
   followings: readTripsQuery_readTrips_targetUser_followings[];
   trips: readTripsQuery_readTrips_targetUser_trips[];

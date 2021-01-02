@@ -5,11 +5,12 @@ import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { client } from '../../apollo';
+import { USER_FRAGMENT } from '../../fragments';
 import { deleteFiles, sleep } from '../../helpers';
 import { useUpdateAccount } from '../../hooks/useUpdateAccount';
 import { useWhoAmI } from '../../hooks/useWhoAmI';
 import { updateAccountMutation } from '../../__generated__/updateAccountMutation';
-import { updatedUser } from '../../__generated__/updatedUser';
+import { UserParts } from '../../__generated__/UserParts';
 import { Button } from '../Button';
 import { Account } from './partials/Account';
 import { ModalBackground } from './partials/Background';
@@ -73,21 +74,9 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
         username,
         timeZone,
       } = f.getValues();
-      client.writeFragment<updatedUser>({
+      client.writeFragment<UserParts>({
         id: `Users:${userData.whoAmI.id}`,
-        fragment: gql`
-          fragment updatedUser on Users {
-            id
-            firstName
-            lastName
-            username
-            slug
-            city
-            timeZone
-            avatarUrl
-            about
-          }
-        `,
+        fragment: USER_FRAGMENT,
         data: {
           __typename: 'Users',
           id: userData.whoAmI.id,

@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: whoAmIQuery
+// GraphQL fragment: UserCoreParts
 // ====================================================
 
-export interface whoAmIQuery_whoAmI {
+export interface UserCoreParts {
   __typename: "Users";
   id: number;
   username: string;
@@ -15,11 +15,4 @@ export interface whoAmIQuery_whoAmI {
   lastName: string;
   avatarUrl: string | null;
   timeZone: string | null;
-  slug: string;
-  city: string | null;
-  about: string | null;
-}
-
-export interface whoAmIQuery {
-  whoAmI: whoAmIQuery_whoAmI;
 }

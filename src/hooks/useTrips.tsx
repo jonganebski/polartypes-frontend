@@ -1,4 +1,5 @@
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { TARGET_USER_FRAGMENT } from '../fragments';
 import {
   readTripsQuery,
   readTripsQueryVariables,
@@ -10,34 +11,11 @@ const READ_TRIPS_QUERY = gql`
       ok
       error
       targetUser {
-        id
-        username
-        firstName
-        lastName
-        about
-        city
-        avatarUrl
-        followers {
-          id
-        }
-        followings {
-          id
-        }
-        trips {
-          id
-          name
-          startDate
-          endDate
-          steps {
-            id
-            lat
-            lon
-            arrivedAt
-          }
-        }
+        ...TargetUserParts
       }
     }
   }
+  ${TARGET_USER_FRAGMENT}
 `;
 
 export const useTrips = (targetUsername: string) => {

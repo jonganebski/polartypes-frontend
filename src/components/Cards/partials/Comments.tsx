@@ -125,9 +125,15 @@ export const Comments: React.FC<ICommentProps> = ({ step }) => {
         </form>
       )}
       <ul className="py-4 grid gap-y-4">
-        {step.comments.map((comment, i) => (
-          <Comment key={i} step={step} comment={comment} />
-        ))}
+        {step.comments
+          .slice()
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          )
+          .map((comment, i) => (
+            <Comment key={i} step={step} comment={comment} />
+          ))}
       </ul>
     </div>
   );

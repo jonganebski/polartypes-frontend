@@ -2,6 +2,7 @@ import { gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
 import { client } from '../apollo';
 import { TImage } from '../components/Modals/Save-step';
+import { UPDATED_STEP_FRAGMENT } from '../fragments';
 import { ICreateStepFormProps } from '../pages/Trip';
 import { readTripQuery_readTrip_trip_steps } from '../__generated__/readTripQuery';
 import {
@@ -36,19 +37,7 @@ export const useUpdateStep = (
     editingStep &&
       client.writeFragment({
         id: `Step:${editingStep.id}`,
-        fragment: gql`
-          fragment updatedStep on Step {
-            location
-            lat
-            lon
-            name
-            country
-            arrivedAt
-            timeZone
-            story
-            imgUrls
-          }
-        `,
+        fragment: UPDATED_STEP_FRAGMENT,
         data: {
           ...values,
           lat: +lat,
