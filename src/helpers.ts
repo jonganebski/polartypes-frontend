@@ -1,5 +1,8 @@
 import Axios from 'axios';
-import { readTripsQuery_readTrips_targetUser_trips_steps } from './__generated__/readTripsQuery';
+import {
+  readTripsQuery_readTrips_targetUser_trips,
+  readTripsQuery_readTrips_targetUser_trips_steps,
+} from './__generated__/readTripsQuery';
 
 interface IGetTimeZoneOutput {
   ok: boolean;
@@ -47,3 +50,20 @@ export const sleep = (milSec: number) =>
   new Promise((resolve) => {
     return setTimeout(resolve, milSec);
   });
+
+export const getBackgroundImage = (
+  trip: readTripsQuery_readTrips_targetUser_trips,
+) => {
+  if (trip.coverUrl) {
+    return trip.coverUrl;
+  }
+  if (trip.steps.length !== 0) {
+    for (let i = 0; i < trip.steps.length; i++) {
+      const imgUrls = trip.steps[i].imgUrls;
+      if (imgUrls && imgUrls.length !== 0) {
+        return imgUrls[0];
+      }
+    }
+  }
+  return '/topography.png';
+};

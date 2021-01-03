@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ReadTripInput } from "./globalTypes";
+import { ReadTripInput, Availability } from "./globalTypes";
 
 // ====================================================
 // GraphQL query operation: readTripQuery
@@ -75,10 +75,14 @@ export interface readTripQuery_readTrip_trip_steps {
 
 export interface readTripQuery_readTrip_trip {
   __typename: "Trip";
+  id: number;
+  name: string;
   startDate: string;
   endDate: string | null;
   coverUrl: string | null;
+  summary: string | null;
   viewCount: number;
+  availability: Availability;
   traveler: readTripQuery_readTrip_trip_traveler;
   steps: readTripQuery_readTrip_trip_steps[];
 }

@@ -1,5 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
-import { faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
+import { faCalendarAlt, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import {
   faGlobe,
   faLock,
@@ -10,11 +10,14 @@ import moment from 'moment-timezone';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
+import { getBackgroundImage } from '../../helpers';
+import { useUpdateTrip } from '../../hooks/useUpdateTrip';
 import {
   createTripMutation,
   createTripMutationVariables,
 } from '../../__generated__/createTripMutation';
 import { Availability } from '../../__generated__/globalTypes';
+import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';
 import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
 import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
 import { Button } from '../Button';
@@ -22,6 +25,7 @@ import { FormError } from '../Form-error';
 import { NewCalendar } from '../Tooltips/Calendar';
 import { ModalBackground } from './partials/Background';
 import { ModalCloseIcon } from './partials/CloseIcon';
+import { StepImages } from './StepImages';
 
 const CREATE_TRIP_MUTATION = gql`
   mutation createTripMutation($input: CreateTripInput!) {
@@ -36,10 +40,11 @@ const CREATE_TRIP_MUTATION = gql`
 interface ICreateTripModal {
   userData: whoAmIQuery;
   setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
+  editingTrip?: readTripQuery_readTrip_trip | null;
   trips?: readTripsQuery_readTrips_targetUser_trips[];
 }
 
-interface IFormProps {
+export interface ISaveTripFormProps {
   name: string;
   summary: string;
   startDate: string;
@@ -50,6 +55,7 @@ interface IFormProps {
 export const CreateTripModal: React.FC<ICreateTripModal> = ({
   userData,
   setIsCreateTrip,
+  editingTrip = null,
   trips = [],
 }) => {
   const history = useHistory();
@@ -57,14 +63,24 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
   const [isStartDateCalendar, setIsStartDateCalendar] = useState<
     boolean | null
   >(null);
-  const f = useForm<IFormProps>({
+  const [isSelectCoverModal, setIsSelectCoverModal] = useState(false);
+  const [coverUrl, setCoverUrl] = useState(
+    editingTrip ? getBackgroundImage(editingTrip) : '',
+  );
+  const defaultValues: Partial<ISaveTripFormProps> = editingTrip
+    ? {
+        startDate: editingTrip.startDate,
+        endDate: editingTrip.endDate ?? '',
+        name: editingTrip.name,
+        summary: editingTrip.summary ?? '',
+        availability: editingTrip.availability,
+      }
+    : { startDate: moment().tz(timeZone).format(), endDate: '' };
+  const f = useForm<ISaveTripFormProps>({
     mode: 'onChange',
-    defaultValues: {
-      startDate: moment().tz(timeZone).format(),
-      endDate: '',
-    },
+    defaultValues,
   });
-  const { setError, clearErrors, getValues, setValue } = f;
+  const { setError, clearErrors, getValues, setValue, register } = f;
   const startDate = getValues('startDate');
   const endDate = getValues('endDate');
 
@@ -152,15 +168,34 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
       history.push(`/${userData.whoAmI.username}/${tripId}`);
     }
   };
-  const [createTripMutation, { loading }] = useMutation<
+  const [createTripMutation, { loading: createLoading }] = useMutation<
     createTripMutation,
     createTripMutationVariables
   >(CREATE_TRIP_MUTATION, { onCompleted });
-  const onSubmit = () => {
+  const [updateTripMutation, { loading: updateLoading }] = useUpdateTrip(
+    f,
+    editingTrip,
+    coverUrl,
+  );
+
+  const onSubmit = async () => {
     const { endDate, ...values } = getValues();
-    createTripMutation({
-      variables: { input: { ...values, endDate: endDate ? endDate : null } },
-    });
+    if (editingTrip) {
+      updateTripMutation({
+        variables: {
+          input: {
+            ...values,
+            coverUrl,
+            endDate: endDate ? endDate : null,
+            tripId: editingTrip.id,
+          },
+        },
+      });
+    } else {
+      createTripMutation({
+        variables: { input: { ...values, endDate: endDate ? endDate : null } },
+      });
+    }
   };
 
   const getEndateValue = () => {
@@ -172,15 +207,13 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
     }
     return dateFormat;
   };
-  console.log('getValues', f.getValues());
-
   return (
     <FormProvider {...f}>
       <ModalBackground onClick={() => setIsCreateTrip(false)} />
       <div className="modal overflow-hidden">
         <ModalCloseIcon onClick={() => setIsCreateTrip(false)} />
         <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
-          New Trip
+          {editingTrip ? 'Edit trip' : 'New trip'}
         </div>
         <form
           onSubmit={f.handleSubmit(onSubmit)}
@@ -189,10 +222,27 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           <div className="p-6 text-xl text-myGreen-darkest font-semibold border-b bg-myGray-lightest">
             Trip details
           </div>
+          {editingTrip && (
+            <div className="px-6 flex items-center">
+              <div
+                className="mr-8 w-28 h-28 rounded-lg bg-cover bg-center shadow-xl"
+                style={{
+                  backgroundImage: `url(${coverUrl})`,
+                }}
+              ></div>
+              <Button
+                text="Change cover photo"
+                isSubmitBtn={false}
+                size="sm"
+                type="blue-regular"
+                onClick={() => setIsSelectCoverModal(true)}
+              />
+            </div>
+          )}
           <div className="grid gap-y-1 px-6">
             <h6 className="font-semibold text-myGreen-darkest">Trip name</h6>
             <input
-              ref={f.register({ required: 'Please enter a name for the trip' })}
+              ref={register({ required: 'Please enter a name for the trip' })}
               name="name"
               type="text"
               placeholder="e.g. South American Trip"
@@ -205,7 +255,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           <div className="grid gap-y-1 px-6">
             <h6 className="font-semibold text-myGreen-darkest">Trip summary</h6>
             <textarea
-              ref={f.register({ maxLength: 80 })}
+              ref={register({ maxLength: 80 })}
               name="summary"
               maxLength={80}
               placeholder="e.g. An awesome roadtrip through the deserts of Africa with my best friends"
@@ -221,7 +271,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <h6 className="font-semibold text-myGreen-darkest">Start date</h6>
             <div className="relative">
               <input
-                ref={f.register({ required: true })}
+                ref={register({ required: true })}
                 name="startDate"
                 readOnly
                 type="text"
@@ -254,7 +304,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <h6 className="font-semibold text-myGreen-darkest">End date</h6>
             <div className="relative">
               <input
-                ref={f.register()}
+                ref={register()}
                 name="endDate"
                 readOnly
                 type="text"
@@ -295,7 +345,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
           <div className="grid">
             <label className="px-6 pb-6 flex items-center border-b border-myGray-light cursor-pointer">
               <input
-                ref={f.register({ required: true })}
+                ref={register({ required: true })}
                 name="availability"
                 value={Availability.Private}
                 type="radio"
@@ -313,7 +363,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             </label>
             <label className="p-6 flex items-center cursor-pointer">
               <input
-                ref={f.register({ required: true })}
+                ref={register({ required: true })}
                 name="availability"
                 value={Availability.Followers}
                 type="radio"
@@ -331,7 +381,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             </label>
             <label className="p-6 flex items-center border-t border-myGray-light cursor-pointer">
               <input
-                ref={f.register({ required: true })}
+                ref={register({ required: true })}
                 name="availability"
                 value={Availability.Public}
                 type="radio"
@@ -348,16 +398,37 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
               </div>
             </label>
           </div>
-          <div className="p-6 grid bg-myGray-lightest border-t border-myGray-light rounded-bl-2xl">
+          <div
+            className={`p-6 ${
+              editingTrip ? 'flex justify-between' : 'grid'
+            } bg-myGray-lightest border-t border-myGray-light rounded-bl-2xl`}
+          >
             <Button
-              text="Create trip"
+              text={editingTrip ? 'Save changes' : 'Create trip'}
               disabled={!f.formState.isValid}
-              loading={loading}
+              loading={createLoading || updateLoading}
               type="red-solid"
             />
+            {editingTrip && (
+              <Button
+                text=""
+                type="white-solid"
+                icon={<FontAwesomeIcon icon={faTrashAlt} className="text-lg" />}
+                fontColorClass="text-myRed"
+                isSubmitBtn={false}
+              />
+            )}
           </div>
         </form>
       </div>
+      {editingTrip && isSelectCoverModal && (
+        <StepImages
+          coverUrl={coverUrl}
+          setCoverUrl={setCoverUrl}
+          steps={editingTrip.steps}
+          setIsSelectCoverModal={setIsSelectCoverModal}
+        />
+      )}
     </FormProvider>
   );
 };

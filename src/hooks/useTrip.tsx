@@ -11,10 +11,14 @@ export const READ_TRIP_QUERY = gql`
       ok
       error
       trip {
+        id
+        name
         startDate
         endDate
         coverUrl
+        summary
         viewCount
+        availability
         traveler {
           ...TravelerParts
         }

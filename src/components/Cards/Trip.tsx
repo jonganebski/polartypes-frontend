@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useDistanceContext } from '../../context';
 import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
 import moment from 'moment';
+import { getBackgroundImage } from '../../helpers';
 
 interface ITripCardProps {
   trip: readTripsQuery_readTrips_targetUser_trips;
@@ -23,6 +24,7 @@ export const TripCard: React.FC<ITripCardProps> = ({
     trip.endDate ? moment(trip.endDate) : moment(),
     'days',
   );
+
   return (
     <li
       style={{ minHeight: '220px' }}
@@ -34,8 +36,7 @@ export const TripCard: React.FC<ITripCardProps> = ({
       >
         <div
           style={{
-            backgroundImage:
-              'url("andreas-gucklhorn-mawU2PoJWfU-unsplash.jpg")',
+            backgroundImage: `url(${getBackgroundImage(trip)})`,
           }}
           className="absolute top-0 w-full h-full bg-cover bg-center transform group-hover:scale-105 transition-transform"
         ></div>

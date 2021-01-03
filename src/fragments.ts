@@ -95,11 +95,13 @@ export const TARGET_USER_FRAGMENT = gql`
       name
       startDate
       endDate
+      coverUrl
       steps {
         id
         lat
         lon
         arrivedAt
+        imgUrls
       }
     }
   }

@@ -25,6 +25,7 @@ export interface readTripsQuery_readTrips_targetUser_trips_steps {
   lat: number;
   lon: number;
   arrivedAt: string;
+  imgUrls: string[] | null;
 }
 
 export interface readTripsQuery_readTrips_targetUser_trips {
@@ -33,6 +34,7 @@ export interface readTripsQuery_readTrips_targetUser_trips {
   name: string;
   startDate: string;
   endDate: string | null;
+  coverUrl: string | null;
   steps: readTripsQuery_readTrips_targetUser_trips_steps[];
 }
 

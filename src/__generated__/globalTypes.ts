@@ -158,6 +158,22 @@ export interface UpdateStepInput {
   stepId: number;
 }
 
+export interface UpdateTripInput {
+  id?: number | null;
+  createdAt?: any | null;
+  updatedAt?: any | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  name?: string | null;
+  summary?: string | null;
+  coverUrl?: string | null;
+  availability?: Availability | null;
+  viewCount?: number | null;
+  traveler?: UserInputType | null;
+  steps?: StepInputType[] | null;
+  tripId: number;
+}
+
 export interface UserInputType {
   email: string;
   username: string;

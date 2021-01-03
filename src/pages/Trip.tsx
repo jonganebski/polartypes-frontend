@@ -15,18 +15,24 @@ import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
+import { CreateTripModal } from '../components/Modals/Create-trip';
 import { SaveStepModal } from '../components/Modals/Save-step';
 import { Options } from '../components/Options';
 import { TripStatus } from '../components/Trip-status';
 import { useStepIdContext } from '../context';
-import { sortSteps } from '../helpers';
+import { getBackgroundImage, sortSteps } from '../helpers';
 import { useFollow } from '../hooks/useFollow';
 import { useTrip } from '../hooks/useTrip';
+import { useTrips } from '../hooks/useTrips';
 import { useUnfollow } from '../hooks/useUnfollow';
 import { useWhoAmI } from '../hooks/useWhoAmI';
-import { readTripQuery_readTrip_trip_steps } from '../__generated__/readTripQuery';
+import {
+  readTripQuery_readTrip_trip,
+  readTripQuery_readTrip_trip_steps,
+} from '../__generated__/readTripQuery';
 
 interface IParams {
+  username: string;
   tripId: string;
 }
 
@@ -43,11 +49,16 @@ export interface ICreateStepFormProps {
 
 export const Trip = () => {
   const articleRef = useRef<HTMLElement | null>(null);
-  const { tripId } = useParams<IParams>();
+  const { username: targetUsername, tripId } = useParams<IParams>();
   const { data: userData } = useWhoAmI();
   const ctx = useStepIdContext();
+  const [isEditTripModal, setIsEditTripModal] = useState(false);
   const [isSaveStepModal, setIsSaveStepModal] = useState(false);
   const [isOption, setIsOption] = useState(false);
+  const [
+    editingTrip,
+    setEditingTrip,
+  ] = useState<readTripQuery_readTrip_trip | null>(null);
   const [
     editingStep,
     setEditingStep,
@@ -59,6 +70,7 @@ export const Trip = () => {
     defaultValues: {},
   });
   const { data } = useTrip(tripId);
+  const { data: tripsData } = useTrips(targetUsername);
   const [followMutation] = useFollow(data?.readTrip.trip?.traveler.id);
   const [unfollowMutation] = useUnfollow(data?.readTrip.trip?.traveler.id);
   const isSelf = data?.readTrip.trip?.traveler.id === userData?.whoAmI.id;
@@ -90,7 +102,7 @@ export const Trip = () => {
       ) : (
         <main className="h-screenExceptHeader flex">
           <section className="relative w-1/2 h-full min-w-px600">
-            {isSaveStepModal && (
+            {isSaveStepModal && isSelf && (
               <SaveStepModal
                 tripId={tripId}
                 tripStartDate={data.readTrip.trip.startDate}
@@ -99,6 +111,16 @@ export const Trip = () => {
                 belowStepTimeZone={belowStepTimeZone}
                 setIsSaveStepModal={setIsSaveStepModal}
                 editingStep={editingStep}
+              />
+            )}
+            {isEditTripModal && userData && isSelf && (
+              <CreateTripModal
+                userData={userData}
+                setIsCreateTrip={setIsEditTripModal}
+                editingTrip={editingTrip}
+                trips={tripsData?.readTrips.targetUser?.trips.filter(
+                  (trip) => trip.id !== data.readTrip.trip?.id,
+                )}
               />
             )}
             <div className="h-tripHeader px-2 flex items-center justify-between">
@@ -184,6 +206,10 @@ export const Trip = () => {
                     text="Trip settings"
                     type="white-solid"
                     size="sm"
+                    onClick={() => {
+                      setEditingTrip(data.readTrip.trip);
+                      setIsEditTripModal(true);
+                    }}
                     icon={
                       <FontAwesomeIcon
                         icon={faCog}
@@ -197,18 +223,32 @@ export const Trip = () => {
             <article ref={articleRef} className="h-tripBody overflow-y-scroll">
               <div
                 style={{
-                  backgroundImage:
-                    'url("../andreas-gucklhorn-mawU2PoJWfU-unsplash.jpg")',
+                  backgroundImage: `url(${getBackgroundImage(
+                    data.readTrip.trip,
+                  )})`,
                 }}
                 className="relative h-96 bg-cover bg-center"
               >
                 <div className="absolute w-full h-full flex flex-col items-center justify-between bg-black bg-opacity-50">
                   <div className="h-full flex flex-col items-center justify-center">
                     <h3 className="mb-1 text-white text-sm font-semibold">
-                      April 2020 - December 2020
+                      {moment(data.readTrip.trip.startDate).format(
+                        'MMMM YYYY',
+                      ) ===
+                      moment(data.readTrip.trip.endDate).format('MMMM YYYY')
+                        ? moment(data.readTrip.trip.startDate).format(
+                            'MMMM YYYY',
+                          )
+                        : moment(data.readTrip.trip.startDate).format(
+                            'MMMM YYYY',
+                          ) +
+                          ' - ' +
+                          moment(data.readTrip.trip.endDate).format(
+                            'MMMM YYYY',
+                          )}
                     </h3>
                     <h1 className="text-white text-3xl font-semibold">
-                      Trip name
+                      {data.readTrip.trip.name}
                     </h1>
                   </div>
                   <div className="w-full p-3 grid grid-cols-7 text-white text-center bg-myGreen-darkest bg-opacity-70">

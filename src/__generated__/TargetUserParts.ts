@@ -23,6 +23,7 @@ export interface TargetUserParts_trips_steps {
   lat: number;
   lon: number;
   arrivedAt: string;
+  imgUrls: string[] | null;
 }
 
 export interface TargetUserParts_trips {
@@ -31,6 +32,7 @@ export interface TargetUserParts_trips {
   name: string;
   startDate: string;
   endDate: string | null;
+  coverUrl: string | null;
   steps: TargetUserParts_trips_steps[];
 }
 

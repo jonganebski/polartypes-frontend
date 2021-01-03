@@ -21,10 +21,10 @@ interface IPrams {
 
 export const Trips = () => {
   const { data: userData } = useWhoAmI();
+  const { username: targetUsername } = useParams<IPrams>();
   const [isCreateTrip, setIsCreateTrip] = useState(false);
   const [isOption, setIsOption] = useState(false);
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
-  const { username: targetUsername } = useParams<IPrams>();
   const { data } = useTrips(targetUsername);
   const [followMutation] = useFollow(data?.readTrips.targetUser?.id);
   const [unfollowMutation] = useUnfollow(data?.readTrips.targetUser?.id);
