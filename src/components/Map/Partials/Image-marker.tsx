@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import React, { useEffect } from 'react';
-import { Marker, useMap } from 'react-leaflet';
+import { Marker, Tooltip, useMap } from 'react-leaflet';
 import { useStepIdContext } from '../../../context';
 import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
 
@@ -42,6 +42,29 @@ export const ImageMarker: React.FC<IImageMarkerProps> = ({ imgUrl, step }) => {
       eventHandlers={{
         click: handleClick,
       }}
-    />
+    >
+      <Tooltip
+        className="p-0 border-none bg-transparent"
+        opacity={1}
+        offset={[10, 0]}
+      >
+        <div className="rounded-xl overflow-hidden">
+          {step.imgUrls && step.imgUrls.length !== 0 && (
+            <div
+              className="w-60 h-72 bg-cover bg-center bg-myGreen-dark"
+              style={{ backgroundImage: `url(${step.imgUrls[0]})` }}
+            ></div>
+          )}
+          <div className="px-5 py-4 bg-white">
+            <h5 className="text-myRed-light font-semibold text-sm">
+              {step.name}
+            </h5>
+            <h6 className="text-myGray-dark font-light text-xs">
+              {step.country}
+            </h6>
+          </div>
+        </div>
+      </Tooltip>
+    </Marker>
   );
 };
