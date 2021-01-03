@@ -39,53 +39,16 @@ export const Comment: React.FC<ICommentProps> = ({ step, comment }) => {
       deleteComment: { ok, error },
     } = data;
     if (ok && !error) {
-      const prevStep = client.readFragment<stepComments>({
-        id: `Step:${step.id}`,
-        fragment: gql`
-          fragment stepComments on Step {
-            comments {
-              id
-              createdAt
-              text
-              creator {
-                id
-                username
-                avatarUrl
-              }
-            }
-          }
-        `,
-      });
-      if (prevStep && userData) {
-        client.writeFragment<stepComments>({
-          id: `Step:${step.id}`,
-          fragment: gql`
-            fragment stepComments on Step {
-              comments {
-                id
-                createdAt
-                text
-                creator {
-                  id
-                  username
-                  avatarUrl
-                }
-              }
-            }
-          `,
-          data: {
-            __typename: 'Step',
-            comments: [...step.comments.filter((c) => c.id !== comment.id)],
-          },
-        });
-      }
+      client.cache.evict({ id: `Comment:${comment.id}` });
     }
   };
 
   const [deleteCommentMutation, { loading }] = useMutation<
     deleteCommentMutation,
     deleteCommentMutationVariables
-  >(DELETE_COMMENT_MUTATION, { onCompleted });
+  >(DELETE_COMMENT_MUTATION, {
+    onCompleted,
+  });
 
   const onDeleteCommentIconClick = (commentId: number) => {
     if (!loading) {

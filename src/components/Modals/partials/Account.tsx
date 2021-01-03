@@ -2,7 +2,7 @@ import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { isLoggedInVar } from '../../../apollo';
+import { client, isLoggedInVar } from '../../../apollo';
 import { AZ_NUM_PATTERN, PW_MIN_LENGTH, TOKEN } from '../../../constants';
 import { useWhoAmI } from '../../../hooks/useWhoAmI';
 import {
@@ -35,6 +35,7 @@ export const Account: React.FC<IAccountProps> = ({ hidden }) => {
     } = data;
     console.log(ok, error);
     if (ok && !error && userData) {
+      client.cache.evict({ id: `Users:${userData.whoAmI.id}` });
       localStorage.removeItem(TOKEN);
       isLoggedInVar(false);
       history.push('/');

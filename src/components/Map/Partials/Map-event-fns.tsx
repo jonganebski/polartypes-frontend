@@ -8,11 +8,13 @@ import { ICreateStepFormProps } from '../../../pages/Trip';
 interface IMapEventFnsProps {
   isSaveStepModal: boolean;
   positions: L.LatLngTuple[];
+  bounds?: L.LatLngTuple[];
 }
 
 export const MapEventFns: React.FC<IMapEventFnsProps> = ({
   isSaveStepModal,
   positions,
+  bounds,
 }) => {
   const f = useFormContext<ICreateStepFormProps>();
   const { setDistance } = useDistanceContext();
@@ -25,6 +27,12 @@ export const MapEventFns: React.FC<IMapEventFnsProps> = ({
       }
     },
   });
+
+  useEffect(() => {
+    if (bounds) {
+      map.flyToBounds(bounds, { maxZoom: 7 });
+    }
+  }, [bounds, map]);
 
   useEffect(() => {
     let dist = 0;

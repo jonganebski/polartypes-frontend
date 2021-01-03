@@ -90,26 +90,12 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
       .map((step) => {
         return [step.lat, step.lon] as L.LatLngTuple;
       });
-  console.log(bounds);
-  // 여기 문제 있음.
-  if (!bounds) {
-    return (
-      <MapContainer
-        center={[20, 20]}
-        zoom={3}
-        style={{ height: '100%', width: '100%' }}
-      >
-        <TileLayer
-          accessToken={MAPBOX_TOKEN}
-          url={`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}`}
-          attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
-        />
-      </MapContainer>
-    );
-  }
-
   return (
-    <MapContainer bounds={bounds} style={{ height: '100%', width: '100%' }}>
+    <MapContainer
+      center={[20, 20]}
+      zoom={3}
+      style={{ height: '100%', width: '100%' }}
+    >
       <TileLayer
         accessToken={MAPBOX_TOKEN}
         url={`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}`}
@@ -122,6 +108,7 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
             <MapEventFns
               isSaveStepModal={isSaveStepModal}
               positions={getPositionsTripCalled(trip.readTrip.trip.steps)}
+              bounds={bounds}
             />
             <DynamicPolylines steps={trip.readTrip.trip.steps} />
             {trip?.readTrip.trip?.steps.map((step, i) => {
@@ -142,6 +129,7 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
               <MapEventFns
                 isSaveStepModal={isSaveStepModal}
                 positions={getPositionsTripsCalled(trip.steps)}
+                bounds={bounds}
               />
               <Polyline
                 pathOptions={{ color: 'white', weight: 2 }}
