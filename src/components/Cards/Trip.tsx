@@ -1,9 +1,10 @@
 import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { months } from 'moment-timezone';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useDistanceContext } from '../../context';
 import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
+import moment from 'moment';
 
 interface ITripCardProps {
   trip: readTripsQuery_readTrips_targetUser_trips;
@@ -14,9 +15,14 @@ export const TripCard: React.FC<ITripCardProps> = ({
   trip,
   targetUsername,
 }) => {
-  const dateObject = new Date(trip.startDate);
-  const year = dateObject.getFullYear();
-  const monthIndex = dateObject.getMonth();
+  const { distance } = useDistanceContext();
+  const dateObject = moment(trip.startDate);
+  const year = dateObject.get('year');
+  const month = dateObject.format('MMMM');
+  const difference = dateObject.diff(
+    trip.endDate ? moment(trip.endDate) : moment(),
+    'days',
+  );
   return (
     <li
       style={{ minHeight: '220px' }}
@@ -49,14 +55,14 @@ export const TripCard: React.FC<ITripCardProps> = ({
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-5/6 flex justify-between text-white">
           <div className="leading-tight">
             <span className="block font-semibold">{year}</span>
-            <span className="text-xs">{months()[monthIndex]}</span>
+            <span className="text-xs">{month}</span>
           </div>
           <div className="leading-tight">
-            <span className="block font-semibold">{months()[monthIndex]}</span>
+            <span className="block font-semibold">{Math.abs(difference)}</span>
             <span className="text-xs">days</span>
           </div>
           <div className="leading-tight">
-            <span className="block font-semibold">distance</span>
+            <span className="block font-semibold">{distance}</span>
             <span className="text-xs">kilometers</span>
           </div>
           <div></div>

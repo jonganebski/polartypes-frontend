@@ -19,7 +19,7 @@ export const Clock: React.FC<IClockProps> = ({ timeZone }) => {
       moment.tz(getValues().arrivedAt, timeZone).minute(),
     ]),
   ).sort((a, b) => a - b);
-  console.log('clock render');
+
   const onHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { arrivedAt } = getValues();
     const hour = +e.currentTarget.value;
@@ -29,6 +29,7 @@ export const Clock: React.FC<IClockProps> = ({ timeZone }) => {
       { shouldValidate: true },
     );
   };
+
   const onMinuteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { arrivedAt } = getValues();
     const minute = +e.currentTarget.value;
@@ -38,6 +39,7 @@ export const Clock: React.FC<IClockProps> = ({ timeZone }) => {
       { shouldValidate: true },
     );
   };
+
   return (
     <div className="absolute top-14 left-1/2 transform -translate-x-1/2 z-10 p-5 bg-myGray-darkest rounded-lg">
       <div

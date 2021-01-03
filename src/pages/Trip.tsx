@@ -52,13 +52,12 @@ export const Trip = () => {
     editingStep,
     setEditingStep,
   ] = useState<readTripQuery_readTrip_trip_steps | null>(null);
-
   const [belowStepDate, setBelowStepDate] = useState<string>('');
+  const [belowStepTimeZone, setBelowStepTimeZone] = useState('');
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
     defaultValues: {},
   });
-  const [belowStepTimeZone, setBelowStepTimeZone] = useState('');
   const { data } = useTrip(tripId);
   const [followMutation] = useFollow(data?.readTrip.trip?.traveler.id);
   const [unfollowMutation] = useUnfollow(data?.readTrip.trip?.traveler.id);
@@ -89,7 +88,7 @@ export const Trip = () => {
       {data.readTrip.error ? (
         <div>{data.readTrip.error}</div>
       ) : (
-        <div className="h-screenExceptHeader flex">
+        <main className="h-screenExceptHeader flex">
           <section className="relative w-1/2 h-full min-w-px600">
             {isSaveStepModal && (
               <SaveStepModal
@@ -290,10 +289,10 @@ export const Trip = () => {
               </ul>
             </article>
           </section>
-          <section className="w-1/2 h-screenExceptHeader">
+          <section className="relative z-0 w-1/2 h-screenExceptHeader">
             <Map isSaveStepModal={isSaveStepModal} />
           </section>
-        </div>
+        </main>
       )}
     </FormProvider>
   );

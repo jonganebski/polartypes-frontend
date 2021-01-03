@@ -74,13 +74,16 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
   const getPositionsTripsCalled = (
     steps: readTripsQuery_readTrips_targetUser_trips_steps[],
   ) => {
-    return steps
-      .slice()
-      .sort(sortSteps)
-      .map((step) => {
-        const { lat, lon } = step;
-        return [lat, lon] as L.LatLngTuple;
-      });
+    if (steps.length !== 0) {
+      return steps
+        .slice()
+        .sort(sortSteps)
+        .map((step) => {
+          const { lat, lon } = step;
+          return [lat, lon] as L.LatLngTuple;
+        });
+    }
+    return [];
   };
 
   const getPositionsTripCalled = (steps: readTripQuery_readTrip_trip_steps[]) =>
@@ -90,6 +93,7 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
       .map((step) => {
         return [step.lat, step.lon] as L.LatLngTuple;
       });
+
   return (
     <MapContainer
       center={[20, 20]}
@@ -131,15 +135,17 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal = false }) => {
                 positions={getPositionsTripsCalled(trip.steps)}
                 bounds={bounds}
               />
-              <Polyline
-                pathOptions={{ color: 'white', weight: 2 }}
-                positions={getPositionsTripsCalled(trip.steps)}
-                eventHandlers={{
-                  click: () => {
-                    history.push(`/${targetUsername}/${trip.id}`);
-                  },
-                }}
-              />
+              {trip.steps.length !== 0 && (
+                <Polyline
+                  pathOptions={{ color: 'white', weight: 2 }}
+                  positions={getPositionsTripsCalled(trip.steps)}
+                  eventHandlers={{
+                    click: () => {
+                      history.push(`/${targetUsername}/${trip.id}`);
+                    },
+                  }}
+                />
+              )}
               {trip.steps.map((step, i) => {
                 return (
                   <PlainMarker

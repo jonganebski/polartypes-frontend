@@ -29,18 +29,20 @@ export const MapEventFns: React.FC<IMapEventFnsProps> = ({
   });
 
   useEffect(() => {
-    if (bounds) {
+    if (bounds && bounds.length !== 0) {
       map.flyToBounds(bounds, { maxZoom: 7 });
     }
   }, [bounds, map]);
 
   useEffect(() => {
     let dist = 0;
-    positions.reduce((prevPos, currPos) => {
-      const d = map.distance(prevPos, currPos) / 1000;
-      dist += Math.round(d);
-      return currPos;
-    });
+    if (positions.length !== 0) {
+      positions.reduce((prevPos, currPos) => {
+        const d = map.distance(prevPos, currPos) / 1000;
+        dist += Math.round(d);
+        return currPos;
+      });
+    }
     setDistance(dist);
   }, [map, positions, setDistance]);
 

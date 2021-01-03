@@ -157,8 +157,9 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
     createTripMutationVariables
   >(CREATE_TRIP_MUTATION, { onCompleted });
   const onSubmit = () => {
+    const { endDate, ...values } = getValues();
     createTripMutation({
-      variables: { input: { ...f.getValues() } },
+      variables: { input: { ...values, endDate: endDate ? endDate : null } },
     });
   };
 
@@ -253,7 +254,7 @@ export const CreateTripModal: React.FC<ICreateTripModal> = ({
             <h6 className="font-semibold text-myGreen-darkest">End date</h6>
             <div className="relative">
               <input
-                ref={f.register({ required: true })}
+                ref={f.register()}
                 name="endDate"
                 readOnly
                 type="text"
