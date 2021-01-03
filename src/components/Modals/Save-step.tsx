@@ -78,7 +78,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
     if (imagesRecord.length === 0 || !imagesRecord.some((image) => image.url)) {
       return;
     }
-    console.log('cleanupUnusedImageFilesOnCancel starting...');
     const urls: string[] = [];
     if (editingStep) {
       imagesRecord.forEach((image) => {
@@ -88,7 +87,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
         const isUsedImage = editingStep.imgUrls?.some(
           (url) => url === image.url,
         );
-        console.log(image, isUsedImage);
         if (!isUsedImage) {
           urls.push(image.url);
         }
@@ -96,7 +94,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
     } else {
       imagesRecord.forEach((image) => image.url && urls.push(image.url));
     }
-    console.log('deleting files in s3: ', urls);
     urls.length !== 0 && deleteFiles(urls);
   }, [editingStep, imagesRecord]);
 
@@ -104,19 +101,16 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
     if (imagesRecord.length === 0 || !imagesRecord.some((image) => image.url)) {
       return;
     }
-    console.log('cleanupUnusedImageFilesOnEditSubmit starting...');
     const urls: string[] = [];
     imagesRecord.forEach((image) => {
       if (!image.url) {
         return;
       }
       const isUsedImage = images.some((img) => img.url === image.url);
-      console.log(image, isUsedImage);
       if (!isUsedImage) {
         urls.push(image.url);
       }
     });
-    console.log('deleting files in s3: ', urls);
     urls.length !== 0 && deleteFiles(urls);
   };
 
@@ -130,7 +124,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
       }
     }, [] as string[]);
     if (editingStep) {
-      console.log('updateStepMutation starting...');
       cleanupUnusedImageFilesOnEditSubmit();
       updateStepMutation({
         variables: {
@@ -144,7 +137,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
         },
       });
     } else {
-      console.log('createStepMutation starting...');
       createStepMutation({
         variables: {
           input: {
@@ -190,7 +182,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
       setValue('arrivedAt', belowStepDate, { shouldValidate: true });
     }
   }, [belowStepDate, editingStep, setValue]);
-  console.log(formState.isValid);
   return (
     <>
       <div className="absolute z-50 top-0 left-0 w-full h-full bg-myGreen-darkest bg-opacity-80"></div>
@@ -361,9 +352,11 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                       timeZone={getValues('timeZone')}
                       selectedDate={getValues('arrivedAt')}
                       effectiveSince={tripStartDate}
-                      effectiveUntil={moment(tripEndDate)
-                        .add(1, 'days')
-                        .format()}
+                      effectiveUntil={
+                        tripEndDate
+                          ? moment(tripEndDate).add(1, 'days').format()
+                          : null
+                      }
                     />
                   )}
                 </div>

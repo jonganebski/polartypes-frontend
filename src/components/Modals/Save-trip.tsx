@@ -11,6 +11,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { getBackgroundImage } from '../../helpers';
+import { useDeleteTrip } from '../../hooks/useMutation/useDeleteTrip';
 import { useUpdateTrip } from '../../hooks/useMutation/useUpdateTrip';
 import {
   createTripMutation,
@@ -177,6 +178,7 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
     editingTrip,
     coverUrl,
   );
+  const [deleteTripMutation] = useDeleteTrip();
 
   const onSubmit = async () => {
     const { endDate, ...values } = getValues();
@@ -416,16 +418,27 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
                 icon={<FontAwesomeIcon icon={faTrashAlt} className="text-lg" />}
                 fontColorClass="text-myRed"
                 isSubmitBtn={false}
+                onClick={() => {
+                  const isConfirmed = window.confirm(
+                    'This trip will be removed permanently. Are you sure?',
+                  );
+                  if (isConfirmed) {
+                    deleteTripMutation({
+                      variables: { input: { tripId: editingTrip.id } },
+                    });
+                  }
+                }}
               />
             )}
           </div>
         </form>
       </div>
-      {editingTrip && isSelectCoverModal && (
+      {editingTrip && (
         <StepImages
           coverUrl={coverUrl}
           setCoverUrl={setCoverUrl}
           steps={editingTrip.steps}
+          isSelectCoverModal={isSelectCoverModal}
           setIsSelectCoverModal={setIsSelectCoverModal}
         />
       )}

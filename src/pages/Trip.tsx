@@ -90,6 +90,19 @@ export const Trip = () => {
       element?.scrollIntoView();
     }
   }, [element, readingStepId]);
+
+  const getDuration = (trip: readTripQuery_readTrip_trip) => {
+    const startDate = moment(trip.startDate).format('MMMM YYYY');
+    if (trip.endDate) {
+      const endDate = moment(trip.endDate).format('MMMM YYYY');
+      if (startDate === endDate) {
+        return startDate;
+      }
+      return `${startDate} - ${endDate}`;
+    }
+    return `${startDate} - Now traveling`;
+  };
+
   if (!data?.readTrip.trip) {
     return null;
   }
@@ -232,20 +245,7 @@ export const Trip = () => {
                 <div className="absolute w-full h-full flex flex-col items-center justify-between bg-black bg-opacity-50">
                   <div className="h-full flex flex-col items-center justify-center">
                     <h3 className="mb-1 text-white text-sm font-semibold">
-                      {moment(data.readTrip.trip.startDate).format(
-                        'MMMM YYYY',
-                      ) ===
-                      moment(data.readTrip.trip.endDate).format('MMMM YYYY')
-                        ? moment(data.readTrip.trip.startDate).format(
-                            'MMMM YYYY',
-                          )
-                        : moment(data.readTrip.trip.startDate).format(
-                            'MMMM YYYY',
-                          ) +
-                          ' - ' +
-                          moment(data.readTrip.trip.endDate).format(
-                            'MMMM YYYY',
-                          )}
+                      {getDuration(data.readTrip.trip)}
                     </h3>
                     <h1 className="text-white text-3xl font-semibold">
                       {data.readTrip.trip.name}

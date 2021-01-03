@@ -38,6 +38,19 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
     onYearChange,
   } = useCalendar(name, selectedDate, timeZone);
 
+  const computeIsValid = (date: moment.Moment) => {
+    if (effectiveSince && effectiveUntil) {
+      return date.isBetween(
+        moment.tz(effectiveSince, timeZone),
+        moment.tz(effectiveUntil, timeZone),
+      );
+    } else if (effectiveSince && !effectiveUntil) {
+      return date.isAfter(moment.tz(effectiveSince, timeZone));
+    } else {
+      return true;
+    }
+  };
+
   return (
     <div className="absolute top-14 left-1/2 transform -translate-x-1/2 z-10 px-1 py-5 bg-myGray-darkest rounded-2xl cursor-pointer">
       <div
@@ -96,19 +109,10 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
       <div className="grid grid-cols-7 justify-items-center text-myGray-dark text-xs">
         {datesLastMonth.map((date: moment.Moment, i) => {
           const isSelectedDate = date.isSame(selectedDate, 'day');
-          let isValid;
-          if (effectiveSince && effectiveUntil) {
-            isValid = date.isBetween(
-              moment.tz(effectiveSince, timeZone),
-              moment.tz(effectiveUntil, timeZone),
-            );
-          } else {
-            isValid = true;
-          }
           return (
             <Day
               key={i}
-              isValid={isValid}
+              isValid={computeIsValid(date)}
               isSelectedDate={isSelectedDate}
               date={date.get('dates')}
               onClick={() => onDateClick(date)}
@@ -117,19 +121,10 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
         })}
         {datesThisMonth.map((date: moment.Moment, i) => {
           const isSelectedDate = date.isSame(selectedDate, 'day');
-          let isValid;
-          if (effectiveSince && effectiveUntil) {
-            isValid = date.isBetween(
-              moment.tz(effectiveSince, timeZone),
-              moment.tz(effectiveUntil, timeZone),
-            );
-          } else {
-            isValid = true;
-          }
           return (
             <Day
               key={i}
-              isValid={isValid}
+              isValid={computeIsValid(date)}
               isSelectedDate={isSelectedDate}
               date={date.get('dates')}
               isThisMonth={true}
@@ -139,19 +134,10 @@ export const NewCalendar: React.FC<ICalendarProps> = ({
         })}
         {datesNextMonth.map((date, i) => {
           const isSelectedDate = date.isSame(selectedDate, 'day');
-          let isValid;
-          if (effectiveSince && effectiveUntil) {
-            isValid = date.isBetween(
-              moment.tz(effectiveSince, timeZone),
-              moment.tz(effectiveUntil, timeZone),
-            );
-          } else {
-            isValid = true;
-          }
           return (
             <Day
               key={i}
-              isValid={isValid}
+              isValid={computeIsValid(date)}
               isSelectedDate={isSelectedDate}
               date={date.get('dates')}
               onClick={() => onDateClick(date)}

@@ -1,23 +1,27 @@
+import { useMutation } from '@apollo/client';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment-timezone';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { client } from '../../apollo';
-import { useUpdateAccount } from '../../hooks/useMutation/useUpdateAccount';
+import { UPDATE_ACCOUNT_MUTATION } from '../../hooks/useMutation/useUpdateAccount';
 import { WHO_AM_I_QUERY } from '../../hooks/useQuery/useWhoAmI';
-import { updateAccountMutation } from '../../__generated__/updateAccountMutation';
+import {
+  updateAccountMutation,
+  updateAccountMutationVariables,
+} from '../../__generated__/updateAccountMutation';
 import { Button } from '../Button';
 import { FormError } from '../Form-error';
-import { ModalCloseIcon } from './partials/CloseIcon';
 import { ModalBackground } from './partials/Background';
+import { ModalCloseIcon } from './partials/CloseIcon';
 
 interface ISetTimeZoneModalProps {
   setIsAskTimeZone: React.Dispatch<React.SetStateAction<boolean>>;
   setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-interface IFormProps {
+export interface ISetTimeZoneFormProps {
   city: string;
   timeZone: string;
 }
@@ -27,15 +31,10 @@ export const SetTimeZoneModal: React.FC<ISetTimeZoneModalProps> = ({
   setIsCreateTrip,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    getValues,
-    formState,
-    register,
-    handleSubmit,
-    errors,
-  } = useForm<IFormProps>({
+  const f = useForm<ISetTimeZoneFormProps>({
     mode: 'onChange',
   });
+  const { getValues, formState, register, handleSubmit, errors } = f;
   const onCompleted = (data: updateAccountMutation) => {
     const {
       updateAccount: { ok, error },
@@ -57,7 +56,11 @@ export const SetTimeZoneModal: React.FC<ISetTimeZoneModalProps> = ({
       setIsCreateTrip(true);
     }
   };
-  const [updateAccountMutation] = useUpdateAccount(onCompleted);
+  const [updateAccountMutation] = useMutation<
+    updateAccountMutation,
+    updateAccountMutationVariables
+  >(UPDATE_ACCOUNT_MUTATION, { onCompleted });
+
   const onSubmit = () => {
     setIsLoading(true);
     updateAccountMutation({ variables: { input: { ...getValues() } } });

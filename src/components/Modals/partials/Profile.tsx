@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import moment from 'moment';
 import { Avatar } from '../../Avatar';
 import { Button } from '../../Button';
-import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
 import { useFormContext } from 'react-hook-form';
 import { ISettingsFormProps } from '../Settings';
 import { ACCEPTED_IMAGE_TYPES, AZ_NUM_PATTERN } from '../../../constants';
@@ -10,7 +9,6 @@ import { FormError } from '../../Form-error';
 
 interface IProfileProps {
   hidden: boolean;
-  userData: whoAmIQuery;
   avatarUrl: string | null | undefined;
   avatarSrc: string;
   setAvatarSrc: React.Dispatch<React.SetStateAction<string>>;
@@ -18,7 +16,6 @@ interface IProfileProps {
 
 export const Profile: React.FC<IProfileProps> = ({
   hidden,
-  userData,
   avatarUrl,
   avatarSrc,
   setAvatarSrc,
@@ -37,7 +34,6 @@ export const Profile: React.FC<IProfileProps> = ({
       reader.readAsDataURL(files[0]);
     }
   };
-  console.log(errors);
   return (
     <div
       className={`px-6 rounded-lg border border-myGray-light bg-white overflow-hidden ${

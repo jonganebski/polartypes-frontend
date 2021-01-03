@@ -11,29 +11,40 @@ interface ILogoProps {
 export const Logo: React.FC<ILogoProps> = ({
   isAlterHeader = false,
   usage,
-}) => (
-  <Link
-    to="/"
-    className={`flex items-center font-headFont ${
-      isAlterHeader ? 'text-myGreen-darkest' : 'text-white'
-    }`}
-  >
-    <FontAwesomeIcon
-      icon={faCompass}
-      className={`${
-        usage === 'home' ? 'text-4xl' : usage === 'common' ? 'text-2xl' : ''
-      } mr-1`}
-    />
-    <span
-      className={`${
-        usage === 'home'
-          ? 'text-3xl font-bold'
-          : usage === 'common'
-          ? 'text-2xl font-semibold'
-          : ''
-      }`}
-    >
-      polartypes
-    </span>
-  </Link>
-);
+}) => {
+  const linkAttributes: React.HTMLAttributes<HTMLAnchorElement> = {
+    className: (() => {
+      const core = 'flex items-center font-headFont';
+      if (isAlterHeader) {
+        return core + ' text-myGreen-darkest';
+      }
+      return core + ' text-white';
+    })(),
+  };
+
+  const iconAttributes: React.HTMLAttributes<HTMLOrSVGElement> = {
+    className: (() => {
+      const core = 'mr-1';
+      if (usage === 'home') {
+        return core + 'text-4xl';
+      }
+      return core + ' text-2xl';
+    })(),
+  };
+
+  const spanAttributes: React.HTMLAttributes<HTMLSpanElement> = {
+    className: (() => {
+      if (usage === 'home') {
+        return 'text-3xl font-bold';
+      }
+      return 'text-2xl font-semibold';
+    })(),
+  };
+
+  return (
+    <Link to="/" {...linkAttributes}>
+      <FontAwesomeIcon icon={faCompass} {...iconAttributes} />
+      <span {...spanAttributes}>polartypes</span>
+    </Link>
+  );
+};

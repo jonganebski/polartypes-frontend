@@ -1,4 +1,5 @@
 import Axios from 'axios';
+import moment from 'moment-timezone';
 import {
   readTripsQuery_readTrips_targetUser_trips,
   readTripsQuery_readTrips_targetUser_trips_steps,
@@ -66,4 +67,11 @@ export const getBackgroundImage = (
     }
   }
   return '/topography.png';
+};
+
+export const getTraveledDays = (startDate: string, endDate: string | null) => {
+  const startMoment = moment(startDate);
+  const endMoment = endDate ? moment(endDate) : moment();
+  const diff = moment.duration(startMoment.diff(endMoment)).asDays();
+  return Math.ceil(Math.abs(diff));
 };

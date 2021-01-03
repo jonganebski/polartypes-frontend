@@ -37,28 +37,7 @@ export const useDeleteStep = (
     if (!ok || error || !stepId) {
       return;
     }
-    const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
-      query: READ_TRIP_QUERY,
-      variables: { input: { tripId: +tripId } },
-    });
-    prevQuery &&
-      client.writeQuery<readTripQuery, readTripQueryVariables>({
-        query: READ_TRIP_QUERY,
-        variables: { input: { tripId: +tripId } },
-        data: {
-          readTrip: {
-            ...prevQuery.readTrip,
-            trip: {
-              ...prevQuery.readTrip.trip!,
-              steps: [
-                ...prevQuery.readTrip.trip!.steps.filter(
-                  (step) => step.id !== stepId,
-                ),
-              ],
-            },
-          },
-        },
-      });
+    client.cache.evict({ id: `Step:${stepId}` });
     const imgUrls = images.reduce((acc, img) => {
       if (img.url) {
         return [...acc, img.url];

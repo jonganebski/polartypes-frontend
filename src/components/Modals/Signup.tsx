@@ -1,6 +1,4 @@
 import { gql, useMutation } from '@apollo/client';
-import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
@@ -17,8 +15,8 @@ import {
 } from '../../__generated__/createAccountMutation';
 import { Button } from '../Button';
 import { FormError } from '../Form-error';
-import { ModalCloseIcon } from './partials/CloseIcon';
 import { ModalBackground } from './partials/Background';
+import { ModalCloseIcon } from './partials/CloseIcon';
 
 const CREATE_ACCOUNT_MUTAION = gql`
   mutation createAccountMutation($input: CreateAccountInput!) {

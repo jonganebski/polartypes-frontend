@@ -1,31 +1,15 @@
-import { gql, useMutation } from '@apollo/client';
-import { faHeart, faComment } from '@fortawesome/free-regular-svg-icons';
+import { faComment, faHeart } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { client } from '../../apollo';
 import { useStepIdContext } from '../../context';
+import { useToggleLike } from '../../hooks/useMutation/useToggleLike';
 import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
-import { toggledLikeStep } from '../../__generated__/toggledLikeStep';
-import {
-  toggleLikeMutation,
-  toggleLikeMutationVariables,
-} from '../../__generated__/toggleLikeMutation';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { Comments } from './partials/Comments';
-
-const TOGGLE_LIKE_MUTATION = gql`
-  mutation toggleLikeMutation($input: ToggleLikeInput!) {
-    toggleLike(input: $input) {
-      ok
-      error
-      toggle
-    }
-  }
-`;
 
 interface IStepProps {
   step: readTripQuery_readTrip_trip_steps;
@@ -42,8 +26,14 @@ export const StepCard: React.FC<IStepProps> = ({
 }) => {
   const { data: userData } = useWhoAmI();
   const { setIdFromDrag } = useStepIdContext();
-  const isSelf = userData?.whoAmI.id === step.traveler.id;
   const liRef = useRef<HTMLLIElement | null>(null);
+  const [isCommentBox, setIsCommentBox] = useState(false);
+  const [toggleLikeMutation, { loading: toggleLikeLoading }] = useToggleLike(
+    step.id,
+  );
+  const isSelf = userData?.whoAmI.id === step.traveler.id;
+  const commentsCount = step.comments.length;
+
   useEffect(() => {
     const buildThresholdList = () => {
       let thresholds = [];
@@ -55,13 +45,14 @@ export const StepCard: React.FC<IStepProps> = ({
       thresholds.push(0);
       return thresholds;
     };
+
     if (liRef.current) {
       let prevRatio = 0.5;
       const handleIntersect = (entries: IntersectionObserverEntry[]) => {
         entries.forEach((entry) => {
           if (
             entry.intersectionRatio > prevRatio &&
-            entry.intersectionRatio > 0.5
+            entry.intersectionRatio > 0.3
           ) {
             setIdFromDrag(entry.target.id);
           }
@@ -74,61 +65,7 @@ export const StepCard: React.FC<IStepProps> = ({
       intersectionObserver.observe(liRef.current);
     }
   }, [setIdFromDrag]);
-  const [isCommentBox, setIsCommentBox] = useState(false);
-  const commentsCount = step.comments.length;
-  const onCompleted = (data: toggleLikeMutation) => {
-    const {
-      toggleLike: { ok, error, toggle },
-    } = data;
-    if (ok && !error && toggle) {
-      const prevStep = client.readFragment<toggledLikeStep>({
-        id: `Step:${step.id}`,
-        fragment: gql`
-          fragment toggledLikeStep on Step {
-            likes {
-              user {
-                username
-              }
-            }
-          }
-        `,
-      });
-      if (prevStep && userData) {
-        const username = userData.whoAmI.username;
-        let likes = prevStep?.likes.slice();
-        console.log(likes);
-        if (0 < toggle) {
-          likes.unshift({
-            __typename: 'Like',
-            user: { __typename: 'Users', username },
-          });
-        } else {
-          likes = likes.filter((like) => like.user.username !== username);
-        }
-        client.writeFragment<toggledLikeStep>({
-          id: `Step:${step.id}`,
-          fragment: gql`
-            fragment toggledLikeStep on Step {
-              likes {
-                user {
-                  username
-                }
-              }
-            }
-          `,
-          data: {
-            __typename: 'Step',
-            likes,
-          },
-        });
-      }
-    }
-  };
 
-  const [toggleLikeMutation, { loading: toggleLikeLoading }] = useMutation<
-    toggleLikeMutation,
-    toggleLikeMutationVariables
-  >(TOGGLE_LIKE_MUTATION, { onCompleted });
   return (
     <li
       id={step.id + ''}

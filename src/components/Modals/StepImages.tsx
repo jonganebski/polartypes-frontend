@@ -9,6 +9,7 @@ interface IStepImagesProps {
   coverUrl: string;
   setCoverUrl: React.Dispatch<React.SetStateAction<string>>;
   steps: readTripQuery_readTrip_trip_steps[];
+  isSelectCoverModal: boolean;
   setIsSelectCoverModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -16,11 +17,16 @@ export const StepImages: React.FC<IStepImagesProps> = ({
   coverUrl,
   setCoverUrl,
   steps,
+  isSelectCoverModal,
   setIsSelectCoverModal,
 }) => {
   const [selectedUrl, setSelectedUrl] = useState(coverUrl);
   return (
-    <div className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl bg-white rounded-2xl">
+    <div
+      className={`${
+        isSelectCoverModal ? 'fixed' : 'hidden'
+      } z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl bg-white rounded-2xl`}
+    >
       <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
         'Pick a cover photo'
       </div>
@@ -62,6 +68,9 @@ export const StepImages: React.FC<IStepImagesProps> = ({
           isSubmitBtn={false}
           type="white-solid"
           className="mr-4"
+          onClick={() => {
+            setIsSelectCoverModal(false);
+          }}
         />
         <Button
           text="Selece cover photo"

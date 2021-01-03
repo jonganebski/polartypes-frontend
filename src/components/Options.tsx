@@ -19,10 +19,11 @@ export const Options: React.FC<IOptionProps> = ({ isOption, setIsOption }) => {
   const [isProfile, setIsProfile] = useState(false);
   return (
     <>
-      {isSettingsModal && (
+      {isLoggedInVar() && (
         <SettingsModal
           isProfile={isProfile}
           setIsProfile={setIsProfile}
+          isSettingsModal={isSettingsModal}
           setIsSettingModal={setIsSettingModal}
         />
       )}

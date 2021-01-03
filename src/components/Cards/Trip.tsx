@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useDistanceContext } from '../../context';
 import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
 import moment from 'moment';
-import { getBackgroundImage } from '../../helpers';
+import { getBackgroundImage, getTraveledDays } from '../../helpers';
 
 interface ITripCardProps {
   trip: readTripsQuery_readTrips_targetUser_trips;
@@ -20,10 +20,7 @@ export const TripCard: React.FC<ITripCardProps> = ({
   const dateObject = moment(trip.startDate);
   const year = dateObject.get('year');
   const month = dateObject.format('MMMM');
-  const difference = dateObject.diff(
-    trip.endDate ? moment(trip.endDate) : moment(),
-    'days',
-  );
+  const traveledDays = getTraveledDays(trip.startDate, trip.endDate);
 
   return (
     <li
@@ -59,12 +56,16 @@ export const TripCard: React.FC<ITripCardProps> = ({
             <span className="text-xs">{month}</span>
           </div>
           <div className="leading-tight">
-            <span className="block font-semibold">{Math.abs(difference)}</span>
-            <span className="text-xs">days</span>
+            <span className="block font-semibold">{traveledDays}</span>
+            <span className="text-xs">
+              {traveledDays === 1 ? 'day' : 'days'}
+            </span>
           </div>
           <div className="leading-tight">
             <span className="block font-semibold">{distance}</span>
-            <span className="text-xs">kilometers</span>
+            <span className="text-xs">
+              {distance === 1 ? 'kilometer' : 'kilometers'}
+            </span>
           </div>
           <div></div>
         </div>

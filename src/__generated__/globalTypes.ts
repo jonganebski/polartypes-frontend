@@ -64,6 +64,10 @@ export interface DeleteStepInput {
   stepId: number;
 }
 
+export interface DeleteTripInput {
+  tripId: number;
+}
+
 export interface FollowInput {
   id: number;
 }

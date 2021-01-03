@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Marker, Tooltip, useMap } from 'react-leaflet';
 import { useStepIdContext } from '../../../context';
 import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
