@@ -21,11 +21,11 @@ import { Options } from '../components/Options';
 import { TripStatus } from '../components/Trip-status';
 import { useStepIdContext } from '../context';
 import { getBackgroundImage, sortSteps } from '../helpers';
-import { useFollow } from '../hooks/useFollow';
-import { useTrip } from '../hooks/useTrip';
-import { useTrips } from '../hooks/useTrips';
-import { useUnfollow } from '../hooks/useUnfollow';
-import { useWhoAmI } from '../hooks/useWhoAmI';
+import { useFollow } from '../hooks/useMutation/useFollow';
+import { useTrip } from '../hooks/useQuery/useTrip';
+import { useTrips } from '../hooks/useQuery/useTrips';
+import { useUnfollow } from '../hooks/useMutation/useUnfollow';
+import { useWhoAmI } from '../hooks/useQuery/useWhoAmI';
 import {
   readTripQuery_readTrip_trip,
   readTripQuery_readTrip_trip_steps,

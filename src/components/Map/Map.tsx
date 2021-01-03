@@ -1,10 +1,10 @@
 import L from 'leaflet';
 import React, { useEffect, useState } from 'react';
-import { MapContainer, Polyline, TileLayer, Tooltip } from 'react-leaflet';
+import { MapContainer, Polyline, TileLayer } from 'react-leaflet';
 import { useHistory, useParams } from 'react-router-dom';
 import { sortSteps } from '../../helpers';
-import { useLazyTrip } from '../../hooks/useTrip';
-import { useLazyTrips } from '../../hooks/useTrips';
+import { useLazyTrip } from '../../hooks/useQuery/useTrip';
+import { useLazyTrips } from '../../hooks/useQuery/useTrips';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
 import { readTripsQuery_readTrips_targetUser_trips_steps } from '../../__generated__/readTripsQuery';
 import { DynamicPolylines } from './Partials/Dynamic-polylines';

@@ -1,21 +1,20 @@
+import { gql, useMutation } from '@apollo/client';
+import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { client } from '../../../apollo';
+import { useWhoAmI } from '../../../hooks/useQuery/useWhoAmI';
+import {
+  deleteCommentMutation,
+  deleteCommentMutationVariables,
+} from '../../../__generated__/deleteCommentMutation';
 import {
   readTripQuery_readTrip_trip_steps,
   readTripQuery_readTrip_trip_steps_comments,
 } from '../../../__generated__/readTripQuery';
 import { Avatar } from '../../Avatar';
-import moment from 'moment';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
-import { useWhoAmI } from '../../../hooks/useWhoAmI';
-import { gql, useMutation } from '@apollo/client';
-import {
-  deleteCommentMutation,
-  deleteCommentMutationVariables,
-} from '../../../__generated__/deleteCommentMutation';
-import { client } from '../../../apollo';
-import { stepComments } from '../../../__generated__/stepComments';
 
 const DELETE_COMMENT_MUTATION = gql`
   mutation deleteCommentMutation($input: DeleteCommentInput!) {

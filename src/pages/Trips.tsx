@@ -10,10 +10,10 @@ import { Map } from '../components/Map/Map';
 import { CreateTripModal } from '../components/Modals/Create-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
 import { Options } from '../components/Options';
-import { useFollow } from '../hooks/useFollow';
-import { useTrips } from '../hooks/useTrips';
-import { useUnfollow } from '../hooks/useUnfollow';
-import { useWhoAmI } from '../hooks/useWhoAmI';
+import { useFollow } from '../hooks/useMutation/useFollow';
+import { useTrips } from '../hooks/useQuery/useTrips';
+import { useUnfollow } from '../hooks/useMutation/useUnfollow';
+import { useWhoAmI } from '../hooks/useQuery/useWhoAmI';
 
 interface IPrams {
   username: string;

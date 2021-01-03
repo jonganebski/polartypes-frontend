@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { client } from '../../apollo';
 import { useStepIdContext } from '../../context';
-import { useWhoAmI } from '../../hooks/useWhoAmI';
+import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';
 import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
 import { toggledLikeStep } from '../../__generated__/toggledLikeStep';
 import {

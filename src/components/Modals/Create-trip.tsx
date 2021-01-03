@@ -11,7 +11,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { getBackgroundImage } from '../../helpers';
-import { useUpdateTrip } from '../../hooks/useUpdateTrip';
+import { useUpdateTrip } from '../../hooks/useMutation/useUpdateTrip';
 import {
   createTripMutation,
   createTripMutationVariables,

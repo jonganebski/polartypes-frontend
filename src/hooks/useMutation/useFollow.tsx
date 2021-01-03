@@ -1,27 +1,28 @@
 import { gql, useMutation } from '@apollo/client';
-import { client } from '../apollo';
-import { targetUser } from '../__generated__/targetUser';
+import { client } from '../../apollo';
 import {
-  unfollowMutation,
-  unfollowMutationVariables,
-} from '../__generated__/unfollowMutation';
-import { useWhoAmI } from './useWhoAmI';
+  followMutation,
+  followMutationVariables,
+} from '../../__generated__/followMutation';
+import { targetUser } from '../../__generated__/targetUser';
+import { useWhoAmI } from '../useQuery/useWhoAmI';
 
-const UNFOLLOW_MUTATION = gql`
-  mutation unfollowMutation($input: UnfollowInput!) {
-    unfollow(input: $input) {
+const FOLLOW_MUTAION = gql`
+  mutation followMutation($input: FollowInput!) {
+    follow(input: $input) {
       ok
       error
     }
   }
 `;
 
-export const useUnfollow = (targetUserId?: number) => {
+export const useFollow = (targetUserId?: number) => {
   const { data: userData } = useWhoAmI();
-  const onCompleted = (data: unfollowMutation) => {
+  const onCompleted = (data: followMutation) => {
     const {
-      unfollow: { ok, error },
+      follow: { ok, error },
     } = data;
+    console.log(ok, error);
     if (ok && !error && targetUserId && userData) {
       const targetUser = client.readFragment<targetUser>({
         id: `Users:${targetUserId}`,
@@ -46,16 +47,15 @@ export const useUnfollow = (targetUserId?: number) => {
           data: {
             __typename: 'Users',
             followers: [
-              ...targetUser.followers.filter(
-                (follower) => follower.id !== userData.whoAmI.id,
-              ),
+              ...targetUser?.followers,
+              { __typename: 'Users', id: userData.whoAmI.id },
             ],
           },
         });
     }
   };
-  return useMutation<unfollowMutation, unfollowMutationVariables>(
-    UNFOLLOW_MUTATION,
-    { onCompleted },
-  );
+
+  return useMutation<followMutation, followMutationVariables>(FOLLOW_MUTAION, {
+    onCompleted,
+  });
 };

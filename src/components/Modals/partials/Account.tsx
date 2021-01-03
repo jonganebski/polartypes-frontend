@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { client, isLoggedInVar } from '../../../apollo';
 import { AZ_NUM_PATTERN, PW_MIN_LENGTH, TOKEN } from '../../../constants';
-import { useWhoAmI } from '../../../hooks/useWhoAmI';
+import { useWhoAmI } from '../../../hooks/useQuery/useWhoAmI';
 import {
   deleteAccountMutation,
   deleteAccountMutationVariables,

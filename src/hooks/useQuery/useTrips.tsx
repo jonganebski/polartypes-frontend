@@ -1,9 +1,9 @@
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
-import { TARGET_USER_FRAGMENT } from '../fragments';
+import { TARGET_USER_FRAGMENT } from '../../fragments';
 import {
   readTripsQuery,
   readTripsQueryVariables,
-} from '../__generated__/readTripsQuery';
+} from '../../__generated__/readTripsQuery';
 
 const READ_TRIPS_QUERY = gql`
   query readTripsQuery($input: ReadTripsInput!) {

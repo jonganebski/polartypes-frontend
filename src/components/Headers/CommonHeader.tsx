@@ -4,7 +4,7 @@ import React from 'react';
 import { Logo } from '../Logo';
 import { Avatar } from '../Avatar';
 import { Link, useParams } from 'react-router-dom';
-import { useWhoAmI } from '../../hooks/useWhoAmI';
+import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';
 
 interface IPrams {
   username: string;

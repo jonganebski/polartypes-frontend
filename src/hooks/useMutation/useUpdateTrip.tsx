@@ -1,12 +1,12 @@
 import { gql, useMutation } from '@apollo/client';
-import { useFormContext, UseFormMethods } from 'react-hook-form';
-import { client } from '../apollo';
-import { ISaveTripFormProps } from '../components/Modals/Create-trip';
-import { readTripQuery_readTrip_trip } from '../__generated__/readTripQuery';
+import { UseFormMethods } from 'react-hook-form';
+import { client } from '../../apollo';
+import { ISaveTripFormProps } from '../../components/Modals/Create-trip';
+import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';
 import {
   updateTripMutation,
   updateTripMutationVariables,
-} from '../__generated__/updateTripMutation';
+} from '../../__generated__/updateTripMutation';
 
 const UPDATE_TRIP_MUTATION = gql`
   mutation updateTripMutation($input: UpdateTripInput!) {

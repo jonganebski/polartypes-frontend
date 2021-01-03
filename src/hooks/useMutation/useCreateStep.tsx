@@ -1,18 +1,18 @@
 import { gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
-import { client } from '../apollo';
-import { TImage } from '../components/Modals/Save-step';
-import { ICreateStepFormProps } from '../pages/Trip';
+import { client } from '../../apollo';
+import { TImage } from '../../components/Modals/Save-step';
+import { ICreateStepFormProps } from '../../pages/Trip';
 import {
   createStepMutation,
   createStepMutationVariables,
-} from '../__generated__/createStepMutation';
+} from '../../__generated__/createStepMutation';
 import {
   readTripQuery,
   readTripQueryVariables,
-} from '../__generated__/readTripQuery';
-import { READ_TRIP_QUERY } from './useTrip';
-import { useWhoAmI } from './useWhoAmI';
+} from '../../__generated__/readTripQuery';
+import { READ_TRIP_QUERY } from '../useQuery/useTrip';
+import { useWhoAmI } from '../useQuery/useWhoAmI';
 
 const CREATE_STEP_MUTAION = gql`
   mutation createStepMutation($input: CreateStepInput!) {
