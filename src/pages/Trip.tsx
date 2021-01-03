@@ -15,7 +15,7 @@ import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
-import { CreateTripModal } from '../components/Modals/Create-trip';
+import { SaveTripModal } from '../components/Modals/Save-trip';
 import { SaveStepModal } from '../components/Modals/Save-step';
 import { Options } from '../components/Options';
 import { TripStatus } from '../components/Trip-status';
@@ -114,7 +114,7 @@ export const Trip = () => {
               />
             )}
             {isEditTripModal && userData && isSelf && (
-              <CreateTripModal
+              <SaveTripModal
                 userData={userData}
                 setIsCreateTrip={setIsEditTripModal}
                 editingTrip={editingTrip}

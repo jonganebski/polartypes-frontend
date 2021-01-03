@@ -52,7 +52,7 @@ export interface ISaveTripFormProps {
   availability: Availability;
 }
 
-export const CreateTripModal: React.FC<ICreateTripModal> = ({
+export const SaveTripModal: React.FC<ICreateTripModal> = ({
   userData,
   setIsCreateTrip,
   editingTrip = null,

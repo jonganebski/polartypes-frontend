@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { TripCard } from '../components/Cards/Trip';
 import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
-import { CreateTripModal } from '../components/Modals/Create-trip';
+import { SaveTripModal } from '../components/Modals/Save-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
 import { Options } from '../components/Options';
 import { useFollow } from '../hooks/useMutation/useFollow';
@@ -35,7 +35,7 @@ export const Trips = () => {
   return (
     <div>
       {isCreateTrip && userData?.whoAmI.timeZone && (
-        <CreateTripModal
+        <SaveTripModal
           userData={userData}
           setIsCreateTrip={setIsCreateTrip}
           trips={data?.readTrips.targetUser?.trips}
