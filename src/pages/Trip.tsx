@@ -19,6 +19,8 @@ import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
 import { SaveStepModal } from '../components/Modals/Save-step';
 import { SaveTripModal } from '../components/Modals/Save-trip';
+import { SigninModal } from '../components/Modals/Signin';
+import { SignupModal } from '../components/Modals/Signup';
 import { Options } from '../components/Options';
 import { TripStatus } from '../components/Trip-status';
 import { useStepIdContext } from '../context';
@@ -53,6 +55,7 @@ export const Trip = () => {
   const articleRef = useRef<HTMLElement | null>(null);
   const { username: targetUsername, tripId } = useParams<IParams>();
   const ctx = useStepIdContext();
+  const [isSignup, setIsSignup] = useState<boolean | null>(null);
   const [isEditTripModal, setIsEditTripModal] = useState(false);
   const [isSaveStepModal, setIsSaveStepModal] = useState(false);
   const [isOption, setIsOption] = useState(false);
@@ -131,7 +134,13 @@ export const Trip = () => {
       <Helmet>
         <title>{data.readTrip.trip.name} | Polartypes</title>
       </Helmet>
-      <CommonHeader userData={userData} setIsOption={setIsOption} />
+      <CommonHeader
+        userData={userData}
+        setIsSignup={setIsSignup}
+        setIsOption={setIsOption}
+      />
+      {isSignup === false && <SigninModal setIsSignup={setIsSignup} />}
+      {isSignup === true && <SignupModal setIsSignup={setIsSignup} />}
       {data.readTrip.error ? (
         <div>{data.readTrip.error}</div>
       ) : (

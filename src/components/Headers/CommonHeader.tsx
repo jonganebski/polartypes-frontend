@@ -14,11 +14,13 @@ interface IPrams {
 interface ICommonHeaderProps {
   userData: whoAmIQuery | undefined;
   setIsOption: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSignup: React.Dispatch<React.SetStateAction<boolean | null>>;
 }
 
 export const CommonHeader: React.FC<ICommonHeaderProps> = ({
   userData,
   setIsOption,
+  setIsSignup,
 }) => {
   const { username: usernameParam } = useParams<IPrams>();
   const isSelf = usernameParam.toLowerCase() === userData?.whoAmI.slug;
@@ -67,9 +69,21 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
         </div>
         {!userData && (
           <div className="h-full px-5 flex items-center justify-center bg-myGreen-darkest">
-            <Button text="Sign in" size="sm" type="white-regular" />
+            <Button
+              text="Sign in"
+              size="sm"
+              type="white-regular"
+              onClick={() => setIsSignup(false)}
+            />
             <span className="mx-3">or</span>
-            <Button text="Create an account" size="sm" type="blue-solid" />
+            <Button
+              text="Create an account"
+              size="sm"
+              type="blue-solid"
+              onClick={() => {
+                setIsSignup(true);
+              }}
+            />
           </div>
         )}
       </div>

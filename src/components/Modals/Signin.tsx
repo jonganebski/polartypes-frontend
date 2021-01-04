@@ -53,7 +53,7 @@ export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
       localStorage.setItem(TOKEN, token);
       authTokenVar(token);
       isLoggedInVar(true);
-      history.push(`/${username}`);
+      history.go(0);
     }
   };
   const [signInMutation, { loading, data: MutationResult }] = useMutation<

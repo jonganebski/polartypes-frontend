@@ -11,6 +11,8 @@ import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
 import { SaveTripModal } from '../components/Modals/Save-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
+import { SigninModal } from '../components/Modals/Signin';
+import { SignupModal } from '../components/Modals/Signup';
 import { Options } from '../components/Options';
 import { useFollow } from '../hooks/useMutation/useFollow';
 import { useUnfollow } from '../hooks/useMutation/useUnfollow';
@@ -24,6 +26,7 @@ interface IPrams {
 export const Trips = () => {
   const { username: targetUsername } = useParams<IPrams>();
   const [isCreateTrip, setIsCreateTrip] = useState(false);
+  const [isSignup, setIsSignup] = useState<boolean | null>(null);
   const [isOption, setIsOption] = useState(false);
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
 
@@ -76,7 +79,13 @@ export const Trips = () => {
           {data.readTrips.targetUser.firstName}'s trips` | Polartypes
         </title>
       </Helmet>
-      <CommonHeader userData={userData} setIsOption={setIsOption} />
+      <CommonHeader
+        userData={userData}
+        setIsSignup={setIsSignup}
+        setIsOption={setIsOption}
+      />
+      {isSignup === false && <SigninModal setIsSignup={setIsSignup} />}
+      {isSignup === true && <SignupModal setIsSignup={setIsSignup} />}
       {data.readTrips.error ? (
         <div>{data.readTrips.error}</div>
       ) : (
