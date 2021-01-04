@@ -2,6 +2,7 @@ import { useReactiveVar } from '@apollo/client';
 import React, { useEffect } from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo';
+import { ModalBackground } from '../components/Modals/partials/Background';
 import { useWhoAmI } from '../hooks/useQuery/useWhoAmI';
 import { Home } from '../pages/Home';
 import { Trip } from '../pages/Trip';

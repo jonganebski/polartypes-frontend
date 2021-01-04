@@ -5,6 +5,7 @@ import { Logo } from '../Logo';
 import { Avatar } from '../Avatar';
 import { Link, useParams } from 'react-router-dom';
 import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
+import { Button } from '../Button';
 
 interface IPrams {
   username: string;
@@ -37,30 +38,40 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
           />
         </form>
       </div>
-      <div className="grid grid-cols-3 gap-x-px border-l border-myGray-darkest bg-myGray-darkest text-white text-sm font-semibold">
-        {userData ? (
+      <div
+        className="grid gap-x-px border-l border-myGray-darkest bg-myGray-darkest text-white text-sm font-semibold"
+        style={{
+          gridTemplateColumns: 'repeat(3, auto)',
+        }}
+      >
+        {userData && (
           <Link
             to={`/${userData.whoAmI.username}`}
-            className={`h-full px-3 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 ${
+            className={`h-full px-5 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 ${
               isSelf ? 'border-b-4 border-myRed text-center' : ''
             }`}
           >
             <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={8} />
             <span className="ml-3">{userData.whoAmI.firstName}</span>
           </Link>
-        ) : (
-          <div className="bg-myGreen-darkest" />
         )}
-        <div className="h-full px-3 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 cursor-pointer">
+        <div className="h-full px-5 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 cursor-pointer">
           Travel Books
         </div>
         <div
-          className="h-full px-3 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 cursor-pointer"
+          className="h-full px-5 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 cursor-pointer"
           onClick={() => setIsOption(true)}
         >
           <span className="mr-3">Options</span>
           <FontAwesomeIcon icon={faBars} />
         </div>
+        {!userData && (
+          <div className="h-full px-5 flex items-center justify-center bg-myGreen-darkest">
+            <Button text="Sign in" size="sm" type="white-regular" />
+            <span className="mx-3">or</span>
+            <Button text="Create an account" size="sm" type="blue-solid" />
+          </div>
+        )}
       </div>
     </header>
   );

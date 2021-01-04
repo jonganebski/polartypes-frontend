@@ -11,6 +11,8 @@ export const WHO_AM_I_QUERY = gql`
   ${USER_FRAGMENT}
 `;
 
+// useQuery makes warnings under strict mode. That is why this is useLazyQuery.
+// see https://github.com/apollographql/react-apollo/issues/3635, https://github.com/apollographql/apollo-client/issues/7404
 export const useWhoAmI = () => {
   return useLazyQuery<whoAmIQuery>(WHO_AM_I_QUERY);
 };

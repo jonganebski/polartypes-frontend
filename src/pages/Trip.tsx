@@ -7,8 +7,9 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Redirect, useParams } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
@@ -69,7 +70,7 @@ export const Trip = () => {
     defaultValues: {},
   });
   const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
-  const [lazyTripQuery, { data }] = useLazyTrip();
+  const [lazyTripQuery, { data, called, loading }] = useLazyTrip();
   const [lazyTripsQuery, { data: tripsData }] = useLazyTrips();
   useEffect(() => {
     lazyWhoAmIQuery();
@@ -109,6 +110,14 @@ export const Trip = () => {
     return `${startDate} - Now traveling`;
   };
 
+  if (loading) {
+    <Helmet>
+      <title>Loading... | Polartypes</title>
+    </Helmet>;
+  }
+  if (!loading && called && !data?.readTrip.trip) {
+    return <Redirect to="/" />;
+  }
   if (!data?.readTrip.trip) {
     return null;
   }
@@ -119,6 +128,9 @@ export const Trip = () => {
         isOption={isOption}
         setIsOption={setIsOption}
       />
+      <Helmet>
+        <title>{data.readTrip.trip.name} | Polartypes</title>
+      </Helmet>
       <CommonHeader userData={userData} setIsOption={setIsOption} />
       {data.readTrip.error ? (
         <div>{data.readTrip.error}</div>

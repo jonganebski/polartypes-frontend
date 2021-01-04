@@ -1,7 +1,8 @@
 import { faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { Redirect, useParams } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
@@ -27,7 +28,7 @@ export const Trips = () => {
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
 
   const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
-  const [lazyTripsQuery, { data }] = useLazyTrips();
+  const [lazyTripsQuery, { data, called, loading }] = useLazyTrips();
   useEffect(() => {
     lazyWhoAmIQuery();
     lazyTripsQuery({ variables: { input: { targetUsername } } });
@@ -36,6 +37,17 @@ export const Trips = () => {
   const [followMutation] = useFollow(data?.readTrips.targetUser?.id);
   const [unfollowMutation] = useUnfollow(data?.readTrips.targetUser?.id);
   const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
+
+  if (loading) {
+    return (
+      <Helmet>
+        <title>Loading... | Polartypes</title>
+      </Helmet>
+    );
+  }
+  if (!loading && called && !data?.readTrips.targetUser) {
+    return <Redirect to="/" />;
+  }
   if (!data?.readTrips.targetUser) {
     return null;
   }
@@ -59,6 +71,11 @@ export const Trips = () => {
         isOption={isOption}
         setIsOption={setIsOption}
       />
+      <Helmet>
+        <title>
+          {data.readTrips.targetUser.firstName}'s trips` | Polartypes
+        </title>
+      </Helmet>
       <CommonHeader userData={userData} setIsOption={setIsOption} />
       {data.readTrips.error ? (
         <div>{data.readTrips.error}</div>

@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { gql, useLazyQuery } from '@apollo/client';
 import { TARGET_USER_FRAGMENT } from '../../fragments';
 import {
   readTripsQuery,
@@ -18,12 +18,8 @@ const READ_TRIPS_QUERY = gql`
   ${TARGET_USER_FRAGMENT}
 `;
 
-export const useTrips = (targetUsername: string) => {
-  return useQuery<readTripsQuery, readTripsQueryVariables>(READ_TRIPS_QUERY, {
-    variables: { input: { targetUsername: targetUsername.toLowerCase() } },
-  });
-};
-
+// useQuery makes warnings under strict mode. That is why this is useLazyQuery.
+// see https://github.com/apollographql/react-apollo/issues/3635, https://github.com/apollographql/apollo-client/issues/7404
 export const useLazyTrips = () => {
   return useLazyQuery<readTripsQuery, readTripsQueryVariables>(
     READ_TRIPS_QUERY,

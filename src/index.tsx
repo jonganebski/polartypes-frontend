@@ -1,6 +1,7 @@
 import { ApolloProvider } from '@apollo/client';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { client } from './apollo';
 import App from './components/App';
 import { MapInteractionCtxProvider } from './context';
@@ -11,7 +12,9 @@ ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <MapInteractionCtxProvider>
-        <App />
+        <HelmetProvider>
+          <App />
+        </HelmetProvider>
       </MapInteractionCtxProvider>
     </ApolloProvider>
   </React.StrictMode>,

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { HomepageHeader } from '../components/Headers/HomeHeader';
 import { SigninModal } from '../components/Modals/Signin';
 import { SignupModal } from '../components/Modals/Signup';
@@ -23,6 +24,9 @@ export const Home = () => {
   }, []);
   return (
     <>
+      <Helmet>
+        <title>Home | Polartypes</title>
+      </Helmet>
       <HomepageHeader setIsSignup={setIsSignup} isAlterHeader={isAlterHeader} />
       {isSignup === false && <SigninModal setIsSignup={setIsSignup} />}
       {isSignup === true && <SignupModal setIsSignup={setIsSignup} />}
