@@ -2,13 +2,13 @@ import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { client } from '../../../apollo';
-import { useWhoAmI } from '../../../hooks/useQuery/useWhoAmI';
 import {
   createCommentMutation,
   createCommentMutationVariables,
 } from '../../../__generated__/createCommentMutation';
 import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
 import { stepComments } from '../../../__generated__/stepComments';
+import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
 import { Avatar } from '../../Avatar';
 import { Comment } from './Comment';
 
@@ -23,11 +23,11 @@ const CREATE_COMMENT_MUTAION = gql`
 `;
 
 interface ICommentProps {
+  userData: whoAmIQuery | undefined;
   step: readTripQuery_readTrip_trip_steps;
 }
 
-export const Comments: React.FC<ICommentProps> = ({ step }) => {
-  const { data: userData } = useWhoAmI();
+export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
   const { register, getValues, handleSubmit, reset } = useForm<{
     text: string;
   }>();
@@ -103,7 +103,6 @@ export const Comments: React.FC<ICommentProps> = ({ step }) => {
   const onSubmit = () => {
     if (!loading) {
       const { text } = getValues();
-      console.log('foo');
       createCommentMutation({
         variables: { input: { text, stepId: step.id } },
       });
@@ -132,7 +131,7 @@ export const Comments: React.FC<ICommentProps> = ({ step }) => {
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
           )
           .map((comment, i) => (
-            <Comment key={i} step={step} comment={comment} />
+            <Comment key={i} userData={userData} comment={comment} />
           ))}
       </ul>
     </div>

@@ -8,11 +8,6 @@ import {
   deleteStepMutation,
   deleteStepMutationVariables,
 } from '../../__generated__/deleteStepMutation';
-import {
-  readTripQuery,
-  readTripQueryVariables,
-} from '../../__generated__/readTripQuery';
-import { READ_TRIP_QUERY } from '../useQuery/useTrip';
 
 const DELETE_STEP_MUTATION = gql`
   mutation deleteStepMutation($input: DeleteStepInput!) {

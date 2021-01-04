@@ -1,7 +1,8 @@
 import { faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { isLoggedInVar } from '../apollo';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { TripCard } from '../components/Cards/Trip';
@@ -11,8 +12,8 @@ import { SaveTripModal } from '../components/Modals/Save-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
 import { Options } from '../components/Options';
 import { useFollow } from '../hooks/useMutation/useFollow';
-import { useTrips } from '../hooks/useQuery/useTrips';
 import { useUnfollow } from '../hooks/useMutation/useUnfollow';
+import { useLazyTrips } from '../hooks/useQuery/useTrips';
 import { useWhoAmI } from '../hooks/useQuery/useWhoAmI';
 
 interface IPrams {
@@ -20,12 +21,18 @@ interface IPrams {
 }
 
 export const Trips = () => {
-  const { data: userData } = useWhoAmI();
   const { username: targetUsername } = useParams<IPrams>();
   const [isCreateTrip, setIsCreateTrip] = useState(false);
   const [isOption, setIsOption] = useState(false);
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
-  const { data } = useTrips(targetUsername);
+
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  const [lazyTripsQuery, { data }] = useLazyTrips();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+    lazyTripsQuery({ variables: { input: { targetUsername } } });
+  }, [lazyTripsQuery, lazyWhoAmIQuery, targetUsername]);
+
   const [followMutation] = useFollow(data?.readTrips.targetUser?.id);
   const [unfollowMutation] = useUnfollow(data?.readTrips.targetUser?.id);
   const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
@@ -47,7 +54,11 @@ export const Trips = () => {
           setIsCreateTrip={setIsCreateTrip}
         />
       )}
-      <Options isOption={isOption} setIsOption={setIsOption} />
+      <Options
+        userData={userData}
+        isOption={isOption}
+        setIsOption={setIsOption}
+      />
       <CommonHeader userData={userData} setIsOption={setIsOption} />
       {data.readTrips.error ? (
         <div>{data.readTrips.error}</div>
@@ -102,7 +113,8 @@ export const Trips = () => {
                   type="white-regular"
                   size="sm"
                 />
-                {!isSelf &&
+                {isLoggedInVar() &&
+                  !isSelf &&
                   !data.readTrips.targetUser?.followers.some(
                     (user) => user.id === userData?.whoAmI.id,
                   ) && (

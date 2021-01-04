@@ -9,22 +9,23 @@ import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
+import { isLoggedInVar } from '../apollo';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
-import { SaveTripModal } from '../components/Modals/Save-trip';
 import { SaveStepModal } from '../components/Modals/Save-step';
+import { SaveTripModal } from '../components/Modals/Save-trip';
 import { Options } from '../components/Options';
 import { TripStatus } from '../components/Trip-status';
 import { useStepIdContext } from '../context';
 import { getBackgroundImage, sortSteps } from '../helpers';
 import { useFollow } from '../hooks/useMutation/useFollow';
-import { useTrip } from '../hooks/useQuery/useTrip';
-import { useTrips } from '../hooks/useQuery/useTrips';
 import { useUnfollow } from '../hooks/useMutation/useUnfollow';
+import { useLazyTrip } from '../hooks/useQuery/useTrip';
+import { useLazyTrips } from '../hooks/useQuery/useTrips';
 import { useWhoAmI } from '../hooks/useQuery/useWhoAmI';
 import {
   readTripQuery_readTrip_trip,
@@ -50,7 +51,6 @@ export interface ICreateStepFormProps {
 export const Trip = () => {
   const articleRef = useRef<HTMLElement | null>(null);
   const { username: targetUsername, tripId } = useParams<IParams>();
-  const { data: userData } = useWhoAmI();
   const ctx = useStepIdContext();
   const [isEditTripModal, setIsEditTripModal] = useState(false);
   const [isSaveStepModal, setIsSaveStepModal] = useState(false);
@@ -64,13 +64,19 @@ export const Trip = () => {
     setEditingStep,
   ] = useState<readTripQuery_readTrip_trip_steps | null>(null);
   const [belowStepDate, setBelowStepDate] = useState<string>('');
-  const [belowStepTimeZone, setBelowStepTimeZone] = useState('');
   const f = useForm<ICreateStepFormProps>({
     mode: 'onChange',
     defaultValues: {},
   });
-  const { data } = useTrip(tripId);
-  const { data: tripsData } = useTrips(targetUsername);
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  const [lazyTripQuery, { data }] = useLazyTrip();
+  const [lazyTripsQuery, { data: tripsData }] = useLazyTrips();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+    lazyTripQuery({ variables: { input: { tripId: +tripId } } });
+    lazyTripsQuery({ variables: { input: { targetUsername } } });
+  }, [lazyTripQuery, lazyTripsQuery, lazyWhoAmIQuery, targetUsername, tripId]);
+
   const [followMutation] = useFollow(data?.readTrip.trip?.traveler.id);
   const [unfollowMutation] = useUnfollow(data?.readTrip.trip?.traveler.id);
   const isSelf = data?.readTrip.trip?.traveler.id === userData?.whoAmI.id;
@@ -108,7 +114,11 @@ export const Trip = () => {
   }
   return (
     <FormProvider {...f}>
-      <Options isOption={isOption} setIsOption={setIsOption} />
+      <Options
+        userData={userData}
+        isOption={isOption}
+        setIsOption={setIsOption}
+      />
       <CommonHeader userData={userData} setIsOption={setIsOption} />
       {data.readTrip.error ? (
         <div>{data.readTrip.error}</div>
@@ -121,7 +131,6 @@ export const Trip = () => {
                 tripStartDate={data.readTrip.trip.startDate}
                 tripEndDate={data.readTrip.trip.endDate}
                 belowStepDate={belowStepDate}
-                belowStepTimeZone={belowStepTimeZone}
                 setIsSaveStepModal={setIsSaveStepModal}
                 editingStep={editingStep}
               />
@@ -178,7 +187,8 @@ export const Trip = () => {
                     />
                   }
                 />
-                {!isSelf &&
+                {isLoggedInVar() &&
+                  !isSelf &&
                   !data.readTrip.trip.traveler.followers.some(
                     (follower) => follower.id === userData?.whoAmI.id,
                   ) && (
@@ -285,7 +295,6 @@ export const Trip = () => {
                           onClick={() => {
                             if (isSelf) {
                               setBelowStepDate(step.arrivedAt);
-                              setBelowStepTimeZone(step.timeZone);
                               setIsSaveStepModal(true);
                             }
                           }}

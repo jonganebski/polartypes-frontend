@@ -38,7 +38,7 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
         </form>
       </div>
       <div className="grid grid-cols-3 gap-x-px border-l border-myGray-darkest bg-myGray-darkest text-white text-sm font-semibold">
-        {userData && (
+        {userData ? (
           <Link
             to={`/${userData.whoAmI.username}`}
             className={`h-full px-3 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 ${
@@ -48,6 +48,8 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
             <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={8} />
             <span className="ml-3">{userData.whoAmI.firstName}</span>
           </Link>
+        ) : (
+          <div className="bg-myGreen-darkest" />
         )}
         <div className="h-full px-3 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 cursor-pointer">
           Travel Books

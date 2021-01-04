@@ -4,12 +4,10 @@ import { useFormContext } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { client, isLoggedInVar } from '../../../apollo';
 import { AZ_NUM_PATTERN, PW_MIN_LENGTH, TOKEN } from '../../../constants';
-import { useWhoAmI } from '../../../hooks/useQuery/useWhoAmI';
 import {
   deleteAccountMutation,
   deleteAccountMutationVariables,
 } from '../../../__generated__/deleteAccountMutation';
-import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
 import { FormError } from '../../Form-error';
 import { ISettingsFormProps } from '../Settings';
 

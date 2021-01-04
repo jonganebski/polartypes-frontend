@@ -2,10 +2,9 @@ import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
 import { deleteFiles } from '../../helpers';
 import { useUpdateAccount } from '../../hooks/useMutation/useUpdateAccount';
-import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';
+import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
 import { Button } from '../Button';
 import { Account } from './partials/Account';
 import { ModalBackground } from './partials/Background';
@@ -13,9 +12,9 @@ import { ModalCloseIcon } from './partials/CloseIcon';
 import { Profile } from './partials/Profile';
 
 interface ISettingsModal {
+  userData: whoAmIQuery | undefined;
   isProfile: boolean;
   setIsProfile: React.Dispatch<React.SetStateAction<boolean>>;
-  isSettingsModal: boolean;
   setIsSettingModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -32,13 +31,11 @@ export interface ISettingsFormProps {
 }
 
 export const SettingsModal: React.FC<ISettingsModal> = ({
+  userData,
   isProfile,
   setIsProfile,
-  isSettingsModal,
   setIsSettingModal,
 }) => {
-  const { data: userData } = useWhoAmI();
-
   const [avatarSrc, setAvatarSrc] = useState(
     userData?.whoAmI.avatarUrl ?? 'blank-profile.webp',
   );
@@ -111,7 +108,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
     return null;
   }
   return (
-    <div className={`${isSettingsModal ? 'block' : 'hidden'}`}>
+    <>
       <ModalBackground onClick={() => setIsSettingModal(false)} />
       <div className="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-white rounded-2xl overflow-hidden">
         <ModalCloseIcon onClick={() => setIsSettingModal(false)} />
@@ -160,6 +157,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
                   type="red-solid"
                   className="mr-3"
                   loading={isLoading}
+                  disabled={isLoading}
                 />
                 <Button
                   text="cancel"
@@ -172,6 +170,6 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
           </FormProvider>
         </div>
       </div>
-    </div>
+    </>
   );
 };

@@ -26,7 +26,6 @@ interface ISaveStepModalProps {
   tripStartDate: string;
   tripEndDate: string | null;
   belowStepDate: string;
-  belowStepTimeZone: string;
   setIsSaveStepModal: React.Dispatch<React.SetStateAction<boolean>>;
   editingStep: readTripQuery_readTrip_trip_steps | null;
 }
@@ -38,7 +37,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
   tripStartDate,
   tripEndDate,
   belowStepDate,
-  belowStepTimeZone,
   setIsSaveStepModal,
   editingStep,
 }) => {

@@ -1,4 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
+import { useEffect } from 'react';
 import { client } from '../../apollo';
 import { targetUser } from '../../__generated__/targetUser';
 import {
@@ -17,7 +18,10 @@ const UNFOLLOW_MUTATION = gql`
 `;
 
 export const useUnfollow = (targetUserId?: number) => {
-  const { data: userData } = useWhoAmI();
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+  }, [lazyWhoAmIQuery]);
   const onCompleted = (data: unfollowMutation) => {
     const {
       unfollow: { ok, error },

@@ -1,5 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UseFormMethods } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { client } from '../../apollo';
@@ -26,7 +26,10 @@ export const useUpdateAccount = (
   f: UseFormMethods<ISettingsFormProps>,
   avatarUrl: string | null,
 ) => {
-  const { data: userData } = useWhoAmI();
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+  }, [lazyWhoAmIQuery]);
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
   const onCompleted = async (data: updateAccountMutation) => {

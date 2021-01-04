@@ -1,5 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
-import React from 'react';
+import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { client } from '../../apollo';
 import {
@@ -18,7 +18,10 @@ const DELETE_TRIP_MUTATION = gql`
 `;
 
 export const useDeleteTrip = (tripId?: number) => {
-  const { data: userData } = useWhoAmI();
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+  }, [lazyWhoAmIQuery]);
   const history = useHistory();
   const onCompleted = (data: deleteTripMutation) => {
     const {

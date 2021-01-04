@@ -1,4 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
+import { useEffect } from 'react';
 import { client } from '../../apollo';
 import {
   followMutation,
@@ -17,7 +18,10 @@ const FOLLOW_MUTAION = gql`
 `;
 
 export const useFollow = (targetUserId?: number) => {
-  const { data: userData } = useWhoAmI();
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+  }, [lazyWhoAmIQuery]);
   const onCompleted = (data: followMutation) => {
     const {
       follow: { ok, error },

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { isLoggedInVar } from '../../apollo';
 import { useStepIdContext } from '../../context';
 import { useToggleLike } from '../../hooks/useMutation/useToggleLike';
 import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';
@@ -24,7 +25,10 @@ export const StepCard: React.FC<IStepProps> = ({
   setEditingStep,
   setIsSaveStepModal,
 }) => {
-  const { data: userData } = useWhoAmI();
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+  }, [lazyWhoAmIQuery]);
   const { setIdFromDrag } = useStepIdContext();
   const liRef = useRef<HTMLLIElement | null>(null);
   const [isCommentBox, setIsCommentBox] = useState(false);
@@ -80,7 +84,7 @@ export const StepCard: React.FC<IStepProps> = ({
           <span>{step.country}</span>
           <div className="inline-block mx-2 text-myGray">•</div>
           <span>
-            {moment(step.arrivedAt).tz(step.timeZone).format('d MMMM YYYY')}
+            {moment.tz(step.arrivedAt, step.timeZone).format('D MMMM YYYY')}
           </span>
         </div>
       </div>
@@ -135,8 +139,10 @@ export const StepCard: React.FC<IStepProps> = ({
                 }`}
               />
             }
-            onClick={(e) => {
-              toggleLikeMutation({ variables: { input: { id: step.id } } });
+            onClick={() => {
+              if (isLoggedInVar()) {
+                toggleLikeMutation({ variables: { input: { id: step.id } } });
+              }
             }}
           />
           <Button
@@ -167,7 +173,7 @@ export const StepCard: React.FC<IStepProps> = ({
           />
         )}
       </div>
-      {isCommentBox && <Comments step={step} />}
+      {isCommentBox && <Comments userData={userData} step={step} />}
     </li>
   );
 };

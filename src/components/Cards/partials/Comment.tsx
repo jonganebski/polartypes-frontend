@@ -5,15 +5,12 @@ import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { client } from '../../../apollo';
-import { useWhoAmI } from '../../../hooks/useQuery/useWhoAmI';
 import {
   deleteCommentMutation,
   deleteCommentMutationVariables,
 } from '../../../__generated__/deleteCommentMutation';
-import {
-  readTripQuery_readTrip_trip_steps,
-  readTripQuery_readTrip_trip_steps_comments,
-} from '../../../__generated__/readTripQuery';
+import { readTripQuery_readTrip_trip_steps_comments } from '../../../__generated__/readTripQuery';
+import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
 import { Avatar } from '../../Avatar';
 
 const DELETE_COMMENT_MUTATION = gql`
@@ -26,13 +23,11 @@ const DELETE_COMMENT_MUTATION = gql`
 `;
 
 interface ICommentProps {
-  step: readTripQuery_readTrip_trip_steps;
+  userData: whoAmIQuery | undefined;
   comment: readTripQuery_readTrip_trip_steps_comments;
 }
 
-export const Comment: React.FC<ICommentProps> = ({ step, comment }) => {
-  const { data: userData } = useWhoAmI();
-
+export const Comment: React.FC<ICommentProps> = ({ userData, comment }) => {
   const onCompleted = (data: deleteCommentMutation) => {
     const {
       deleteComment: { ok, error },

@@ -4,26 +4,33 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo';
 import { TOKEN } from '../constants';
+import { whoAmIQuery } from '../__generated__/whoAmIQuery';
 import { Button } from './Button';
 import { ModalCloseIcon } from './Modals/partials/CloseIcon';
 import { SettingsModal } from './Modals/Settings';
 
 interface IOptionProps {
+  userData: whoAmIQuery | undefined;
   isOption: boolean;
   setIsOption: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Options: React.FC<IOptionProps> = ({ isOption, setIsOption }) => {
+export const Options: React.FC<IOptionProps> = ({
+  userData,
+  isOption,
+  setIsOption,
+}) => {
   const history = useHistory();
   const [isSettingsModal, setIsSettingModal] = useState(false);
   const [isProfile, setIsProfile] = useState(false);
+
   return (
     <>
-      {isLoggedInVar() && (
+      {isLoggedInVar() && isSettingsModal && (
         <SettingsModal
+          userData={userData}
           isProfile={isProfile}
           setIsProfile={setIsProfile}
-          isSettingsModal={isSettingsModal}
           setIsSettingModal={setIsSettingModal}
         />
       )}
@@ -40,31 +47,33 @@ export const Options: React.FC<IOptionProps> = ({ isOption, setIsOption }) => {
       >
         <ModalCloseIcon onClick={() => setIsOption(false)} />
         <ul className="grid gap-y-px bg-myGray-light">
-          <li className="py-8 bg-white">
-            <h5 className="mb-2 text-myGray-dark text-sm font-semibold">
-              My account
-            </h5>
-            <h6
-              className="text-myGreen-dark font-semibold cursor-pointer hover:text-myBlue"
-              onClick={() => {
-                setIsOption(false);
-                setIsProfile(true);
-                setIsSettingModal(true);
-              }}
-            >
-              Profile settings
-            </h6>
-            <h6
-              className="text-myGreen-dark font-semibold cursor-pointer hover:text-myBlue"
-              onClick={() => {
-                setIsOption(false);
-                setIsProfile(false);
-                setIsSettingModal(true);
-              }}
-            >
-              Account settings
-            </h6>
-          </li>
+          {isLoggedInVar() && (
+            <li className="py-8 bg-white">
+              <h5 className="mb-2 text-myGray-dark text-sm font-semibold">
+                My account
+              </h5>
+              <h6
+                className="text-myGreen-dark font-semibold cursor-pointer hover:text-myBlue"
+                onClick={() => {
+                  setIsOption(false);
+                  setIsProfile(true);
+                  setIsSettingModal(true);
+                }}
+              >
+                Profile settings
+              </h6>
+              <h6
+                className="text-myGreen-dark font-semibold cursor-pointer hover:text-myBlue"
+                onClick={() => {
+                  setIsOption(false);
+                  setIsProfile(false);
+                  setIsSettingModal(true);
+                }}
+              >
+                Account settings
+              </h6>
+            </li>
+          )}
           <li className="py-8 bg-white">
             <h5 className="mb-2 text-myGray-dark text-sm font-semibold">
               See code
@@ -91,17 +100,19 @@ export const Options: React.FC<IOptionProps> = ({ isOption, setIsOption }) => {
             </a>
           </li>
           <li className="py-8 bg-white">
-            <Button
-              text="Logout"
-              type="red-regular"
-              size="sm"
-              className="w-full"
-              onClick={() => {
-                localStorage.removeItem(TOKEN);
-                isLoggedInVar(false);
-                history.push('/');
-              }}
-            />
+            {isLoggedInVar() && (
+              <Button
+                text="Logout"
+                type="red-regular"
+                size="sm"
+                className="w-full"
+                onClick={() => {
+                  localStorage.removeItem(TOKEN);
+                  isLoggedInVar(false);
+                  history.go(0);
+                }}
+              />
+            )}
           </li>
         </ul>
       </div>

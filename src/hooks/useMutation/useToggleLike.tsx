@@ -1,4 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
+import { useEffect } from 'react';
 import { client } from '../../apollo';
 import { toggledLikeStep } from '../../__generated__/toggledLikeStep';
 import {
@@ -18,7 +19,10 @@ const TOGGLE_LIKE_MUTATION = gql`
 `;
 
 export const useToggleLike = (stepId: number) => {
-  const { data: userData } = useWhoAmI();
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+  }, [lazyWhoAmIQuery]);
   const onCompleted = (data: toggleLikeMutation) => {
     const {
       toggleLike: { ok, error, toggle },

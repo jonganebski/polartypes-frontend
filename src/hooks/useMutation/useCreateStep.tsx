@@ -1,4 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
+import { useEffect } from 'react';
 import { UseFormMethods } from 'react-hook-form';
 import { client } from '../../apollo';
 import { TImage } from '../../components/Modals/Save-step';
@@ -30,7 +31,10 @@ export const useCreateStep = (
   images: TImage[],
   setIsCreateStepModal: (value: React.SetStateAction<boolean>) => void,
 ) => {
-  const { data: userData } = useWhoAmI();
+  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  useEffect(() => {
+    lazyWhoAmIQuery();
+  }, [lazyWhoAmIQuery]);
   const updateApolloCache = (stepId: number) => {
     const { lat, lon, ...values } = f.getValues();
     const imgUrls = images.reduce((acc, img) => {
