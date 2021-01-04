@@ -153,7 +153,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
                 avatarSrc={avatarSrc}
                 setAvatarSrc={setAvatarSrc}
               />
-              <Account hidden={isProfile} />
+              <Account hidden={isProfile} userId={userData.whoAmI.id} />
               <div className="pt-6">
                 <Button
                   text="Save Changes"

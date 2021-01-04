@@ -4,18 +4,21 @@ import React from 'react';
 import { Logo } from '../Logo';
 import { Avatar } from '../Avatar';
 import { Link, useParams } from 'react-router-dom';
-import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';
+import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
 
 interface IPrams {
   username: string;
 }
 
 interface ICommonHeaderProps {
+  userData: whoAmIQuery | undefined;
   setIsOption: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const CommonHeader: React.FC<ICommonHeaderProps> = ({ setIsOption }) => {
-  const { data: userData } = useWhoAmI();
+export const CommonHeader: React.FC<ICommonHeaderProps> = ({
+  userData,
+  setIsOption,
+}) => {
   const { username: usernameParam } = useParams<IPrams>();
   const isSelf = usernameParam.toLowerCase() === userData?.whoAmI.slug;
   return (

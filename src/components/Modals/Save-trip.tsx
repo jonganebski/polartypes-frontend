@@ -178,7 +178,7 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
     editingTrip,
     coverUrl,
   );
-  const [deleteTripMutation] = useDeleteTrip();
+  const [deleteTripMutation] = useDeleteTrip(editingTrip?.id);
 
   const onSubmit = async () => {
     const { endDate, ...values } = getValues();

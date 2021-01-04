@@ -9,6 +9,7 @@ import {
   deleteAccountMutation,
   deleteAccountMutationVariables,
 } from '../../../__generated__/deleteAccountMutation';
+import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
 import { FormError } from '../../Form-error';
 import { ISettingsFormProps } from '../Settings';
 
@@ -23,19 +24,18 @@ const DELETE_ACCOUNT_MUTAION = gql`
 
 interface IAccountProps {
   hidden: boolean;
+  userId: number;
 }
 
-export const Account: React.FC<IAccountProps> = ({ hidden }) => {
+export const Account: React.FC<IAccountProps> = ({ hidden, userId }) => {
   const history = useHistory();
-  const { data: userData } = useWhoAmI();
   const { register, errors } = useFormContext<ISettingsFormProps>();
   const onCompleted = async (data: deleteAccountMutation) => {
     const {
       deleteAccount: { ok, error },
     } = data;
-    console.log(ok, error);
-    if (ok && !error && userData) {
-      client.cache.evict({ id: `Users:${userData.whoAmI.id}` });
+    if (ok && !error) {
+      client.cache.evict({ id: `Users:${userId}` });
       localStorage.removeItem(TOKEN);
       isLoggedInVar(false);
       history.push('/');
@@ -48,6 +48,7 @@ export const Account: React.FC<IAccountProps> = ({ hidden }) => {
   const onDeleteAccountClick = () => {
     deleteAccountMutation({ variables: { input: { password: null } } });
   };
+  console.log('Account rendering');
   return (
     <div className={`${hidden ? 'hidden' : 'block'}`}>
       <div className="px-6 mb-6 rounded-lg border border-myGray-light bg-white overflow-hidden">

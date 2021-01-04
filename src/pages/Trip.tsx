@@ -109,7 +109,7 @@ export const Trip = () => {
   return (
     <FormProvider {...f}>
       <Options isOption={isOption} setIsOption={setIsOption} />
-      <CommonHeader setIsOption={setIsOption} />
+      <CommonHeader userData={userData} setIsOption={setIsOption} />
       {data.readTrip.error ? (
         <div>{data.readTrip.error}</div>
       ) : (
