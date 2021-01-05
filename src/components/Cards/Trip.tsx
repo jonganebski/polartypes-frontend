@@ -1,11 +1,14 @@
 import { faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useDistanceContext } from '../../context';
 import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
 import moment from 'moment';
-import { getBackgroundImage, getTraveledDays } from '../../helpers';
+import {
+  calcDistance,
+  getBackgroundImage,
+  getTraveledDays,
+} from '../../helpers';
 
 interface ITripCardProps {
   trip: readTripsQuery_readTrips_targetUser_trips;
@@ -16,11 +19,22 @@ export const TripCard: React.FC<ITripCardProps> = ({
   trip,
   targetUsername,
 }) => {
-  const { distance } = useDistanceContext();
+  const [distance, setDistance] = useState('0');
   const dateObject = moment(trip.startDate);
   const year = dateObject.get('year');
   const month = dateObject.format('MMMM');
   const traveledDays = getTraveledDays(trip.startDate, trip.endDate);
+
+  useEffect(() => {
+    let distance = 0;
+    trip.steps.length !== 0 &&
+      trip.steps.reduce((prev, curr) => {
+        const d = calcDistance(prev.lat, prev.lon, curr.lat, curr.lon);
+        distance += d;
+        return curr;
+      });
+    setDistance(Math.round(distance).toLocaleString());
+  }, [trip.steps]);
 
   return (
     <li
@@ -64,7 +78,7 @@ export const TripCard: React.FC<ITripCardProps> = ({
           <div className="leading-tight">
             <span className="block font-semibold">{distance}</span>
             <span className="text-xs">
-              {distance === 1 ? 'kilometer' : 'kilometers'}
+              {distance === '1' ? 'kilometer' : 'kilometers'}
             </span>
           </div>
           <div></div>

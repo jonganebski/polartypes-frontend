@@ -1,3 +1,4 @@
+@import './mapbox.css';
 @tailwind base;
 @tailwind components;
 
@@ -15,6 +16,11 @@ body {
 
 .modal {
   @apply fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-2xl;
+}
+
+/* Overriding mapbox.css */
+.mapboxgl-popup-content {
+  @apply p-0 rounded-xl overflow-hidden;
 }
 
 @tailwind utilities;

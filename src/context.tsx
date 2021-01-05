@@ -52,6 +52,7 @@ export const useStepIdContext = () => {
   return { idFromDrag, setIdFromDrag, idFromMap, setIdFromMap };
 };
 
+// This context is only useful when I'm using React-leaflet.
 export const useDistanceContext = () => {
   const { distance, setDistance } = useContext(MapInteractionCtx);
   if (distance === undefined || setDistance === undefined) {

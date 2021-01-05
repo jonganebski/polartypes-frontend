@@ -89,7 +89,7 @@ export const Trips = () => {
       {data.readTrips.error ? (
         <div>{data.readTrips.error}</div>
       ) : (
-        <main className="grid grid-cols-tripsPage">
+        <main className="h-screenExceptHeader grid grid-cols-tripsPage">
           <section className="overflow-y-scroll">
             <div className="relative p-5 flex flex-col items-center">
               <div

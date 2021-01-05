@@ -13,8 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { readTripQuery_readTrip_trip } from '../__generated__/readTripQuery';
-import { useDistanceContext } from '../context';
-import { getTraveledDays } from '../helpers';
+import { calcDistance, getTraveledDays } from '../helpers';
 
 interface ITripStatus {
   count: number;
@@ -27,12 +26,12 @@ interface ITripStatusProps {
 }
 
 export const TripStatus: React.FC<ITripStatusProps> = ({ trip }) => {
-  const { distance } = useDistanceContext();
   const [tripStatus, setTripStatus] = useState<ITripStatus[]>([]);
 
   useEffect(() => {
     let imgCount = 0;
     let likeCount = 0;
+    let distance = 0;
     const countries = new Set<string>();
     trip.steps.forEach((step) => {
       step.imgUrls && (imgCount += step.imgUrls.length);
@@ -40,8 +39,14 @@ export const TripStatus: React.FC<ITripStatusProps> = ({ trip }) => {
       countries.add(step.country);
     });
     const traveledDays = getTraveledDays(trip.startDate, trip.endDate);
+    trip.steps.length !== 0 &&
+      trip.steps.reduce((prev, curr) => {
+        const d = calcDistance(prev.lat, prev.lon, curr.lat, curr.lon);
+        distance += d;
+        return curr;
+      });
     setTripStatus([
-      { unit: 'kilometer', count: distance, icon: faTachometerAlt },
+      { unit: 'kilometer', count: Math.round(distance), icon: faTachometerAlt },
       { unit: 'view', count: trip.viewCount, icon: faEye },
       { unit: 'like', count: likeCount, icon: faHeart },
       { unit: 'day', count: traveledDays, icon: faCalendar },
@@ -49,7 +54,7 @@ export const TripStatus: React.FC<ITripStatusProps> = ({ trip }) => {
       { unit: 'country', count: countries.size, icon: faPassport },
       { unit: 'step', count: trip.steps.length, icon: faAtlas },
     ]);
-  }, [distance, trip.endDate, trip.startDate, trip.steps, trip.viewCount]);
+  }, [trip.endDate, trip.startDate, trip.steps, trip.viewCount]);
 
   return (
     <>
