@@ -1,11 +1,42 @@
+import { gql, useLazyQuery } from '@apollo/client';
+import { faBars, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBars } from '@fortawesome/free-solid-svg-icons';
-import React from 'react';
-import { Logo } from '../Logo';
-import { Avatar } from '../Avatar';
+import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import {
+  searchQuery,
+  searchQueryVariables,
+} from '../../__generated__/searchQuery';
 import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
+import { Avatar } from '../Avatar';
 import { Button } from '../Button';
+import { Logo } from '../Logo';
+import { SearchResult } from './partials/Search-result';
+
+const SEARCH_QUERY = gql`
+  query searchQuery($input: SearchInput!) {
+    search(input: $input) {
+      ok
+      error
+      usersCount
+      users {
+        firstName
+        lastName
+        avatarUrl
+        city
+      }
+      tripsCount
+      trips {
+        name
+        coverUrl
+        traveler {
+          firstName
+          lastName
+        }
+      }
+    }
+  }
+`;
 
 interface IPrams {
   username: string;
@@ -23,21 +54,56 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
   setIsSignup,
 }) => {
   const { username: usernameParam } = useParams<IPrams>();
+  const timeoutIdRef = useRef<any>(0);
   const isSelf = usernameParam.toLowerCase() === userData?.whoAmI.slug;
+  const [isSearchTooltip, setIsSearchTooltip] = useState(false);
+  const [isDelay, setIsDelay] = useState(false);
+
+  const [
+    searchQuery,
+    { data: searchResult, loading: isSearchLoading },
+  ] = useLazyQuery<searchQuery, searchQueryVariables>(SEARCH_QUERY);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    clearTimeout(timeoutIdRef.current);
+    const searchTerm = e.currentTarget.value;
+    if (searchTerm.length === 0) {
+      setIsSearchTooltip(false);
+    }
+    if (2 < searchTerm.length) {
+      console.log('foo');
+      setIsSearchTooltip(true);
+      setIsDelay(true);
+      timeoutIdRef.current = setTimeout(() => {
+        setIsDelay(false);
+        searchQuery({ variables: { input: { searchTerm } } });
+      }, 1000);
+    }
+  };
   return (
     <header className="h-commonHeader flex justify-between bg-myGreen-darkest">
       <div className="px-3 flex items-center">
         <Logo usage="common" />
         <form className="relative ml-4 w-80">
           <input
+            onChange={onChange}
+            name="searchTerm"
             type="text"
             placeholder="Explore people, trips or locations..."
+            autoComplete="off"
             className="w-full pl-9 py-1.5 text-white text-sm bg-transparent border border-myGray-darkest rounded-full hover:border-myGray-dark focus:border-myGray-dark focus:outline-none"
           />
           <FontAwesomeIcon
             icon={faSearch}
             className="absolute top-2 left-3 text-white"
           />
+          {isSearchTooltip && (
+            <SearchResult
+              isDelay={isDelay}
+              isSearchLoading={isSearchLoading}
+              searchResult={searchResult}
+            />
+          )}
         </form>
       </div>
       <div

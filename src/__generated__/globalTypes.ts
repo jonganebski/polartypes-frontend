@@ -93,6 +93,10 @@ export interface ReadTripsInput {
   targetUsername: string;
 }
 
+export interface SearchInput {
+  searchTerm: string;
+}
+
 export interface StepInputType {
   location: string;
   country: string;
