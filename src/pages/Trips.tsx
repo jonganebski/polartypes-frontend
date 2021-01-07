@@ -14,6 +14,7 @@ import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
 import { SigninModal } from '../components/Modals/Signin';
 import { SignupModal } from '../components/Modals/Signup';
 import { Options } from '../components/Options';
+import { Statistics } from '../components/Statistics';
 import { useFollow } from '../hooks/useMutation/useFollow';
 import { useUnfollow } from '../hooks/useMutation/useUnfollow';
 import { useLazyTrips } from '../hooks/useQuery/useTrips';
@@ -29,13 +30,17 @@ export const Trips = () => {
   const [isSignup, setIsSignup] = useState<boolean | null>(null);
   const [isOption, setIsOption] = useState(false);
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
+  const [isTabTrips, setIsTabTrips] = useState(true);
 
   const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
   const [lazyTripsQuery, { data, called, loading }] = useLazyTrips();
   useEffect(() => {
     lazyWhoAmIQuery();
+  }, [lazyWhoAmIQuery]);
+  useEffect(() => {
+    console.log('foo');
     lazyTripsQuery({ variables: { input: { targetUsername } } });
-  }, [lazyTripsQuery, lazyWhoAmIQuery, targetUsername]);
+  }, [lazyTripsQuery, targetUsername]);
 
   const [followMutation] = useFollow(data?.readTrips.targetUser?.id);
   const [unfollowMutation] = useUnfollow(data?.readTrips.targetUser?.id);
@@ -182,14 +187,24 @@ export const Trips = () => {
               </div>
             </div>
             <div className="bg-gradient-to-br from-myBlue to-myBlue-light">
-              <button className="w-1/2 py-4 text-white font-semibold focus:outline-none">
+              <button
+                className={`w-1/2 py-4 text-white font-semibold ${
+                  !isTabTrips && 'opacity-50'
+                } focus:outline-none`}
+                onClick={() => setIsTabTrips(true)}
+              >
                 Trips
               </button>
-              <button className="w-1/2 py-4 text-white font-semibold focus:outline-none">
+              <button
+                className={`w-1/2 py-4 text-white ${
+                  isTabTrips && 'opacity-50'
+                } font-semibold focus:outline-none`}
+                onClick={() => setIsTabTrips(false)}
+              >
                 Statistics
               </button>
             </div>
-            <div className="px-3 py-5">
+            <div className={`${isTabTrips ? '' : 'hidden'} px-3 py-5`}>
               <div className="w-full mb-5 flex justify-center">
                 {isSelf && (
                   <Button
@@ -221,6 +236,11 @@ export const Trips = () => {
                   ))}
               </ul>
             </div>
+            <Statistics
+              isSelf={isSelf}
+              isHidden={isTabTrips}
+              trips={data.readTrips.targetUser.trips}
+            />
           </section>
           <section className="relative z-0 h-screenExceptHeader">
             <Map />

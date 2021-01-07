@@ -1,9 +1,6 @@
 import Axios from 'axios';
 import moment from 'moment-timezone';
-import {
-  readTripsQuery_readTrips_targetUser_trips,
-  readTripsQuery_readTrips_targetUser_trips_steps,
-} from './__generated__/readTripsQuery';
+import { readTripsQuery_readTrips_targetUser_trips } from './__generated__/readTripsQuery';
 
 interface IGetTimeZoneOutput {
   ok: boolean;
@@ -42,10 +39,8 @@ export const deleteFiles = async (urls: string[]) => {
   console.log(data);
 };
 
-export const sortSteps = (
-  a: readTripsQuery_readTrips_targetUser_trips_steps,
-  b: readTripsQuery_readTrips_targetUser_trips_steps,
-) => new Date(a.arrivedAt).getTime() - new Date(b.arrivedAt).getTime();
+export const sortSteps = (a: { arrivedAt: string }, b: { arrivedAt: string }) =>
+  new Date(a.arrivedAt).getTime() - new Date(b.arrivedAt).getTime();
 
 export const sleep = (milSec: number) =>
   new Promise((resolve) => {

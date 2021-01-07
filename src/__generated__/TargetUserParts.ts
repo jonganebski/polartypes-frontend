@@ -17,6 +17,16 @@ export interface TargetUserParts_followings {
   id: number;
 }
 
+export interface TargetUserParts_trips_steps_likes_user {
+  __typename: "Users";
+  username: string;
+}
+
+export interface TargetUserParts_trips_steps_likes {
+  __typename: "Like";
+  user: TargetUserParts_trips_steps_likes_user;
+}
+
 export interface TargetUserParts_trips_steps {
   __typename: "Step";
   id: number;
@@ -24,6 +34,8 @@ export interface TargetUserParts_trips_steps {
   lon: number;
   arrivedAt: string;
   imgUrls: string[] | null;
+  country: string;
+  likes: TargetUserParts_trips_steps_likes[];
 }
 
 export interface TargetUserParts_trips {

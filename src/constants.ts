@@ -14,3 +14,5 @@ export const INITIAL_DATE_STATE = new Date(
 );
 
 export const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+
+export const TOTAL_COUNTRIES_IN_THE_WORLD = 193;

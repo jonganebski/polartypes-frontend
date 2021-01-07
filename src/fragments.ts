@@ -102,6 +102,12 @@ export const TARGET_USER_FRAGMENT = gql`
         lon
         arrivedAt
         imgUrls
+        country
+        likes {
+          user {
+            username
+          }
+        }
       }
     }
   }
