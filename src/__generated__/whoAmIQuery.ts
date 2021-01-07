@@ -14,9 +14,9 @@ export interface whoAmIQuery_whoAmI {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  city: string | null;
   timeZone: string | null;
   slug: string;
-  city: string | null;
   about: string | null;
 }
 

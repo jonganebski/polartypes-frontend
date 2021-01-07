@@ -77,9 +77,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
           body,
           method: 'POST',
         });
-        avatarUrl && (await deleteFiles([avatarUrl]));
         const result = await response.json();
-        console.log(result.error);
         if (result.ok && !result.error && result.url) {
           url = result.url;
         } else {
@@ -97,7 +95,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
             newPassword: newPasswords[0] ? newPasswords[0] : null,
           },
         },
-      });
+      }).then(async () => avatarUrl && (await deleteFiles([avatarUrl])));
     } catch (error) {
       setIsLoading(false);
       console.log(error);

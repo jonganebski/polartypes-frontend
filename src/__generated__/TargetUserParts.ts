@@ -10,11 +10,23 @@
 export interface TargetUserParts_followers {
   __typename: "Users";
   id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
 }
 
 export interface TargetUserParts_followings {
   __typename: "Users";
   id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
 }
 
 export interface TargetUserParts_trips_steps_likes_user {
@@ -55,9 +67,9 @@ export interface TargetUserParts {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  city: string | null;
   timeZone: string | null;
   about: string | null;
-  city: string | null;
   followers: TargetUserParts_followers[];
   followings: TargetUserParts_followings[];
   trips: TargetUserParts_trips[];

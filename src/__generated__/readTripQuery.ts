@@ -12,6 +12,23 @@ import { ReadTripInput, Availability } from "./globalTypes";
 export interface readTripQuery_readTrip_trip_traveler_followers {
   __typename: "Users";
   id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
+}
+
+export interface readTripQuery_readTrip_trip_traveler_followings {
+  __typename: "Users";
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
 }
 
 export interface readTripQuery_readTrip_trip_traveler {
@@ -21,8 +38,10 @@ export interface readTripQuery_readTrip_trip_traveler {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  city: string | null;
   timeZone: string | null;
   followers: readTripQuery_readTrip_trip_traveler_followers[];
+  followings: readTripQuery_readTrip_trip_traveler_followings[];
 }
 
 export interface readTripQuery_readTrip_trip_steps_traveler {

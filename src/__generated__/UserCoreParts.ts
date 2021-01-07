@@ -14,5 +14,6 @@ export interface UserCoreParts {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  city: string | null;
   timeZone: string | null;
 }

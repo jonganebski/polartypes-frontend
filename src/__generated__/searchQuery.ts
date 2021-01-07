@@ -11,11 +11,13 @@ import { SearchInput } from "./globalTypes";
 
 export interface searchQuery_search_users {
   __typename: "Users";
+  id: number;
+  username: string;
   firstName: string;
   lastName: string;
-  username: string;
   avatarUrl: string | null;
   city: string | null;
+  timeZone: string | null;
 }
 
 export interface searchQuery_search_trips_traveler {

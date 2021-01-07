@@ -10,6 +10,23 @@
 export interface TravelerParts_followers {
   __typename: "Users";
   id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
+}
+
+export interface TravelerParts_followings {
+  __typename: "Users";
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
 }
 
 export interface TravelerParts {
@@ -19,6 +36,8 @@ export interface TravelerParts {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  city: string | null;
   timeZone: string | null;
   followers: TravelerParts_followers[];
+  followings: TravelerParts_followings[];
 }

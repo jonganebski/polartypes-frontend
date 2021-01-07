@@ -9,6 +9,7 @@ import { Button } from '../components/Button';
 import { TripCard } from '../components/Cards/Trip';
 import { CommonHeader } from '../components/Headers/CommonHeader';
 import { Map } from '../components/Map/Map';
+import { FollowFollowing } from '../components/Modals/Follow-following';
 import { SaveTripModal } from '../components/Modals/Save-trip';
 import { SetTimeZoneModal } from '../components/Modals/Set-time-zone';
 import { SigninModal } from '../components/Modals/Signin';
@@ -31,6 +32,9 @@ export const Trips = () => {
   const [isOption, setIsOption] = useState(false);
   const [isAskTimeZone, setIsAskTimeZone] = useState(false);
   const [isTabTrips, setIsTabTrips] = useState(true);
+  const [isFollowersModal, setIsFollowersModal] = useState<boolean | null>(
+    null,
+  );
 
   const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
   const [lazyTripsQuery, { data, called, loading }] = useLazyTrips();
@@ -42,8 +46,8 @@ export const Trips = () => {
     lazyTripsQuery({ variables: { input: { targetUsername } } });
   }, [lazyTripsQuery, targetUsername]);
 
-  const [followMutation] = useFollow(data?.readTrips.targetUser?.id);
-  const [unfollowMutation] = useUnfollow(data?.readTrips.targetUser?.id);
+  const [followMutation] = useFollow();
+  const [unfollowMutation] = useUnfollow();
   const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
 
   if (loading) {
@@ -91,6 +95,22 @@ export const Trips = () => {
       />
       {isSignup === false && <SigninModal setIsSignup={setIsSignup} />}
       {isSignup === true && <SignupModal setIsSignup={setIsSignup} />}
+      {userData && isFollowersModal === false && (
+        <FollowFollowing
+          isFollowers={false}
+          currentUserId={userData.whoAmI.id}
+          users={data.readTrips.targetUser.followings}
+          setIsFollowersModal={setIsFollowersModal}
+        />
+      )}
+      {userData && isFollowersModal === true && (
+        <FollowFollowing
+          isFollowers={true}
+          currentUserId={userData.whoAmI.id}
+          users={data.readTrips.targetUser.followers}
+          setIsFollowersModal={setIsFollowersModal}
+        />
+      )}
       {data.readTrips.error ? (
         <div>{data.readTrips.error}</div>
       ) : (
@@ -138,11 +158,13 @@ export const Trips = () => {
                   type="white-regular"
                   size="sm"
                   className="mr-2"
+                  onClick={() => userData && setIsFollowersModal(true)}
                 />
                 <Button
                   text={`${data?.readTrips.targetUser?.followings.length} following`}
                   type="white-regular"
                   size="sm"
+                  onClick={() => userData && setIsFollowersModal(false)}
                 />
                 {isLoggedInVar() &&
                   !isSelf &&

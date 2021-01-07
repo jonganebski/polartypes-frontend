@@ -48,13 +48,14 @@ export const UPDATED_STEP_FRAGMENT = gql`
   }
 `;
 
-const USER_CORE_FRAGMENT = gql`
+export const USER_CORE_FRAGMENT = gql`
   fragment UserCoreParts on Users {
     id
     username
     firstName
     lastName
     avatarUrl
+    city
     timeZone
   }
 `;
@@ -63,7 +64,10 @@ export const TRAVELER_FRAGMENT = gql`
   fragment TravelerParts on Users {
     ...UserCoreParts
     followers {
-      id
+      ...UserCoreParts
+    }
+    followings {
+      ...UserCoreParts
     }
   }
   ${USER_CORE_FRAGMENT}
@@ -85,10 +89,10 @@ export const TARGET_USER_FRAGMENT = gql`
     about
     city
     followers {
-      id
+      ...UserCoreParts
     }
     followings {
-      id
+      ...UserCoreParts
     }
     trips {
       id

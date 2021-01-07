@@ -12,11 +12,23 @@ import { ReadTripsInput } from "./globalTypes";
 export interface readTripsQuery_readTrips_targetUser_followers {
   __typename: "Users";
   id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
 }
 
 export interface readTripsQuery_readTrips_targetUser_followings {
   __typename: "Users";
   id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
 }
 
 export interface readTripsQuery_readTrips_targetUser_trips_steps_likes_user {
@@ -57,9 +69,9 @@ export interface readTripsQuery_readTrips_targetUser {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  city: string | null;
   timeZone: string | null;
   about: string | null;
-  city: string | null;
   followers: readTripsQuery_readTrips_targetUser_followers[];
   followings: readTripsQuery_readTrips_targetUser_followings[];
   trips: readTripsQuery_readTrips_targetUser_trips[];

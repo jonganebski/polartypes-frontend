@@ -85,6 +85,14 @@ export interface LoginInput {
   rememberMe: boolean;
 }
 
+export interface ReadFollowersInput {
+  targetUserId: number;
+}
+
+export interface ReadFollowingsInput {
+  targetUserId: number;
+}
+
 export interface ReadTripInput {
   tripId: number;
 }

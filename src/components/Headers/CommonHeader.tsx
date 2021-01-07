@@ -3,6 +3,7 @@ import { faBars, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { USER_CORE_FRAGMENT } from '../../fragments';
 import {
   searchQuery,
   searchQueryVariables,
@@ -20,11 +21,7 @@ const SEARCH_QUERY = gql`
       error
       usersCount
       users {
-        firstName
-        lastName
-        username
-        avatarUrl
-        city
+        ...UserCoreParts
       }
       tripsCount
       trips {
@@ -39,6 +36,7 @@ const SEARCH_QUERY = gql`
       }
     }
   }
+  ${USER_CORE_FRAGMENT}
 `;
 
 interface IPrams {
@@ -102,6 +100,7 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
           />
           {isSearchTooltip && (
             <SearchResult
+              currentUserId={userData?.whoAmI.id}
               isDelay={isDelay}
               isSearchLoading={isSearchLoading}
               searchResult={searchResult}

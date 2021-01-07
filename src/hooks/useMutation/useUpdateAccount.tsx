@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { client } from '../../apollo';
 import { ISettingsFormProps } from '../../components/Modals/Settings';
 import { USER_FRAGMENT } from '../../fragments';
-import { sleep } from '../../helpers';
+import { deleteFiles, sleep } from '../../helpers';
 import {
   updateAccountMutation,
   updateAccountMutationVariables,

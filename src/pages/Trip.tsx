@@ -81,8 +81,8 @@ export const Trip = () => {
     lazyTripsQuery({ variables: { input: { targetUsername } } });
   }, [lazyTripQuery, lazyTripsQuery, lazyWhoAmIQuery, targetUsername, tripId]);
 
-  const [followMutation] = useFollow(data?.readTrip.trip?.traveler.id);
-  const [unfollowMutation] = useUnfollow(data?.readTrip.trip?.traveler.id);
+  const [followMutation] = useFollow();
+  const [unfollowMutation] = useUnfollow();
   const isSelf = data?.readTrip.trip?.traveler.id === userData?.whoAmI.id;
   const startDateData = data?.readTrip.trip?.startDate;
   const endDateData = data?.readTrip.trip?.endDate;
