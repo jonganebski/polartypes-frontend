@@ -243,7 +243,7 @@ export const Trips = () => {
             />
           </section>
           <section className="relative z-0 h-screenExceptHeader">
-            <Map />
+            {/* <Map /> */}
           </section>
         </main>
       )}

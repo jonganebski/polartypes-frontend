@@ -1,8 +1,8 @@
 import React from 'react';
-import { searchQuery } from '../../../__generated__/searchQuery';
-import { TripBox } from '../../Box/Trip';
-import { UserBox } from '../../Box/User';
-import { Spinner } from '../../Loading-spinner';
+import { searchQuery } from '../../__generated__/searchQuery';
+import { TripBox } from '../Box/Trip';
+import { UserBox } from '../Box/User';
+import { Spinner } from '../Loading-spinner';
 
 interface ISearchResultProps {
   isSearchLoading: boolean;

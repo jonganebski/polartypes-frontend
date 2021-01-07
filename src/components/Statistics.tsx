@@ -104,8 +104,11 @@ export const Statistics: React.FC<IStatisticsProps> = ({
             Traveled for {totalTravelDays} days
           </div>
           <ul className="grid grid-cols-2 gap-2">
-            {statistics.map((stat) => (
-              <li className="p-5 flex items-center border border-myGray-light rounded-lg">
+            {statistics.map((stat, i) => (
+              <li
+                key={i}
+                className="p-5 flex items-center border border-myGray-light rounded-lg"
+              >
                 <FontAwesomeIcon
                   icon={stat.icon}
                   className="mr-4 text-myGray-dark text-xl"

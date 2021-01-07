@@ -13,6 +13,7 @@ export interface searchQuery_search_users {
   __typename: "Users";
   firstName: string;
   lastName: string;
+  username: string;
   avatarUrl: string | null;
   city: string | null;
 }
@@ -21,10 +22,12 @@ export interface searchQuery_search_trips_traveler {
   __typename: "Users";
   firstName: string;
   lastName: string;
+  username: string;
 }
 
 export interface searchQuery_search_trips {
   __typename: "Trip";
+  id: number;
   name: string;
   coverUrl: string | null;
   traveler: searchQuery_search_trips_traveler;

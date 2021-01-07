@@ -11,7 +11,7 @@ import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { Logo } from '../Logo';
-import { SearchResult } from './partials/Search-result';
+import { SearchResult } from '../Tooltips/Search-result';
 
 const SEARCH_QUERY = gql`
   query searchQuery($input: SearchInput!) {
@@ -22,16 +22,19 @@ const SEARCH_QUERY = gql`
       users {
         firstName
         lastName
+        username
         avatarUrl
         city
       }
       tripsCount
       trips {
+        id
         name
         coverUrl
         traveler {
           firstName
           lastName
+          username
         }
       }
     }
