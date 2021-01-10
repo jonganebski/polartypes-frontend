@@ -2,6 +2,7 @@ import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { SERVER_URI } from '../../constants';
 import { deleteFiles } from '../../helpers';
 import { useUpdateAccount } from '../../hooks/useMutation/useUpdateAccount';
 import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
@@ -73,7 +74,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
       if (files.length !== 0) {
         const body = new FormData();
         body.append('file', files[0]);
-        const response = await fetch('http://localhost:4000/aws-s3/upload', {
+        const response = await fetch(`${SERVER_URI}/aws-s3/upload`, {
           body,
           method: 'POST',
         });

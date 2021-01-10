@@ -1,5 +1,6 @@
 import Axios from 'axios';
 import moment from 'moment-timezone';
+import { SERVER_URI } from './constants';
 import { readTripsQuery_readTrips_targetUser_trips } from './__generated__/readTripsQuery';
 
 interface IGetTimeZoneOutput {
@@ -28,7 +29,7 @@ export const deleteFiles = async (urls: string[]) => {
   if (urls.length === 0) {
     return;
   }
-  await fetch('http://localhost:4000/aws-s3/delete', {
+  await fetch(`${SERVER_URI}/aws-s3/delete`, {
     method: 'POST',
     body: JSON.stringify({ urls: urls }),
     headers: { 'Content-Type': 'application/json' },

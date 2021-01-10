@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { TImage } from '../components/Modals/Save-step';
 import { TMyFile } from '../components/Modals/partials/FilesArea';
-import { ACCEPTED_IMAGE_TYPES } from '../constants';
+import { ACCEPTED_IMAGE_TYPES, SERVER_URI } from '../constants';
 
 export const useDragNDropFile = (
   images: TImage[],
@@ -43,7 +43,7 @@ export const useDragNDropFile = (
         const body = new FormData();
         body.append('file', file);
         try {
-          const response = await fetch('http://localhost:4000/aws-s3/upload', {
+          const response = await fetch(`${SERVER_URI}/aws-s3/upload`, {
             body,
             method: 'POST',
           });

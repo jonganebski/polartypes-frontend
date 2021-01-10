@@ -19,5 +19,5 @@ export const TOTAL_COUNTRIES_IN_THE_WORLD = 193;
 
 export const SERVER_URI =
   process.env.NODE_ENV === 'production'
-    ? 'https://polartypes.herokuapp.com/graphql'
-    : 'http://localhost:4000/graphql';
+    ? 'https://polartypes.herokuapp.com'
+    : 'http://localhost:4000';
