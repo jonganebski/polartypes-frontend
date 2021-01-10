@@ -2,10 +2,6 @@ import { gql, useMutation } from '@apollo/client';
 import { useEffect } from 'react';
 import { client } from '../../apollo';
 import {
-  readFollowersQuery,
-  readFollowersQueryVariables,
-} from '../../__generated__/readFollowersQuery';
-import {
   readFollowingsQuery,
   readFollowingsQueryVariables,
 } from '../../__generated__/readFollowingsQuery';

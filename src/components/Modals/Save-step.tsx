@@ -61,10 +61,12 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
     { loading: updateStepMutaionLoading },
   ] = useUpdateStep(f, editingStep, images, setIsSaveStepModal);
 
-  const [
-    deleteStepMutation,
-    { loading: deleteStepMutaionLoading },
-  ] = useDeleteStep(f, tripId, images, setIsSaveStepModal);
+  const [deleteStepMutation] = useDeleteStep(
+    f,
+    tripId,
+    images,
+    setIsSaveStepModal,
+  );
 
   const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
 

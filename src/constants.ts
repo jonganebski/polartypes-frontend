@@ -16,3 +16,8 @@ export const INITIAL_DATE_STATE = new Date(
 export const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
 export const TOTAL_COUNTRIES_IN_THE_WORLD = 193;
+
+export const SERVER_URI =
+  process.env.NODE_ENV === 'production'
+    ? 'https://polartypes.herokuapp.com/graphql'
+    : 'http://localhost:4000/graphql';

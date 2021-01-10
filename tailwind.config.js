@@ -2,7 +2,7 @@ const commonHeaderH = '3.5rem';
 const tripHeaderH = '3rem';
 
 module.exports = {
-  purge: [],
+  purge: ['./src/**/*.tsx'],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {

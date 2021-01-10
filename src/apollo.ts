@@ -5,7 +5,7 @@ import {
   makeVar,
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
-import { TOKEN } from './constants';
+import { SERVER_URI, TOKEN } from './constants';
 
 const token = localStorage.getItem(TOKEN);
 
@@ -14,7 +14,7 @@ export const isLoggedInVar = makeVar(Boolean(token));
 export const authTokenVar = makeVar(token);
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:4000/graphql',
+  uri: SERVER_URI,
 });
 
 const authLink = setContext((_, { headers }) => {
