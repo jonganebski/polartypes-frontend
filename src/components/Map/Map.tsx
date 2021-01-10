@@ -15,6 +15,13 @@ import { ICreateStepFormProps } from '../../pages/Trip';
 import { StepMarkers } from './partials/Step-markers';
 import { StepRoute } from './partials/Step-route';
 import { TripRoute } from './partials/Trip-route';
+import mapboxgl from 'mapbox-gl';
+
+// https://github.com/mapbox/mapbox-gl-js/issues/10173
+// current version of mapbox-gl has issue when build.
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+mapboxgl.WorkerClass = require('worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker').default;
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
