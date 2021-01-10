@@ -26,7 +26,7 @@ export const Logo: React.FC<ILogoProps> = ({
     className: (() => {
       const core = 'mr-1';
       if (usage === 'home') {
-        return core + 'text-4xl';
+        return core + ' text-4xl';
       }
       return core + ' text-2xl';
     })(),

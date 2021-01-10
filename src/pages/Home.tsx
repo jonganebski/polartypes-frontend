@@ -50,7 +50,7 @@ export const Home = () => {
                 Adventure starts&nbsp;with&nbsp;a
               </h2>
               <h2 className="text-6xl text-white font-black mb-10">
-                single step
+                single&nbsp;step
               </h2>
               <h5 className="text-3xl text-white font-light">
                 Plan, track and relive your trips in a smart and beautiful way
@@ -67,8 +67,50 @@ export const Home = () => {
             style={{ backgroundImage: 'url("splatter-white.png")' }}
             className="absolute -top-12 w-full h-12 bg-cover"
           />
-          <div className="bg-white w-full max-w-4xl mx-auto h-full pt-32">
-            Welcome to Polartypes!
+          <div className="bg-white w-full max-w-4xl mx-auto h-full pt-32 text-center">
+            <h4 className="mb-6">Welcome to Polartypes!</h4>
+            <p className="mb-6">
+              This site is a result of learning purpose clone coding. The
+              original site is{' '}
+              <a
+                href="https://www.polarsteps.com"
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                Polarsteps
+              </a>
+              . Your password is going to be encrypted properly with argon 2 and
+              your information is not going to be shared with any other
+              services. Unfortunately, there are no means to help you in case
+              you forget your password.
+            </p>
+            <p className="mb-6">
+              I named this project polartypes becase it is writen in typescript.
+              Sharing programming language between front and back with strong
+              type support, I had very good developing experience and learned a
+              lot. If you want to check the code, please visit github links
+              below.
+            </p>
+            <div className="mb-10">
+              <a
+                href="https://github.com/jonganebski/polartypes-frontend"
+                target="_blank"
+                rel="noreferrer"
+                className="block underline"
+              >
+                Frontend
+              </a>
+              <a
+                href="https://github.com/jonganebski/polartypes-backend"
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                Backend
+              </a>
+            </div>
+            <span>&copy; polartypes {new Date().getFullYear()}</span>
           </div>
         </div>
       </main>
