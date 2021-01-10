@@ -43,7 +43,6 @@ export const useToggleLike = (stepId: number) => {
       if (prevStep && userData) {
         const username = userData.whoAmI.username;
         let likes = prevStep?.likes.slice();
-        console.log(likes);
         if (0 < toggle) {
           likes.unshift({
             __typename: 'Like',

@@ -14,6 +14,8 @@ import { ICreateStepFormProps } from '../../pages/Trip';
 import { StepRoute } from './partials/Step-route';
 import { TripRoute } from './partials/Trip-route';
 
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
+
 interface IParams {
   username: string;
   tripId?: string;
@@ -24,8 +26,6 @@ interface IMapProps {
 }
 
 export const Map: React.FC<IMapProps> = ({ isSaveStepModal }) => {
-  const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
-  console.log(MAPBOX_TOKEN);
   const { username: targetUsername, tripId } = useParams<IParams>();
   const f = useFormContext<ICreateStepFormProps>();
   const { idFromDrag } = useStepIdContext();

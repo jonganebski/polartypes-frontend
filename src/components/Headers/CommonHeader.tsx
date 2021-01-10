@@ -72,7 +72,6 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
       setIsSearchTooltip(false);
     }
     if (2 < searchTerm.length) {
-      console.log('foo');
       setIsSearchTooltip(true);
       setIsDelay(true);
       timeoutIdRef.current = setTimeout(() => {

@@ -42,7 +42,6 @@ export const Trips = () => {
     lazyWhoAmIQuery();
   }, [lazyWhoAmIQuery]);
   useEffect(() => {
-    console.log('foo');
     lazyTripsQuery({ variables: { input: { targetUsername } } });
   }, [lazyTripsQuery, targetUsername]);
 

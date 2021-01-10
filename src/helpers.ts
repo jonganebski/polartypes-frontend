@@ -15,7 +15,6 @@ export const getTimeZone = async (
   const BINGMAPS_API_KEY = process.env.REACT_APP_BINGMAPS_API_KEY;
   const END_POINT = `https://dev.virtualearth.net/REST/v1/TimeZone/${lat},${lon}?key=${BINGMAPS_API_KEY}`;
   try {
-    console.log('requesting timezone');
     const res = await Axios.get(END_POINT);
     const timeZone =
       res.data?.resourceSets[0]?.resources[0]?.timeZone.ianaTimeZoneId;
@@ -29,14 +28,11 @@ export const deleteFiles = async (urls: string[]) => {
   if (urls.length === 0) {
     return;
   }
-  console.log(JSON.stringify({ urls: urls }));
-  const response = await fetch('http://localhost:4000/aws-s3/delete', {
+  await fetch('http://localhost:4000/aws-s3/delete', {
     method: 'POST',
     body: JSON.stringify({ urls: urls }),
     headers: { 'Content-Type': 'application/json' },
   });
-  const data = await response.json();
-  console.log(data);
 };
 
 export const sortSteps = (a: { arrivedAt: string }, b: { arrivedAt: string }) =>

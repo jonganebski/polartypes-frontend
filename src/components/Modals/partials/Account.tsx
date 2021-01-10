@@ -46,7 +46,6 @@ export const Account: React.FC<IAccountProps> = ({ hidden, userId }) => {
   const onDeleteAccountClick = () => {
     deleteAccountMutation({ variables: { input: { password: null } } });
   };
-  console.log('Account rendering');
   return (
     <div className={`${hidden ? 'hidden' : 'block'}`}>
       <div className="px-6 mb-6 rounded-lg border border-myGray-light bg-white overflow-hidden">

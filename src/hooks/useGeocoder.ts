@@ -19,7 +19,6 @@ export const useGeocoder = (searchTerm: string, lat?: string, lon?: string) => {
         2 < searchTerm.length &&
         searchTerm !== prevSearchTerm
       ) {
-        console.log('requesting geocoder');
         const response = await Axios.get(GEOCODER_END_POINT);
         setGeocodeData(response.data.hits);
         setPrevSearchTerm(searchTerm);

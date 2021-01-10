@@ -32,7 +32,6 @@ export const useFollow = () => {
     const {
       follow: { ok, error, targetUserId },
     } = data;
-    console.log(ok, error);
     if (ok && !error && targetUserId && userData) {
       const targetUser = client.readFragment<targetUser>({
         id: `Users:${targetUserId}`,

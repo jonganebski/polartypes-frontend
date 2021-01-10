@@ -48,7 +48,6 @@ export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
     const {
       login: { ok, error, token, username },
     } = data;
-    console.log(data);
     if (ok && token && username && !error) {
       localStorage.setItem(TOKEN, token);
       authTokenVar(token);
