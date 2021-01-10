@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import ReactMapGL, {
   FlyToInterpolator,
+  PointerEvent,
   ViewportProps,
   WebMercatorViewport,
-  PointerEvent,
 } from 'react-map-gl';
 import { useParams } from 'react-router-dom';
 import { useStepIdContext } from '../../context';
+import { sortSteps } from '../../helpers';
 import { useLazyTrip } from '../../hooks/useQuery/useTrip';
 import { useLazyTrips } from '../../hooks/useQuery/useTrips';
 import { ICreateStepFormProps } from '../../pages/Trip';
+import { StepMarkers } from './partials/Step-markers';
 import { StepRoute } from './partials/Step-route';
 import { TripRoute } from './partials/Trip-route';
 
@@ -29,6 +31,7 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal }) => {
   const { username: targetUsername, tripId } = useParams<IParams>();
   const f = useFormContext<ICreateStepFormProps>();
   const { idFromDrag } = useStepIdContext();
+  const [coordinates, setCoordinates] = useState<number[][]>([]);
   const [viewport, setViewport] = useState<Partial<ViewportProps>>({
     latitude: 20,
     longitude: 20,
@@ -81,6 +84,16 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal }) => {
       const readingStep = trip.readTrip.trip.steps.find(
         (step) => step.id + '' === idFromDrag,
       );
+      setCoordinates(() => {
+        const coords: number[][] = [];
+        trip?.readTrip.trip?.steps
+          .slice()
+          .sort(sortSteps)
+          .forEach((step) => {
+            coords.push([step.lon, step.lat]);
+          });
+        return coords;
+      });
       if (readingStep) {
         setViewport((prev) => ({
           latitude: readingStep.lat,
@@ -115,7 +128,10 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal }) => {
       {tripsCalled &&
         trips?.readTrips.targetUser?.trips.map((trip, i) => {
           const coordinates: number[][] = [];
-          trip.steps.forEach((step) => coordinates.push([step.lon, step.lat]));
+          trip.steps
+            .slice()
+            .sort(sortSteps)
+            .forEach((step) => coordinates.push([step.lon, step.lat]));
           return (
             <TripRoute
               key={i}
@@ -125,21 +141,16 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal }) => {
             />
           );
         })}
-      {tripCalled &&
-        trip?.readTrip.trip?.steps.map((step, i) => {
-          const coordinates: number[][] = [];
-          trip?.readTrip.trip?.steps.forEach((step) =>
-            coordinates.push([step.lon, step.lat]),
-          );
-          return (
-            <StepRoute
-              key={i}
-              coordinates={coordinates}
-              step={step}
-              setViewport={setViewport}
-            />
-          );
-        })}
+      {tripCalled && trip?.readTrip.trip && (
+        <>
+          <StepRoute coordinates={coordinates} />
+          {trip?.readTrip.trip?.steps.map((step, i) => {
+            return (
+              <StepMarkers key={i} step={step} setViewport={setViewport} />
+            );
+          })}
+        </>
+      )}
     </ReactMapGL>
   );
 };
