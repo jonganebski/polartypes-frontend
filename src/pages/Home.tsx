@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import { HomepageHeader } from '../components/Headers/HomeHeader';
 import { SigninModal } from '../components/Modals/Signin';
 import { SignupModal } from '../components/Modals/Signup';
@@ -83,32 +84,35 @@ export const Home = () => {
               . Your password is going to be encrypted properly with argon 2 and
               your information is not going to be shared with any other
               services. Unfortunately, there are no means to help you in case
-              you forget your password.
+              you forget your password right now. Keep this in mind.
             </p>
             <p className="mb-6">
-              I named this project polartypes becase it is writen in typescript.
+              I named this project Polartypes becase it is writen in Typescript.
               Sharing programming language between front and back with strong
               type support, I had very good developing experience and learned a
               lot. If you want to check the code, please visit github links
-              below.
+              below. Also I made an example post for you.
             </p>
-            <div className="mb-10">
+            <div className="mb-10 grid">
               <a
                 href="https://github.com/jonganebski/polartypes-frontend"
                 target="_blank"
                 rel="noreferrer"
-                className="block underline"
+                className="underline"
               >
-                Frontend
+                Frontend code
               </a>
               <a
                 href="https://github.com/jonganebski/polartypes-backend"
                 target="_blank"
                 rel="noreferrer"
-                className="underline"
+                className="underline mb-5"
               >
-                Backend
+                Backend code
               </a>
+              <Link to="/JinseokBang" className="underline">
+                Example trip
+              </Link>
             </div>
             <span>&copy; polartypes {new Date().getFullYear()}</span>
           </div>

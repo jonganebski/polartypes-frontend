@@ -1,7 +1,7 @@
 import { faCode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo';
 import { TOKEN } from '../constants';
 import { whoAmIQuery } from '../__generated__/whoAmIQuery';
@@ -76,11 +76,7 @@ export const Options: React.FC<IOptionProps> = ({
           )}
           <li className="py-8 bg-white">
             <h5 className="mb-2 text-myGray-dark text-sm font-semibold">
-              See code
-              <FontAwesomeIcon
-                icon={faCode}
-                className="ml-2 text-sm text-myGray-dark"
-              />
+              Github
             </h5>
             <a
               className="block text-myGreen-dark font-semibold hover:text-myBlue"
@@ -98,6 +94,17 @@ export const Options: React.FC<IOptionProps> = ({
             >
               Backend
             </a>
+          </li>
+          <li className="py-8 bg-white">
+            <h5 className="mb-2 text-myGray-dark text-sm font-semibold">
+              Example trip
+            </h5>
+            <Link
+              to="/JinseokBang"
+              className="block text-myGreen-dark font-semibold hover:text-myBlue"
+            >
+              Jinseok's trips
+            </Link>
           </li>
           <li className="py-8 bg-white">
             {isLoggedInVar() && (
