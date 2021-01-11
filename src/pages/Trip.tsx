@@ -16,6 +16,7 @@ import { Button } from '../components/Button';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
 import { CommonHeader } from '../components/Headers/CommonHeader';
+import { Loading } from '../components/Loading';
 import { Map } from '../components/Map/Map';
 import { SaveStepModal } from '../components/Modals/Save-step';
 import { SaveTripModal } from '../components/Modals/Save-trip';
@@ -114,9 +115,7 @@ export const Trip = () => {
   };
 
   if (loading) {
-    <Helmet>
-      <title>Loading... | Polartypes</title>
-    </Helmet>;
+    <Loading />;
   }
   if (!loading && called && !data?.readTrip.trip) {
     return <Redirect to="/" />;

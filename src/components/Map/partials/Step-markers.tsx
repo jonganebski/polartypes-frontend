@@ -49,11 +49,16 @@ export const StepMarkers: React.FC<IStepMarkersProps> = ({
         ></div>
       </Marker>
       {isPopup && (
-        <Popup latitude={step.lat} longitude={step.lon} closeButton={false}>
-          <div className="">
+        <Popup
+          latitude={step.lat}
+          longitude={step.lon}
+          closeButton={false}
+          className="relative z-10"
+        >
+          <div className="w-60 h-90">
             {step.imgUrls && step.imgUrls.length !== 0 && (
               <div
-                className="w-60 h-72 bg-cover bg-center bg-myGreen-dark"
+                className="w-full h-72 bg-cover bg-center bg-myGreen-dark"
                 style={{ backgroundImage: `url(${step.imgUrls[0]})` }}
               ></div>
             )}

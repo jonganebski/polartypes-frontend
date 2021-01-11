@@ -38,7 +38,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
   setIsSettingModal,
 }) => {
   const [avatarSrc, setAvatarSrc] = useState(
-    userData?.whoAmI.avatarUrl ?? 'blank-profile.webp',
+    userData?.whoAmI.avatarUrl ?? '/blank-profile.webp',
   );
   const [avatarUrl, setAvatarUrl] = useState(
     userData?.whoAmI.avatarUrl ?? null,

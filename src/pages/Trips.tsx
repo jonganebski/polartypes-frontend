@@ -8,6 +8,7 @@ import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { TripCard } from '../components/Cards/Trip';
 import { CommonHeader } from '../components/Headers/CommonHeader';
+import { Loading } from '../components/Loading';
 import { Map } from '../components/Map/Map';
 import { FollowFollowing } from '../components/Modals/Follow-following';
 import { SaveTripModal } from '../components/Modals/Save-trip';
@@ -50,11 +51,7 @@ export const Trips = () => {
   const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
 
   if (loading) {
-    return (
-      <Helmet>
-        <title>Loading... | Polartypes</title>
-      </Helmet>
-    );
+    return <Loading />;
   }
   if (!loading && called && !data?.readTrips.targetUser) {
     return <Redirect to="/" />;
@@ -84,7 +81,7 @@ export const Trips = () => {
       />
       <Helmet>
         <title>
-          {data.readTrips.targetUser.firstName}'s trips` | Polartypes
+          {data.readTrips.targetUser.firstName}'s trips | Polartypes
         </title>
       </Helmet>
       <CommonHeader
