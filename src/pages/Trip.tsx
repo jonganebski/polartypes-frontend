@@ -63,9 +63,18 @@ export const Trip = () => {
     mode: 'onChange',
     defaultValues: {},
   });
-  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
-  const [lazyTripQuery, { data, called, loading }] = useLazyTrip();
-  const [lazyTripsQuery, { data: tripsData }] = useLazyTrips();
+  const [
+    lazyWhoAmIQuery,
+    { data: userData, loading: isUserDataLoading },
+  ] = useWhoAmI();
+  const [
+    lazyTripQuery,
+    { data, called, loading: isTripLoading },
+  ] = useLazyTrip();
+  const [
+    lazyTripsQuery,
+    { data: tripsData, loading: isTripsLoading },
+  ] = useLazyTrips();
   useEffect(() => {
     lazyWhoAmIQuery();
     lazyTripQuery({ variables: { input: { tripId: +tripId } } });
@@ -89,11 +98,12 @@ export const Trip = () => {
       element?.scrollIntoView();
     }
   }, [element, readingStepId]);
+  const isLoading = isUserDataLoading || isTripLoading || isTripsLoading;
 
-  if (loading) {
+  if (isLoading) {
     <Loading />;
   }
-  if (!loading && called && !data?.readTrip.trip) {
+  if (!isLoading && called && !data?.readTrip.trip) {
     return <Redirect to="/" />;
   }
   if (!data?.readTrip.trip) {
