@@ -1,14 +1,13 @@
-<h2 align="center">🧭</h2>
-<h1 align="center">Polartypes</h1>
+<h1 align="center">🧭 Polartypes</h1>
 <p align="center">Cloning <a href="https://www.polarsteps.com/" target="_blank">polarsteps</a>, really cool service for travelers and adventurers. I planned to do this project from the very beginning, when I was learning about for loop.</p>
-<p align="center">
-<img src="https://img.shields.io/github/languages/top/jonganebski/polartypes-frontend"/>
-<img src="https://img.shields.io/github/languages/code-size/jonganebski/polartypes-frontend"/>
-<img src="https://img.shields.io/github/last-commit/jonganebski/polartypes-frontend"/>
-</p>
-<p align="center">
+<div align="center">
+    <img src="https://img.shields.io/github/languages/top/jonganebski/polartypes-frontend"/>
+    <img src="https://img.shields.io/github/languages/code-size/jonganebski/polartypes-frontend"/>
+    <img src="https://img.shields.io/github/last-commit/jonganebski/polartypes-frontend"/>
+</div>
+<div align="center">
 <img src="https://api.netlify.com/api/v1/badges/9232dd7a-77bc-4ae3-84c2-7774defd0746/deploy-status"/>
-</p>
+</div>
 
 ---
 
