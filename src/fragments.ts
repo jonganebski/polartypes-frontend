@@ -88,12 +88,10 @@ export const TARGET_USER_FRAGMENT = gql`
     ...UserCoreParts
     about
     city
-    followers {
-      ...UserCoreParts
-    }
-    followings {
-      ...UserCoreParts
-    }
+    countFollowings
+    countFollowers
+    isFollowing
+    isFollower
     trips {
       id
       name

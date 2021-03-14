@@ -12,7 +12,7 @@ export interface whoAmIQuery_whoAmI {
   id: number;
   username: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;

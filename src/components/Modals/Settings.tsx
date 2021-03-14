@@ -47,7 +47,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
     mode: 'onChange',
     defaultValues: {
       firstName: userData?.whoAmI.firstName,
-      lastName: userData?.whoAmI.lastName,
+      lastName: userData?.whoAmI.lastName ?? '',
       username: userData?.whoAmI.username,
       about: userData?.whoAmI.about ?? '',
       city: userData?.whoAmI.city ?? '',

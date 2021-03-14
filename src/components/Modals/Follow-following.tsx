@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useFollowings } from '../../hooks/useQuery/useFollowings';
-import { UserCoreParts } from '../../__generated__/UserCoreParts';
 import { UserBox } from '../Box/User';
 import { Spinner } from '../Loading-spinner';
 import { ModalBackground } from './partials/Background';
@@ -9,14 +8,12 @@ import { ModalCloseIcon } from './partials/CloseIcon';
 interface IFollowFollowingProps {
   isFollowers: boolean;
   currentUserId: number;
-  users: UserCoreParts[];
   setIsFollowersModal: React.Dispatch<React.SetStateAction<boolean | null>>;
 }
 
 export const FollowFollowing: React.FC<IFollowFollowingProps> = ({
   isFollowers,
   currentUserId,
-  users,
   setIsFollowersModal,
 }) => {
   const [readFollowings, { data: myFollowings, loading }] = useFollowings();
@@ -33,7 +30,7 @@ export const FollowFollowing: React.FC<IFollowFollowingProps> = ({
         <div className="py-6 max-h-screen70 text-center text-2xl text-myGreen-darkest font-semibold border-b">
           {isFollowers ? 'Followers' : 'Following'}
         </div>
-        <ul className="overflow-y-scroll">
+        {/* <ul className="overflow-y-scroll">
           {loading || !myFollowings?.readFollowings.followings ? (
             <div className="relative h-20 bg-white">
               <Spinner color="myGreen-dark" />
@@ -57,7 +54,7 @@ export const FollowFollowing: React.FC<IFollowFollowingProps> = ({
               />
             ))
           )}
-        </ul>
+        </ul> */}
       </div>
     </>
   );

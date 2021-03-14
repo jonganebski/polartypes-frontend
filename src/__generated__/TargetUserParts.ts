@@ -7,28 +7,6 @@
 // GraphQL fragment: TargetUserParts
 // ====================================================
 
-export interface TargetUserParts_followers {
-  __typename: "Users";
-  id: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  avatarUrl: string | null;
-  city: string | null;
-  timeZone: string | null;
-}
-
-export interface TargetUserParts_followings {
-  __typename: "Users";
-  id: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  avatarUrl: string | null;
-  city: string | null;
-  timeZone: string | null;
-}
-
 export interface TargetUserParts_trips_steps_likes_user {
   __typename: "Users";
   username: string;
@@ -65,12 +43,14 @@ export interface TargetUserParts {
   id: number;
   username: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
   about: string | null;
-  followers: TargetUserParts_followers[];
-  followings: TargetUserParts_followings[];
+  countFollowings: number;
+  countFollowers: number;
+  isFollowing: boolean;
+  isFollower: boolean;
   trips: TargetUserParts_trips[];
 }

@@ -9,28 +9,6 @@ import { ReadTripsInput } from "./globalTypes";
 // GraphQL query operation: readTripsQuery
 // ====================================================
 
-export interface readTripsQuery_readTrips_targetUser_followers {
-  __typename: "Users";
-  id: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  avatarUrl: string | null;
-  city: string | null;
-  timeZone: string | null;
-}
-
-export interface readTripsQuery_readTrips_targetUser_followings {
-  __typename: "Users";
-  id: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-  avatarUrl: string | null;
-  city: string | null;
-  timeZone: string | null;
-}
-
 export interface readTripsQuery_readTrips_targetUser_trips_steps_likes_user {
   __typename: "Users";
   username: string;
@@ -67,13 +45,15 @@ export interface readTripsQuery_readTrips_targetUser {
   id: number;
   username: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
   about: string | null;
-  followers: readTripsQuery_readTrips_targetUser_followers[];
-  followings: readTripsQuery_readTrips_targetUser_followings[];
+  countFollowings: number;
+  countFollowers: number;
+  isFollowing: boolean;
+  isFollower: boolean;
   trips: readTripsQuery_readTrips_targetUser_trips[];
 }
 

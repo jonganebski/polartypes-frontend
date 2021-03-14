@@ -88,7 +88,6 @@ export const Trips = () => {
         <FollowFollowing
           isFollowers={false}
           currentUserId={userData.whoAmI.id}
-          users={data.readTrips.targetUser.followings}
           setIsFollowersModal={setIsFollowersModal}
         />
       )}
@@ -96,7 +95,6 @@ export const Trips = () => {
         <FollowFollowing
           isFollowers={true}
           currentUserId={userData.whoAmI.id}
-          users={data.readTrips.targetUser.followers}
           setIsFollowersModal={setIsFollowersModal}
         />
       )}

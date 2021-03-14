@@ -14,7 +14,7 @@ export interface searchQuery_search_users {
   id: number;
   username: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
@@ -23,7 +23,7 @@ export interface searchQuery_search_users {
 export interface searchQuery_search_trips_traveler {
   __typename: "Users";
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   username: string;
 }
 

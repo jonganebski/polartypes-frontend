@@ -21,9 +21,9 @@ export interface CommentInputType {
 
 export interface CreateAccountInput {
   email: string;
+  password: string;
   firstName: string;
   lastName: string;
-  password: string;
 }
 
 export interface CreateCommentInput {
@@ -83,10 +83,6 @@ export interface LoginInput {
   password: string;
   usernameOrEmail: string;
   rememberMe: boolean;
-}
-
-export interface ReadFollowersInput {
-  targetUserId: number;
 }
 
 export interface ReadFollowingsInput {
@@ -196,7 +192,7 @@ export interface UserInputType {
   slug: string;
   password: string;
   firstName: string;
-  lastName: string;
+  lastName?: string | null;
   about?: string | null;
   avatarUrl?: string | null;
   city?: string | null;

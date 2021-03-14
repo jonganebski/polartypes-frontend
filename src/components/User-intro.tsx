@@ -51,58 +51,55 @@ export const UserIntro: React.FC<IUserItroProps> = ({
       )}
       <div className="mt-4">
         <Button
-          text={`${
-            targetUser?.followers.length === 1
-              ? targetUser?.followers.length + ' follower'
-              : targetUser?.followers.length + ' followers'
-          }`}
+          text={
+            targetUser.countFollowers === 1
+              ? '1 Follower'
+              : `${targetUser.countFollowers} Followers`
+          }
           type="white-regular"
           size="sm"
           className="mr-2"
           onClick={() => currentUserId && setIsFollowersModal(true)}
         />
         <Button
-          text={`${targetUser?.followings.length} following`}
+          text={`${targetUser?.countFollowings} following`}
           type="white-regular"
           size="sm"
           onClick={() => currentUserId && setIsFollowersModal(false)}
         />
-        {isLoggedInVar() &&
-          !isSelf &&
-          !targetUser?.followers.some((user) => user.id === currentUserId) && (
-            <Button
-              text="Follow"
-              type="void"
-              className="text-white border border-myBlue ml-2 hover:bg-myBlue active:bg-myBlue-dark"
-              size="sm"
-              onClick={() => {
-                targetUser &&
-                  followMutation({
-                    variables: {
-                      input: { id: targetUser.id },
-                    },
-                  });
-              }}
-            />
-          )}
-        {!isSelf &&
-          targetUser?.followers.some((user) => user.id === currentUserId) && (
-            <Button
-              text=""
-              type="blue-solid"
-              size="sm"
-              className="ml-2"
-              icon={<FontAwesomeIcon icon={faUserCheck} />}
-              onClick={() => {
-                targetUser &&
-                  unfollowMutation({
-                    variables: {
-                      input: { id: targetUser.id },
-                    },
-                  });
-              }}
-            />
-          )}
+        {isLoggedInVar() && !isSelf && !targetUser.isFollowing && (
+          <Button
+            text="Follow"
+            type="void"
+            className="text-white border border-myBlue ml-2 hover:bg-myBlue active:bg-myBlue-dark"
+            size="sm"
+            onClick={() => {
+              targetUser &&
+                followMutation({
+                  variables: {
+                    input: { id: targetUser.id },
+                  },
+                });
+            }}
+          />
+        )}
+        {!isSelf && targetUser.isFollowing && (
+          <Button
+            text=""
+            type="blue-solid"
+            size="sm"
+            className="ml-2"
+            icon={<FontAwesomeIcon icon={faUserCheck} />}
+            onClick={() => {
+              targetUser &&
+                unfollowMutation({
+                  variables: {
+                    input: { id: targetUser.id },
+                  },
+                });
+            }}
+          />
+        )}
       </div>
     </div>
   );

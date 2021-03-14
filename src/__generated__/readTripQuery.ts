@@ -14,7 +14,7 @@ export interface readTripQuery_readTrip_trip_traveler_followers {
   id: number;
   username: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
@@ -25,7 +25,7 @@ export interface readTripQuery_readTrip_trip_traveler_followings {
   id: number;
   username: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
@@ -36,7 +36,7 @@ export interface readTripQuery_readTrip_trip_traveler {
   id: number;
   username: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
