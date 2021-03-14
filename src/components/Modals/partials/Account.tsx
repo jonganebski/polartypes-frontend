@@ -22,10 +22,10 @@ const DELETE_ACCOUNT_MUTAION = gql`
 
 interface IAccountProps {
   hidden: boolean;
-  userId: number;
+  slug: string;
 }
 
-export const Account: React.FC<IAccountProps> = ({ hidden, userId }) => {
+export const Account: React.FC<IAccountProps> = ({ hidden, slug }) => {
   const history = useHistory();
   const { register, errors } = useFormContext<ISettingsFormProps>();
   const onCompleted = async (data: deleteAccountMutation) => {
@@ -33,7 +33,7 @@ export const Account: React.FC<IAccountProps> = ({ hidden, userId }) => {
       deleteAccount: { ok, error },
     } = data;
     if (ok && !error) {
-      client.cache.evict({ id: `Users:${userId}` });
+      client.cache.evict({ id: `User:${slug}` });
       localStorage.removeItem(TOKEN);
       isLoggedInVar(false);
       history.push('/');

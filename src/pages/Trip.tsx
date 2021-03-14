@@ -81,7 +81,7 @@ export const Trip = () => {
     lazyTripsQuery({ variables: { input: { targetUsername } } });
   }, [lazyTripQuery, lazyTripsQuery, lazyWhoAmIQuery, targetUsername, tripId]);
 
-  const isSelf = data?.readTrip.trip?.traveler.id === userData?.whoAmI.id;
+  const isSelf = data?.readTrip.trip?.traveler.slug === userData?.whoAmI.slug;
   const startDateData = data?.readTrip.trip?.startDate;
   const endDateData = data?.readTrip.trip?.endDate;
   const timeZoneData = data?.readTrip.trip?.traveler.timeZone;
@@ -152,7 +152,7 @@ export const Trip = () => {
               />
             )}
             <StepsHeader
-              currentUserId={userData?.whoAmI.id}
+              currentUserSlug={userData?.whoAmI.slug}
               isSelf={isSelf}
               trip={data.readTrip.trip}
               setEditingTrip={setEditingTrip}

@@ -9,7 +9,7 @@
 
 export interface stepComments_comments_creator {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   avatarUrl: string | null;
 }

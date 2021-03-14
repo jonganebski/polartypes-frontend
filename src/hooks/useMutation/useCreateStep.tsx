@@ -68,7 +68,7 @@ export const useCreateStep = (
                   imgUrls,
                   traveler: {
                     __typename: 'Users',
-                    id: userData.whoAmI.id,
+                    slug: userData.whoAmI.slug,
                   },
                   likes: [],
                   comments: [],

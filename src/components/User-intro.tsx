@@ -1,3 +1,4 @@
+import { useReactiveVar } from '@apollo/client';
 import { faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
@@ -10,17 +11,16 @@ import { Button } from './Button';
 
 interface IUserItroProps {
   targetUser: readTripsQuery_readTrips_targetUser;
-  currentUserId?: number;
   isSelf: boolean;
   setIsFollowersModal: React.Dispatch<React.SetStateAction<boolean | null>>;
 }
 
 export const UserIntro: React.FC<IUserItroProps> = ({
   targetUser,
-  currentUserId,
   isSelf,
   setIsFollowersModal,
 }) => {
+  const isLoggedIn = useReactiveVar(isLoggedInVar);
   const [followMutation] = useFollow();
   const [unfollowMutation] = useUnfollow();
   return (
@@ -59,13 +59,13 @@ export const UserIntro: React.FC<IUserItroProps> = ({
           type="white-regular"
           size="sm"
           className="mr-2"
-          onClick={() => currentUserId && setIsFollowersModal(true)}
+          onClick={() => isLoggedIn && setIsFollowersModal(true)}
         />
         <Button
           text={`${targetUser?.countFollowings} following`}
           type="white-regular"
           size="sm"
-          onClick={() => currentUserId && setIsFollowersModal(false)}
+          onClick={() => isLoggedIn && setIsFollowersModal(false)}
         />
         {isLoggedInVar() && !isSelf && !targetUser.isFollowing && (
           <Button
@@ -77,7 +77,7 @@ export const UserIntro: React.FC<IUserItroProps> = ({
               targetUser &&
                 followMutation({
                   variables: {
-                    input: { id: targetUser.id },
+                    input: { slug: targetUser.slug },
                   },
                 });
             }}
@@ -94,7 +94,7 @@ export const UserIntro: React.FC<IUserItroProps> = ({
               targetUser &&
                 unfollowMutation({
                   variables: {
-                    input: { id: targetUser.id },
+                    input: { slug: targetUser.slug },
                   },
                 });
             }}

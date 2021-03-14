@@ -11,7 +11,7 @@ import { Button } from '../Button';
 
 interface IStepsHeader {
   trip: readTripQuery_readTrip_trip;
-  currentUserId?: number;
+  currentUserSlug?: string;
   isSelf: boolean;
   setEditingTrip: React.Dispatch<
     React.SetStateAction<readTripQuery_readTrip_trip | null>
@@ -22,7 +22,7 @@ interface IStepsHeader {
 export const StepsHeader: React.FC<IStepsHeader> = ({
   trip,
   isSelf,
-  currentUserId,
+  currentUserSlug,
   setEditingTrip,
   setIsEditTripModal,
 }) => {
@@ -66,17 +66,17 @@ export const StepsHeader: React.FC<IStepsHeader> = ({
         {isLoggedInVar() &&
           !isSelf &&
           !trip.traveler.followers.some(
-            (follower) => follower.id === currentUserId,
+            (follower) => follower.slug === currentUserSlug,
           ) && (
             <Button
               text="Follow"
               type="blue-regular"
               size="sm"
               onClick={() => {
-                trip.traveler.id &&
+                trip.traveler.slug &&
                   followMutation({
                     variables: {
-                      input: { id: trip.traveler.id },
+                      input: { slug: trip.traveler.slug },
                     },
                   });
               }}
@@ -84,17 +84,17 @@ export const StepsHeader: React.FC<IStepsHeader> = ({
           )}
         {!isSelf &&
           trip.traveler.followers.some(
-            (follower) => follower.id === currentUserId,
+            (follower) => follower.slug === currentUserSlug,
           ) && (
             <Button
               text="Following"
               type="blue-solid"
               size="sm"
               onClick={() => {
-                trip.traveler.id &&
+                trip.traveler.slug &&
                   unfollowMutation({
                     variables: {
-                      input: { id: trip.traveler.id },
+                      input: { slug: trip.traveler.slug },
                     },
                   });
               }}

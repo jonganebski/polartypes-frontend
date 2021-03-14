@@ -35,7 +35,7 @@ export const StepCard: React.FC<IStepProps> = ({
   const [toggleLikeMutation, { loading: toggleLikeLoading }] = useToggleLike(
     step.id,
   );
-  const isSelf = userData?.whoAmI.id === step.traveler.id;
+  const isSelf = userData?.whoAmI.slug === step.traveler.slug;
   const commentsCount = step.comments.length;
 
   useEffect(() => {

@@ -1,34 +1,45 @@
 import { ApolloCache, FetchResult, gql, useMutation } from '@apollo/client';
+import { useEffect } from 'react';
 import {
   followMutation,
   followMutationVariables,
 } from '../../__generated__/followMutation';
+import { useWhoAmI } from '../useQuery/useWhoAmI';
 
 const FOLLOW_MUTAION = gql`
   mutation followMutation($input: FollowInput!) {
     follow(input: $input) {
       ok
       error
-      targetUserId
+      slug
     }
   }
 `;
 
 export const useFollow = () => {
+  const [whoAmIQuery, { data: userData }] = useWhoAmI();
+
+  useEffect(() => {
+    whoAmIQuery();
+  }, []);
   const update = (
     cache: ApolloCache<followMutation>,
     { data }: FetchResult<followMutation>,
   ) => {
     if (data) {
       const {
-        follow: { targetUserId, error, ok },
+        follow: { slug, error, ok },
       } = data;
-      if (ok) {
+      if (ok && userData?.whoAmI.slug) {
         cache.modify({
-          id: `Users:${targetUserId}`,
+          id: `User:${slug}`,
           fields: {
             countFollowers: (prev) => prev + 1,
             isFollowing: () => true,
+            followers: (prev) => [
+              { __ref: `User:${userData.whoAmI.slug}` },
+              ...prev,
+            ],
           },
         });
       }

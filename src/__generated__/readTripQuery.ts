@@ -11,46 +11,50 @@ import { ReadTripInput, Availability } from "./globalTypes";
 
 export interface readTripQuery_readTrip_trip_traveler_followers {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
+  isFollowing: boolean;
 }
 
 export interface readTripQuery_readTrip_trip_traveler_followings {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
+  isFollowing: boolean;
 }
 
 export interface readTripQuery_readTrip_trip_traveler {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
+  isFollowing: boolean;
   followers: readTripQuery_readTrip_trip_traveler_followers[];
   followings: readTripQuery_readTrip_trip_traveler_followings[];
 }
 
 export interface readTripQuery_readTrip_trip_steps_traveler {
   __typename: "Users";
-  id: number;
+  slug: string;
 }
 
 export interface readTripQuery_readTrip_trip_steps_likes_user {
   __typename: "Users";
+  slug: string;
   username: string;
   avatarUrl: string | null;
 }
@@ -62,7 +66,7 @@ export interface readTripQuery_readTrip_trip_steps_likes {
 
 export interface readTripQuery_readTrip_trip_steps_comments_creator {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   avatarUrl: string | null;
 }

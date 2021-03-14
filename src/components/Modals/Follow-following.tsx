@@ -1,26 +1,44 @@
 import React, { useEffect } from 'react';
-import { useFollowings } from '../../hooks/useQuery/useFollowings';
+import { useListFollowers } from '../../hooks/useQuery/useListFollowers';
+import { useListFollowings } from '../../hooks/useQuery/useListFollowings';
 import { UserBox } from '../Box/User';
 import { Spinner } from '../Loading-spinner';
 import { ModalBackground } from './partials/Background';
 import { ModalCloseIcon } from './partials/CloseIcon';
 
 interface IFollowFollowingProps {
+  slug: string;
   isFollowers: boolean;
-  currentUserId: number;
   setIsFollowersModal: React.Dispatch<React.SetStateAction<boolean | null>>;
 }
 
 export const FollowFollowing: React.FC<IFollowFollowingProps> = ({
   isFollowers,
-  currentUserId,
+  slug,
   setIsFollowersModal,
 }) => {
-  const [readFollowings, { data: myFollowings, loading }] = useFollowings();
+  const [
+    listFollowings,
+    { data: followings, loading: followingsLoading },
+  ] = useListFollowings();
+  const [
+    listFollowers,
+    { data: followers, loading: followersLoading },
+  ] = useListFollowers();
 
   useEffect(() => {
-    readFollowings({ variables: { input: { targetUserId: currentUserId } } });
-  }, [currentUserId, readFollowings]);
+    if (isFollowers) {
+      listFollowers({ variables: { input: { slug } } });
+    } else {
+      listFollowings({ variables: { input: { slug } } });
+    }
+    // eslint-disable-next-line
+  }, [slug]);
+
+  const loading = isFollowers ? followersLoading : followingsLoading;
+  const data = isFollowers
+    ? followers?.listFollowers.user?.followers
+    : followings?.listFollowings.user?.followings;
 
   return (
     <>
@@ -30,31 +48,25 @@ export const FollowFollowing: React.FC<IFollowFollowingProps> = ({
         <div className="py-6 max-h-screen70 text-center text-2xl text-myGreen-darkest font-semibold border-b">
           {isFollowers ? 'Followers' : 'Following'}
         </div>
-        {/* <ul className="overflow-y-scroll">
-          {loading || !myFollowings?.readFollowings.followings ? (
+        <ul className="overflow-y-scroll">
+          {loading ? (
             <div className="relative h-20 bg-white">
               <Spinner color="myGreen-dark" />
             </div>
-          ) : !loading && users.length === 0 ? (
+          ) : data?.length === 0 ? (
             <div className="flex items-center justify-center h-20 bg-white">
               <span className="text-lg text-myGray">No one yet</span>
             </div>
           ) : (
-            users.map((user, i) => (
+            data?.map((user, i) => (
               <UserBox
                 key={i}
                 user={user}
-                currentUserId={currentUserId}
-                isFollowing={
-                  myFollowings.readFollowings.followings?.some(
-                    (following) => following.id === user.id,
-                  ) ?? false
-                }
                 onClick={() => setIsFollowersModal(null)}
               />
             ))
           )}
-        </ul> */}
+        </ul>
       </div>
     </>
   );

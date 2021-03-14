@@ -99,7 +99,6 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
           />
           {isSearchTooltip && (
             <SearchResult
-              currentUserId={userData?.whoAmI.id}
               isDelay={isDelay}
               isSearchLoading={isSearchLoading}
               searchResult={searchResult}

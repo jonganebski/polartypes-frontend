@@ -14,7 +14,7 @@ export interface createAccountMutation_createAccount {
   ok: boolean;
   error: string | null;
   token: string | null;
-  username: string | null;
+  slug: string | null;
 }
 
 export interface createAccountMutation {

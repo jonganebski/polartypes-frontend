@@ -9,14 +9,14 @@
 
 export interface whoAmIQuery_whoAmI {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
-  slug: string;
+  isFollowing: boolean;
   about: string | null;
 }
 

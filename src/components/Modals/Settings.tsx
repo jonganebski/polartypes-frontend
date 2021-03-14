@@ -2,6 +2,7 @@ import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useHistory } from 'react-router';
 import { SERVER_URI } from '../../constants';
 import { deleteFiles } from '../../helpers';
 import { useUpdateAccount } from '../../hooks/useMutation/useUpdateAccount';
@@ -37,6 +38,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
   setIsProfile,
   setIsSettingModal,
 }) => {
+  const history = useHistory();
   const [avatarSrc, setAvatarSrc] = useState(
     userData?.whoAmI.avatarUrl ?? '/blank-profile.webp',
   );
@@ -99,10 +101,12 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
             newPassword: newPasswords[0] ? newPasswords[0] : null,
           },
         },
-      }).then(
-        async () =>
-          uploadingNewAvatar && oldUrl && (await deleteFiles([oldUrl])),
-      );
+      })
+        .then(
+          async () =>
+            uploadingNewAvatar && oldUrl && (await deleteFiles([oldUrl])),
+        )
+        .finally(() => history.push(`/${f.getValues().username}`));
     } catch (error) {
       setIsLoading(false);
       console.log(error);
@@ -155,7 +159,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
                 avatarSrc={avatarSrc}
                 setAvatarSrc={setAvatarSrc}
               />
-              <Account hidden={isProfile} userId={userData.whoAmI.id} />
+              <Account hidden={isProfile} slug={userData.whoAmI.slug} />
               <div className="pt-6">
                 <Button
                   text="Save Changes"

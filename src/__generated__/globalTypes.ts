@@ -69,7 +69,7 @@ export interface DeleteTripInput {
 }
 
 export interface FollowInput {
-  id: number;
+  slug: string;
 }
 
 export interface LikeInputType {
@@ -79,14 +79,20 @@ export interface LikeInputType {
   step: StepInputType;
 }
 
+export interface ListFollowersInput {
+  slug: string;
+  skip?: number | null;
+}
+
+export interface ListFollowingsInput {
+  slug: string;
+  skip?: number | null;
+}
+
 export interface LoginInput {
   password: string;
   usernameOrEmail: string;
   rememberMe: boolean;
-}
-
-export interface ReadFollowingsInput {
-  targetUserId: number;
 }
 
 export interface ReadTripInput {
@@ -134,7 +140,7 @@ export interface TripInputType {
 }
 
 export interface UnfollowInput {
-  id: number;
+  slug: string;
 }
 
 export interface UpdateAccountInput {

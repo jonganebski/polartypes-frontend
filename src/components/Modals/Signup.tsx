@@ -24,7 +24,7 @@ const CREATE_ACCOUNT_MUTAION = gql`
       ok
       error
       token
-      username
+      slug
     }
   }
 `;
@@ -51,9 +51,9 @@ export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
   } = useForm<IFormProps>({ mode: 'onChange' });
   const onCompleted = (data: createAccountMutation) => {
     const {
-      createAccount: { ok, error, token, username },
+      createAccount: { ok, error, token, slug },
     } = data;
-    if (ok && token && username && !error) {
+    if (ok && token && slug && !error) {
       localStorage.setItem(TOKEN, token);
       authTokenVar(token);
       isLoggedInVar(true);

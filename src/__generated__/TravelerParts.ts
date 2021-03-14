@@ -9,35 +9,38 @@
 
 export interface TravelerParts_followers {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
+  isFollowing: boolean;
 }
 
 export interface TravelerParts_followings {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
+  isFollowing: boolean;
 }
 
 export interface TravelerParts {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
+  isFollowing: boolean;
   followers: TravelerParts_followers[];
   followings: TravelerParts_followings[];
 }

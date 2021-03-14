@@ -63,7 +63,7 @@ export const Comment: React.FC<ICommentProps> = ({ userData, comment }) => {
             : moment(comment.createdAt).format('D MMMM YYYY')}
         </span>
       </div>
-      {userData?.whoAmI.id === comment.creator.id && (
+      {userData?.whoAmI.slug === comment.creator.slug && (
         <FontAwesomeIcon
           icon={faTrashAlt}
           className="text-myRed cursor-pointer opacity-60 hover:opacity-100"

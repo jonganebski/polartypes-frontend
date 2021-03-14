@@ -13,10 +13,11 @@ export const STEPS_FRAGMENTS = gql`
     story
     imgUrls
     traveler {
-      id
+      slug
     }
     likes {
       user {
+        slug
         username
         avatarUrl
       }
@@ -26,7 +27,7 @@ export const STEPS_FRAGMENTS = gql`
       createdAt
       text
       creator {
-        id
+        slug
         username
         avatarUrl
       }
@@ -50,13 +51,14 @@ export const UPDATED_STEP_FRAGMENT = gql`
 
 export const USER_CORE_FRAGMENT = gql`
   fragment UserCoreParts on Users {
-    id
+    slug
     username
     firstName
     lastName
     avatarUrl
     city
     timeZone
+    isFollowing
   }
 `;
 
@@ -76,7 +78,6 @@ export const TRAVELER_FRAGMENT = gql`
 export const USER_FRAGMENT = gql`
   fragment UserParts on Users {
     ...UserCoreParts
-    slug
     city
     about
   }
@@ -107,6 +108,7 @@ export const TARGET_USER_FRAGMENT = gql`
         country
         likes {
           user {
+            slug
             username
           }
         }

@@ -87,14 +87,14 @@ export const Trips = () => {
       {userData && isFollowersModal === false && (
         <FollowFollowing
           isFollowers={false}
-          currentUserId={userData.whoAmI.id}
+          slug={targetUsername.toLocaleLowerCase()}
           setIsFollowersModal={setIsFollowersModal}
         />
       )}
       {userData && isFollowersModal === true && (
         <FollowFollowing
           isFollowers={true}
-          currentUserId={userData.whoAmI.id}
+          slug={targetUsername.toLocaleLowerCase()}
           setIsFollowersModal={setIsFollowersModal}
         />
       )}
@@ -105,7 +105,6 @@ export const Trips = () => {
           <section className="overflow-y-scroll">
             <UserIntro
               targetUser={data.readTrips.targetUser}
-              currentUserId={userData?.whoAmI.id}
               isSelf={isSelf}
               setIsFollowersModal={setIsFollowersModal}
             />

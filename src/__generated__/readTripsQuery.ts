@@ -11,6 +11,7 @@ import { ReadTripsInput } from "./globalTypes";
 
 export interface readTripsQuery_readTrips_targetUser_trips_steps_likes_user {
   __typename: "Users";
+  slug: string;
   username: string;
 }
 
@@ -42,17 +43,17 @@ export interface readTripsQuery_readTrips_targetUser_trips {
 
 export interface readTripsQuery_readTrips_targetUser {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
+  isFollowing: boolean;
   about: string | null;
   countFollowings: number;
   countFollowers: number;
-  isFollowing: boolean;
   isFollower: boolean;
   trips: readTripsQuery_readTrips_targetUser_trips[];
 }

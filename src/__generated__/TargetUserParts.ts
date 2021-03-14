@@ -9,6 +9,7 @@
 
 export interface TargetUserParts_trips_steps_likes_user {
   __typename: "Users";
+  slug: string;
   username: string;
 }
 
@@ -40,17 +41,17 @@ export interface TargetUserParts_trips {
 
 export interface TargetUserParts {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   firstName: string;
   lastName: string | null;
   avatarUrl: string | null;
   city: string | null;
   timeZone: string | null;
+  isFollowing: boolean;
   about: string | null;
   countFollowings: number;
   countFollowers: number;
-  isFollowing: boolean;
   isFollower: boolean;
   trips: TargetUserParts_trips[];
 }

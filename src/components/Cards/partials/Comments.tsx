@@ -46,7 +46,7 @@ export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
               createdAt
               text
               creator {
-                id
+                slug
                 username
                 avatarUrl
               }
@@ -64,7 +64,7 @@ export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
                 createdAt
                 text
                 creator {
-                  id
+                  slug
                   username
                   avatarUrl
                 }
@@ -81,7 +81,7 @@ export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
                 text,
                 creator: {
                   __typename: 'Users',
-                  id: userData.whoAmI.id,
+                  slug: userData.whoAmI.slug,
                   username: userData.whoAmI.username,
                   avatarUrl: userData.whoAmI.avatarUrl,
                 },

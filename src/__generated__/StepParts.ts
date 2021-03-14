@@ -9,11 +9,12 @@
 
 export interface StepParts_traveler {
   __typename: "Users";
-  id: number;
+  slug: string;
 }
 
 export interface StepParts_likes_user {
   __typename: "Users";
+  slug: string;
   username: string;
   avatarUrl: string | null;
 }
@@ -25,7 +26,7 @@ export interface StepParts_likes {
 
 export interface StepParts_comments_creator {
   __typename: "Users";
-  id: number;
+  slug: string;
   username: string;
   avatarUrl: string | null;
 }

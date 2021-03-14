@@ -1,31 +1,20 @@
-import React, { useEffect } from 'react';
-import { useFollowings } from '../../hooks/useQuery/useFollowings';
+import React from 'react';
 import { searchQuery } from '../../__generated__/searchQuery';
 import { TripBox } from '../Box/Trip';
 import { UserBox } from '../Box/User';
 import { Spinner } from '../Loading-spinner';
 
 interface ISearchResultProps {
-  currentUserId?: number;
   isSearchLoading: boolean;
   isDelay: boolean;
   searchResult?: searchQuery;
 }
 
 export const SearchResult: React.FC<ISearchResultProps> = ({
-  currentUserId,
   isSearchLoading,
   isDelay,
   searchResult,
 }) => {
-  const [readFollowings, { data: myFollowings }] = useFollowings();
-
-  useEffect(() => {
-    if (currentUserId) {
-      readFollowings({ variables: { input: { targetUserId: currentUserId } } });
-    }
-  }, [currentUserId, readFollowings]);
-
   const isUserSearchResult = Boolean(
     searchResult?.search.users &&
       !!searchResult?.search.usersCount &&
@@ -65,16 +54,7 @@ export const SearchResult: React.FC<ISearchResultProps> = ({
               <div>
                 <ul>
                   {searchResult!.search.users!.map((user, i) => (
-                    <UserBox
-                      key={i}
-                      user={user}
-                      currentUserId={currentUserId}
-                      isFollowing={
-                        myFollowings?.readFollowings.followings?.some(
-                          (following) => following.id === user.id,
-                        ) ?? false
-                      }
-                    />
+                    <UserBox user={user} key={i} />
                   ))}
                 </ul>
                 {0 <
