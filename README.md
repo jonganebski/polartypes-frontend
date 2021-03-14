@@ -4,6 +4,7 @@
     <img src="https://img.shields.io/github/languages/top/jonganebski/polartypes-frontend"/>
     <img src="https://img.shields.io/github/languages/code-size/jonganebski/polartypes-frontend"/>
     <img src="https://img.shields.io/github/last-commit/jonganebski/polartypes-frontend"/>
+    <img src="https://img.shields.io/website-up-down-green-red/https/polartypes.netlify.app"/>
 </div>
 <div align="center">
 <img src="https://api.netlify.com/api/v1/badges/9232dd7a-77bc-4ae3-84c2-7774defd0746/deploy-status"/>

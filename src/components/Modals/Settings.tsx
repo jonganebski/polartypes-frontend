@@ -58,6 +58,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
     f,
     avatarUrl,
   );
+
   const onSubmit = async () => {
     setIsLoading(true);
     const { files, password, newPasswords, ...values } = f.getValues();
@@ -70,8 +71,10 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
       }
     }
     try {
-      let url = avatarUrl;
-      if (files.length !== 0) {
+      let newUrl: string | null = null;
+      const oldUrl = userData?.whoAmI.avatarUrl;
+      const uploadingNewAvatar = files.length !== 0;
+      if (uploadingNewAvatar) {
         const body = new FormData();
         body.append('file', files[0]);
         const response = await fetch(`${SERVER_URI}/aws-s3/upload`, {
@@ -80,23 +83,26 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
         });
         const result = await response.json();
         if (result.ok && !result.error && result.url) {
-          url = result.url;
+          newUrl = result.url;
+          setAvatarUrl(newUrl);
         } else {
           throw new Error();
         }
       }
-      setAvatarUrl(url);
       updateAccountMutation({
         variables: {
           input: {
             ...values,
             slug: values.username.toLowerCase(),
-            avatarUrl: url,
+            ...(newUrl && { avatarUrl: newUrl }),
             password: password ? password : null,
             newPassword: newPasswords[0] ? newPasswords[0] : null,
           },
         },
-      }).then(async () => avatarUrl && (await deleteFiles([avatarUrl])));
+      }).then(
+        async () =>
+          uploadingNewAvatar && oldUrl && (await deleteFiles([oldUrl])),
+      );
     } catch (error) {
       setIsLoading(false);
       console.log(error);
