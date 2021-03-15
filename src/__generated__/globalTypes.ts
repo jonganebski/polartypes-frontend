@@ -81,12 +81,12 @@ export interface LikeInputType {
 
 export interface ListFollowersInput {
   slug: string;
-  skip?: number | null;
+  cursorId?: number | null;
 }
 
 export interface ListFollowingsInput {
   slug: string;
-  skip?: number | null;
+  cursorId?: number | null;
 }
 
 export interface LoginInput {
@@ -100,7 +100,7 @@ export interface ReadTripInput {
 }
 
 export interface ReadTripsInput {
-  targetUsername: string;
+  slug: string;
 }
 
 export interface SearchInput {

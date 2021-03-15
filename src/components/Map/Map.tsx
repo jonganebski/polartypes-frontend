@@ -28,7 +28,7 @@ interface IMapProps {
 }
 
 export const Map: React.FC<IMapProps> = ({ isSaveStepModal }) => {
-  const { username: targetUsername, tripId } = useParams<IParams>();
+  const { username, tripId } = useParams<IParams>();
   const f = useFormContext<ICreateStepFormProps>();
   const { idFromDrag } = useStepIdContext();
   const [coordinates, setCoordinates] = useState<number[][]>([]);
@@ -44,9 +44,12 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal }) => {
     if (tripId) {
       lazyTripQuery({ variables: { input: { tripId: +tripId } } });
     } else {
-      lazyTripsQuery({ variables: { input: { targetUsername } } });
+      lazyTripsQuery({
+        variables: { input: { slug: username.toLowerCase() } },
+      });
     }
-  }, [lazyTripQuery, lazyTripsQuery, targetUsername, tripId]);
+    // eslint-disable-next-line
+  }, [username, tripId]);
 
   const onMapLoaded = () => {
     let bounds: [[number, number], [number, number]];
@@ -137,7 +140,7 @@ export const Map: React.FC<IMapProps> = ({ isSaveStepModal }) => {
               key={i}
               trip={trip}
               coordinates={coordinates}
-              targetUsername={targetUsername}
+              username={username}
             />
           );
         })}

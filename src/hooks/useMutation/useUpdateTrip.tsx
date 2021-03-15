@@ -1,6 +1,6 @@
 import { gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
-import { client } from '../../apollo';
+import { client } from '../../apollo/apollo';
 import { ISaveTripFormProps } from '../../components/Modals/Save-trip';
 import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';
 import {

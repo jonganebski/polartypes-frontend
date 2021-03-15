@@ -31,6 +31,8 @@ export interface listFollowersQuery_listFollowers {
   __typename: "ListFollowersOutput";
   ok: boolean;
   error: string | null;
+  endCursorId: number | null;
+  hasNextPage: boolean | null;
   user: listFollowersQuery_listFollowers_user | null;
 }
 

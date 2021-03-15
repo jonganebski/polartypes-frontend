@@ -1,8 +1,8 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { client, isLoggedInVar } from '../../../apollo';
+import { isLoggedInVar } from '../../../apollo/reactive-variables';
 import { AZ_NUM_PATTERN, PW_MIN_LENGTH, TOKEN } from '../../../constants';
 import {
   deleteAccountMutation,
@@ -27,6 +27,7 @@ interface IAccountProps {
 
 export const Account: React.FC<IAccountProps> = ({ hidden, slug }) => {
   const history = useHistory();
+  const client = useApolloClient();
   const { register, errors } = useFormContext<ISettingsFormProps>();
   const onCompleted = async (data: deleteAccountMutation) => {
     const {

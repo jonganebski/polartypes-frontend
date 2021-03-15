@@ -2,7 +2,7 @@ import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { authTokenVar, isLoggedInVar } from '../../apollo';
+import { authTokenVar, isLoggedInVar } from '../../apollo/reactive-variables';
 import {
   AZ_NUM_PATTERN,
   EMAIL_PATTERN,

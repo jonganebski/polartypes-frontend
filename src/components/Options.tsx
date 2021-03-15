@@ -1,8 +1,6 @@
-import { faCode } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { isLoggedInVar } from '../apollo';
+import { isLoggedInVar } from '../apollo/reactive-variables';
 import { TOKEN } from '../constants';
 import { whoAmIQuery } from '../__generated__/whoAmIQuery';
 import { Button } from './Button';

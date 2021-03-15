@@ -2,7 +2,7 @@ import { ApolloProvider } from '@apollo/client';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { client } from './apollo';
+import { client } from './apollo/apollo';
 import App from './components/App';
 import { MapInteractionCtxProvider } from './context';
 import reportWebVitals from './reportWebVitals';

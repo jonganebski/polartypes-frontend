@@ -31,6 +31,8 @@ export interface listFollowingsQuery_listFollowings {
   __typename: "ListFollowingsOutput";
   ok: boolean;
   error: string | null;
+  endCursorId: number | null;
+  hasNextPage: boolean | null;
   user: listFollowingsQuery_listFollowings_user | null;
 }
 

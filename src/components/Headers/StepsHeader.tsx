@@ -2,7 +2,7 @@ import { faBook, faShareAlt, faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { isLoggedInVar } from '../../apollo';
+import { isLoggedInVar } from '../../apollo/reactive-variables';
 import { useFollow } from '../../hooks/useMutation/useFollow';
 import { useUnfollow } from '../../hooks/useMutation/useUnfollow';
 import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';

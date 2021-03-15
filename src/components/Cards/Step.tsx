@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { isLoggedInVar } from '../../apollo';
+import { isLoggedInVar } from '../../apollo/reactive-variables';
 import { useStepIdContext } from '../../context';
 import { useToggleLike } from '../../hooks/useMutation/useToggleLike';
 import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';

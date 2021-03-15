@@ -78,7 +78,9 @@ export const Trip = () => {
   useEffect(() => {
     lazyWhoAmIQuery();
     lazyTripQuery({ variables: { input: { tripId: +tripId } } });
-    lazyTripsQuery({ variables: { input: { targetUsername } } });
+    lazyTripsQuery({
+      variables: { input: { slug: targetUsername.toLowerCase() } },
+    });
   }, [lazyTripQuery, lazyTripsQuery, lazyWhoAmIQuery, targetUsername, tripId]);
 
   const isSelf = data?.readTrip.trip?.traveler.slug === userData?.whoAmI.slug;

@@ -7,13 +7,13 @@ import { readTripsQuery_readTrips_targetUser_trips } from '../../../__generated_
 interface ITripRouteProps {
   trip: readTripsQuery_readTrips_targetUser_trips;
   coordinates: number[][];
-  targetUsername: string;
+  username: string;
 }
 
 export const TripRoute: React.FC<ITripRouteProps> = ({
   trip,
   coordinates,
-  targetUsername,
+  username,
 }) => {
   const id = `trip-${trip.id}-route`;
   const { setIdFromMap } = useStepIdContext();
@@ -21,7 +21,7 @@ export const TripRoute: React.FC<ITripRouteProps> = ({
 
   const onMarkerClick = (stepId: number) => {
     setIdFromMap(stepId + '');
-    history.push(`/${targetUsername}/${trip.id}`);
+    history.push(`/${username}/${trip.id}`);
   };
 
   return (

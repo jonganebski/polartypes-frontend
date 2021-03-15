@@ -1,6 +1,6 @@
 import { gql, useMutation } from '@apollo/client';
 import { useEffect } from 'react';
-import { client } from '../../apollo';
+import { client } from '../../apollo/apollo';
 import { toggledLikeStep } from '../../__generated__/toggledLikeStep';
 import {
   toggleLikeMutation,

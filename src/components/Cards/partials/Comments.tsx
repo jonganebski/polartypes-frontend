@@ -1,7 +1,7 @@
 import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { client } from '../../../apollo';
+import { client } from '../../../apollo/apollo';
 import {
   createCommentMutation,
   createCommentMutationVariables,

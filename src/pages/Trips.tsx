@@ -38,7 +38,9 @@ export const Trips = () => {
     lazyWhoAmIQuery();
   }, [lazyWhoAmIQuery]);
   useEffect(() => {
-    lazyTripsQuery({ variables: { input: { targetUsername } } });
+    lazyTripsQuery({
+      variables: { input: { slug: targetUsername.toLowerCase() } },
+    });
   }, [lazyTripsQuery, targetUsername]);
 
   const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;

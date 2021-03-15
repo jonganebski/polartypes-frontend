@@ -36,10 +36,6 @@ export const useFollow = () => {
           fields: {
             countFollowers: (prev) => prev + 1,
             isFollowing: () => true,
-            followers: (prev) => [
-              { __ref: `User:${userData.whoAmI.slug}` },
-              ...prev,
-            ],
           },
         });
       }

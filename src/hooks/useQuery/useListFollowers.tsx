@@ -10,6 +10,8 @@ export const LIST_FOLLOWERS = gql`
     listFollowers(input: $input) {
       ok
       error
+      endCursorId
+      hasNextPage
       user {
         slug
         followers {

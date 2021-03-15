@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment-timezone';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { client } from '../../apollo';
+import { client } from '../../apollo/apollo';
 import { UPDATE_ACCOUNT_MUTATION } from '../../hooks/useMutation/useUpdateAccount';
 import { WHO_AM_I_QUERY } from '../../hooks/useQuery/useWhoAmI';
 import {

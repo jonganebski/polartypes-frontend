@@ -1,6 +1,6 @@
 import { gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
-import { client } from '../../apollo';
+import { client } from '../../apollo/apollo';
 import { TImage } from '../../components/Modals/Save-step';
 import { UPDATED_STEP_FRAGMENT } from '../../fragments';
 import { ICreateStepFormProps } from '../../pages/Trip';

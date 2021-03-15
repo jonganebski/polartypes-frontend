@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { client } from '../../../apollo';
+import { client } from '../../../apollo/apollo';
 import {
   deleteCommentMutation,
   deleteCommentMutationVariables,

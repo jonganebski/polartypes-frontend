@@ -1,7 +1,7 @@
 import { gql, useMutation } from '@apollo/client';
 import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { client } from '../../apollo';
+import { client } from '../../apollo/apollo';
 import {
   deleteTripMutation,
   deleteTripMutationVariables,

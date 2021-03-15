@@ -2,7 +2,7 @@ import { useReactiveVar } from '@apollo/client';
 import { faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { isLoggedInVar } from '../apollo';
+import { isLoggedInVar } from '../apollo/reactive-variables';
 import { useFollow } from '../hooks/useMutation/useFollow';
 import { useUnfollow } from '../hooks/useMutation/useUnfollow';
 import { readTripsQuery_readTrips_targetUser } from '../__generated__/readTripsQuery';
