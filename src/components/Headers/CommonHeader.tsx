@@ -56,7 +56,7 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
 }) => {
   const { username: usernameParam } = useParams<IPrams>();
   const timeoutIdRef = useRef<any>(0);
-  const isSelf = usernameParam.toLowerCase() === userData?.whoAmI.slug;
+  const isMe = usernameParam.toLowerCase() === userData?.whoAmI.slug;
   const [isSearchTooltip, setIsSearchTooltip] = useState(false);
   const [isDelay, setIsDelay] = useState(false);
 
@@ -116,7 +116,7 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
           <Link
             to={`/${userData.whoAmI.username}`}
             className={`h-full px-5 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 ${
-              isSelf ? 'border-b-4 border-myRed text-center' : ''
+              isMe ? 'border-b-4 border-myRed text-center' : ''
             }`}
           >
             <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={8} />

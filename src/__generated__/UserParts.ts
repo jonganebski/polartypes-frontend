@@ -17,5 +17,6 @@ export interface UserParts {
   city: string | null;
   timeZone: string | null;
   isFollowing: boolean;
+  isMe: boolean;
   about: string | null;
 }

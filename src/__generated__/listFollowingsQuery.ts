@@ -19,6 +19,7 @@ export interface listFollowingsQuery_listFollowings_user_followings {
   city: string | null;
   timeZone: string | null;
   isFollowing: boolean;
+  isMe: boolean;
 }
 
 export interface listFollowingsQuery_listFollowings_user {

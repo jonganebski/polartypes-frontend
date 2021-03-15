@@ -83,10 +83,11 @@ export const Trip = () => {
     });
   }, [lazyTripQuery, lazyTripsQuery, lazyWhoAmIQuery, targetUsername, tripId]);
 
-  const isSelf = data?.readTrip.trip?.traveler.slug === userData?.whoAmI.slug;
   const startDateData = data?.readTrip.trip?.startDate;
   const endDateData = data?.readTrip.trip?.endDate;
   const timeZoneData = data?.readTrip.trip?.traveler.timeZone;
+  const isMe = data?.readTrip.trip?.traveler.isMe ?? false;
+
   useEffect(() => {
     if (!isSaveStepModal) {
       setEditingStep(null);
@@ -133,7 +134,7 @@ export const Trip = () => {
       ) : (
         <main className="h-screenExceptHeader flex">
           <section className="relative w-1/2 h-full min-w-px600">
-            {isSaveStepModal && isSelf && (
+            {isSaveStepModal && data.readTrip.trip.traveler.isMe && (
               <SaveStepModal
                 tripId={tripId}
                 tripStartDate={data.readTrip.trip.startDate}
@@ -143,7 +144,7 @@ export const Trip = () => {
                 editingStep={editingStep}
               />
             )}
-            {isEditTripModal && userData && isSelf && (
+            {isEditTripModal && userData && isMe && (
               <SaveTripModal
                 userData={userData}
                 setIsCreateTrip={setIsEditTripModal}
@@ -154,8 +155,7 @@ export const Trip = () => {
               />
             )}
             <StepsHeader
-              currentUserSlug={userData?.whoAmI.slug}
-              isSelf={isSelf}
+              isMe={isMe}
               trip={data.readTrip.trip}
               setEditingTrip={setEditingTrip}
               setIsEditTripModal={setIsEditTripModal}
@@ -177,9 +177,9 @@ export const Trip = () => {
                     return (
                       <React.Fragment key={step.id}>
                         <AddStepButton
-                          isSelf={isSelf}
+                          isMe={isMe}
                           onClick={() => {
-                            if (isSelf) {
+                            if (isMe) {
                               setBelowStepDate(step.arrivedAt);
                               setIsSaveStepModal(true);
                             }
@@ -194,9 +194,9 @@ export const Trip = () => {
                     );
                   })}
                 <AddStepButton
-                  isSelf={isSelf}
+                  isMe={isMe}
                   onClick={() => {
-                    if (isSelf) {
+                    if (isMe) {
                       setBelowStepDate(
                         data?.readTrip.trip?.endDate ?? moment().format(),
                       );

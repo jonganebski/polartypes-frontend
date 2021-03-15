@@ -2,7 +2,6 @@ import { faBook, faShareAlt, faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { isLoggedInVar } from '../../apollo/reactive-variables';
 import { useFollow } from '../../hooks/useMutation/useFollow';
 import { useUnfollow } from '../../hooks/useMutation/useUnfollow';
 import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';
@@ -11,8 +10,7 @@ import { Button } from '../Button';
 
 interface IStepsHeader {
   trip: readTripQuery_readTrip_trip;
-  currentUserSlug?: string;
-  isSelf: boolean;
+  isMe: boolean;
   setEditingTrip: React.Dispatch<
     React.SetStateAction<readTripQuery_readTrip_trip | null>
   >;
@@ -21,8 +19,7 @@ interface IStepsHeader {
 
 export const StepsHeader: React.FC<IStepsHeader> = ({
   trip,
-  isSelf,
-  currentUserSlug,
+  isMe,
   setEditingTrip,
   setIsEditTripModal,
 }) => {
@@ -37,7 +34,7 @@ export const StepsHeader: React.FC<IStepsHeader> = ({
         </span>
       </Link>
       <div>
-        {isSelf && (
+        {isMe && (
           <Button
             text="Create Travel Book"
             type="white-solid"
@@ -63,44 +60,37 @@ export const StepsHeader: React.FC<IStepsHeader> = ({
             />
           }
         />
-        {isLoggedInVar() &&
-          !isSelf &&
-          !trip.traveler.followers.some(
-            (follower) => follower.slug === currentUserSlug,
-          ) && (
-            <Button
-              text="Follow"
-              type="blue-regular"
-              size="sm"
-              onClick={() => {
-                trip.traveler.slug &&
-                  followMutation({
-                    variables: {
-                      input: { slug: trip.traveler.slug },
-                    },
-                  });
-              }}
-            />
-          )}
-        {!isSelf &&
-          trip.traveler.followers.some(
-            (follower) => follower.slug === currentUserSlug,
-          ) && (
-            <Button
-              text="Following"
-              type="blue-solid"
-              size="sm"
-              onClick={() => {
-                trip.traveler.slug &&
-                  unfollowMutation({
-                    variables: {
-                      input: { slug: trip.traveler.slug },
-                    },
-                  });
-              }}
-            />
-          )}
-        {isSelf && (
+        {!trip.traveler.isFollowing && !trip.traveler.isMe && (
+          <Button
+            text="Follow"
+            type="blue-regular"
+            size="sm"
+            onClick={() => {
+              trip.traveler.slug &&
+                followMutation({
+                  variables: {
+                    input: { slug: trip.traveler.slug },
+                  },
+                });
+            }}
+          />
+        )}
+        {trip.traveler.isFollowing && !trip.traveler.isMe && (
+          <Button
+            text="Following"
+            type="blue-solid"
+            size="sm"
+            onClick={() => {
+              trip.traveler.slug &&
+                unfollowMutation({
+                  variables: {
+                    input: { slug: trip.traveler.slug },
+                  },
+                });
+            }}
+          />
+        )}
+        {isMe && (
           <Button
             text="Trip settings"
             type="white-solid"

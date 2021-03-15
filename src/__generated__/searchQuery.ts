@@ -19,6 +19,7 @@ export interface searchQuery_search_users {
   city: string | null;
   timeZone: string | null;
   isFollowing: boolean;
+  isMe: boolean;
 }
 
 export interface searchQuery_search_trips_traveler {

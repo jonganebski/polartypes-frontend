@@ -1,5 +1,5 @@
 import { gql, useLazyQuery } from '@apollo/client';
-import { STEPS_FRAGMENTS, TRAVELER_FRAGMENT } from '../../fragments';
+import { STEPS_FRAGMENTS, USER_CORE_FRAGMENT } from '../../fragments';
 import {
   readTripQuery,
   readTripQueryVariables,
@@ -20,7 +20,7 @@ export const READ_TRIP_QUERY = gql`
         viewCount
         availability
         traveler {
-          ...TravelerParts
+          ...UserCoreParts
         }
         steps {
           ...StepParts
@@ -28,7 +28,7 @@ export const READ_TRIP_QUERY = gql`
       }
     }
   }
-  ${TRAVELER_FRAGMENT}
+  ${USER_CORE_FRAGMENT}
   ${STEPS_FRAGMENTS}
 `;
 

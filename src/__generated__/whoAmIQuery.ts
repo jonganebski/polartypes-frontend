@@ -17,6 +17,7 @@ export interface whoAmIQuery_whoAmI {
   city: string | null;
   timeZone: string | null;
   isFollowing: boolean;
+  isMe: boolean;
   about: string | null;
 }
 

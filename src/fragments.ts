@@ -14,6 +14,7 @@ export const STEPS_FRAGMENTS = gql`
     imgUrls
     traveler {
       slug
+      isMe
     }
     likes {
       user {
@@ -59,20 +60,8 @@ export const USER_CORE_FRAGMENT = gql`
     city
     timeZone
     isFollowing
+    isMe
   }
-`;
-
-export const TRAVELER_FRAGMENT = gql`
-  fragment TravelerParts on Users {
-    ...UserCoreParts
-    followers {
-      ...UserCoreParts
-    }
-    followings {
-      ...UserCoreParts
-    }
-  }
-  ${USER_CORE_FRAGMENT}
 `;
 
 export const USER_FRAGMENT = gql`
@@ -93,6 +82,7 @@ export const TARGET_USER_FRAGMENT = gql`
     countFollowers
     isFollowing
     isFollower
+    isMe
     trips {
       id
       name

@@ -11,13 +11,13 @@ import { Button } from './Button';
 
 interface IUserItroProps {
   targetUser: readTripsQuery_readTrips_targetUser;
-  isSelf: boolean;
+  isMe: boolean;
   setIsFollowersModal: React.Dispatch<React.SetStateAction<boolean | null>>;
 }
 
 export const UserIntro: React.FC<IUserItroProps> = ({
   targetUser,
-  isSelf,
+  isMe,
   setIsFollowersModal,
 }) => {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -67,7 +67,7 @@ export const UserIntro: React.FC<IUserItroProps> = ({
           size="sm"
           onClick={() => isLoggedIn && setIsFollowersModal(false)}
         />
-        {isLoggedInVar() && !isSelf && !targetUser.isFollowing && (
+        {isLoggedInVar() && !isMe && !targetUser.isFollowing && (
           <Button
             text="Follow"
             type="void"
@@ -83,7 +83,7 @@ export const UserIntro: React.FC<IUserItroProps> = ({
             }}
           />
         )}
-        {!isSelf && targetUser.isFollowing && (
+        {!isMe && targetUser.isFollowing && (
           <Button
             text=""
             type="blue-solid"

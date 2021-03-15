@@ -11,9 +11,9 @@ import { calcDistance, getTraveledDays } from '../helpers';
 import { readTripsQuery_readTrips_targetUser_trips } from '../__generated__/readTripsQuery';
 
 interface IStatisticsProps {
-  isSelf: boolean;
-  isHidden: boolean;
   trips: readTripsQuery_readTrips_targetUser_trips[];
+  isHidden: boolean;
+  isMe: boolean;
 }
 
 interface IStatistics {
@@ -23,9 +23,9 @@ interface IStatistics {
 }
 
 export const Statistics: React.FC<IStatisticsProps> = ({
-  isSelf,
   isHidden,
   trips,
+  isMe,
 }) => {
   const [countriesCount, setCountriesCount] = useState(0);
   const [totalTravelDays, setTotalTravelDays] = useState(0);
@@ -73,7 +73,7 @@ export const Statistics: React.FC<IStatisticsProps> = ({
     >
       <li>
         <h4 className="my-5 mx-2 text-xl text-myGreen-dark font-semibold">
-          {isSelf ? "You've seen" : 'has seen'}
+          {isMe ? "You've seen" : 'has seen'}
         </h4>
         <div className="p-4 grid grid-cols-2 gap-2 bg-white rounded-lg border border-myGray-light">
           <div className="p-5 border border-myGray-light rounded-lg">

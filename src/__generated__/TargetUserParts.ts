@@ -49,6 +49,7 @@ export interface TargetUserParts {
   city: string | null;
   timeZone: string | null;
   isFollowing: boolean;
+  isMe: boolean;
   about: string | null;
   countFollowings: number;
   countFollowers: number;

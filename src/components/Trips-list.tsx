@@ -7,7 +7,7 @@ import { TripCard } from './Cards/Trip';
 interface ITripsListProps {
   isTabTrips: boolean;
   targetUser: readTripsQuery_readTrips_targetUser;
-  isSelf: boolean;
+  isMe: boolean;
   userData?: whoAmIQuery;
   setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
   setIsAskTimeZone: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,7 +16,7 @@ interface ITripsListProps {
 export const TripsList: React.FC<ITripsListProps> = ({
   isTabTrips,
   targetUser,
-  isSelf,
+  isMe,
   userData,
   setIsCreateTrip,
   setIsAskTimeZone,
@@ -24,7 +24,7 @@ export const TripsList: React.FC<ITripsListProps> = ({
   return (
     <div className={`${isTabTrips ? '' : 'hidden'} px-3 py-5`}>
       <div className="w-full mb-5 flex justify-center">
-        {isSelf && (
+        {isMe && (
           <Button
             text="Add a past, current or future trip"
             type="blue-regular"

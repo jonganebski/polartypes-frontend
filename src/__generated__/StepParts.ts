@@ -10,6 +10,7 @@
 export interface StepParts_traveler {
   __typename: "Users";
   slug: string;
+  isMe: boolean;
 }
 
 export interface StepParts_likes_user {

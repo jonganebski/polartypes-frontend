@@ -3,21 +3,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
 interface IAddStepButton {
-  isSelf: boolean;
+  isMe: boolean;
   onClick: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
 }
 
-export const AddStepButton: React.FC<IAddStepButton> = ({
-  isSelf,
-  onClick,
-}) => (
+export const AddStepButton: React.FC<IAddStepButton> = ({ isMe, onClick }) => (
   <li
-    role={isSelf ? 'button' : 'list'}
+    role={isMe ? 'button' : 'list'}
     onClick={onClick}
     className="relative group"
   >
     <div className="w-8 h-16 border-r border-myGray"></div>
-    {isSelf && (
+    {isMe && (
       <div className="absolute top-1/2 left-6 transform -translate-y-1/2 w-full flex items-center">
         <FontAwesomeIcon
           icon={faPlusCircle}

@@ -35,7 +35,7 @@ export const StepCard: React.FC<IStepProps> = ({
   const [toggleLikeMutation, { loading: toggleLikeLoading }] = useToggleLike(
     step.id,
   );
-  const isSelf = userData?.whoAmI.slug === step.traveler.slug;
+  const isMe = step.traveler.isMe;
   const commentsCount = step.comments.length;
 
   useEffect(() => {
@@ -161,7 +161,7 @@ export const StepCard: React.FC<IStepProps> = ({
             }
           />
         </div>
-        {isSelf && (
+        {isMe && (
           <Button
             text="Edit step"
             type="blue-solid"

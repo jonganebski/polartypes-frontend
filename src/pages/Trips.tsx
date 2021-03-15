@@ -43,7 +43,7 @@ export const Trips = () => {
     });
   }, [lazyTripsQuery, targetUsername]);
 
-  const isSelf = targetUsername.toLowerCase() === userData?.whoAmI.slug;
+  const isMe = data?.readTrips.targetUser?.isMe ?? false;
 
   if (loading) {
     return <Loading />;
@@ -108,7 +108,7 @@ export const Trips = () => {
             <section className="overflow-y-scroll">
               <UserIntro
                 targetUser={data.readTrips.targetUser}
-                isSelf={isSelf}
+                isMe={isMe}
                 setIsFollowersModal={setIsFollowersModal}
               />
               <TabButtons
@@ -116,7 +116,7 @@ export const Trips = () => {
                 setIsTabTrips={setIsTabTrips}
               />
               <TripsList
-                isSelf={isSelf}
+                isMe={isMe}
                 isTabTrips={isTabTrips}
                 targetUser={data.readTrips.targetUser}
                 userData={userData}
@@ -124,7 +124,7 @@ export const Trips = () => {
                 setIsAskTimeZone={setIsAskTimeZone}
               />
               <Statistics
-                isSelf={isSelf}
+                isMe={isMe}
                 isHidden={isTabTrips}
                 trips={data.readTrips.targetUser.trips}
               />
