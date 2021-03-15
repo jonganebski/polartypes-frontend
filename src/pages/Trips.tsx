@@ -104,26 +104,32 @@ export const Trips = () => {
         <div>{data.readTrips.error}</div>
       ) : (
         <main className="h-screenExceptHeader grid grid-cols-tripsPage">
-          <section className="overflow-y-scroll">
-            <UserIntro
-              targetUser={data.readTrips.targetUser}
-              isSelf={isSelf}
-              setIsFollowersModal={setIsFollowersModal}
-            />
-            <TabButtons isTabTrips={isTabTrips} setIsTabTrips={setIsTabTrips} />
-            <TripsList
-              isSelf={isSelf}
-              isTabTrips={isTabTrips}
-              targetUser={data.readTrips.targetUser}
-              setIsCreateTrip={setIsCreateTrip}
-              setIsAskTimeZone={setIsAskTimeZone}
-            />
-            <Statistics
-              isSelf={isSelf}
-              isHidden={isTabTrips}
-              trips={data.readTrips.targetUser.trips}
-            />
-          </section>
+          {data.readTrips.targetUser && (
+            <section className="overflow-y-scroll">
+              <UserIntro
+                targetUser={data.readTrips.targetUser}
+                isSelf={isSelf}
+                setIsFollowersModal={setIsFollowersModal}
+              />
+              <TabButtons
+                isTabTrips={isTabTrips}
+                setIsTabTrips={setIsTabTrips}
+              />
+              <TripsList
+                isSelf={isSelf}
+                isTabTrips={isTabTrips}
+                targetUser={data.readTrips.targetUser}
+                userData={userData}
+                setIsCreateTrip={setIsCreateTrip}
+                setIsAskTimeZone={setIsAskTimeZone}
+              />
+              <Statistics
+                isSelf={isSelf}
+                isHidden={isTabTrips}
+                trips={data.readTrips.targetUser.trips}
+              />
+            </section>
+          )}
           <section className="relative z-0 h-screenExceptHeader">
             <Map />
           </section>

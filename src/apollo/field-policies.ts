@@ -4,7 +4,6 @@ export const LIST_FOLLOWERS_POLICY: { [fieldName: string]: FieldPolicy } = {
   listFollowers: {
     keyArgs: ['input', ['slug']],
     merge(_, incoming) {
-      console.log(incoming);
       return incoming;
     },
   },

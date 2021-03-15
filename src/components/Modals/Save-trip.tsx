@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { faCalendarAlt, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import {
   faGlobe,
@@ -11,12 +11,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { getBackgroundImage } from '../../helpers';
+import { useCreateTrip } from '../../hooks/useMutation/useCreateTrip';
 import { useDeleteTrip } from '../../hooks/useMutation/useDeleteTrip';
 import { useUpdateTrip } from '../../hooks/useMutation/useUpdateTrip';
-import {
-  createTripMutation,
-  createTripMutationVariables,
-} from '../../__generated__/createTripMutation';
 import { Availability } from '../../__generated__/globalTypes';
 import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';
 import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
@@ -27,16 +24,6 @@ import { NewCalendar } from '../Tooltips/Calendar';
 import { ModalBackground } from './partials/Background';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { StepImages } from './StepImages';
-
-const CREATE_TRIP_MUTATION = gql`
-  mutation createTripMutation($input: CreateTripInput!) {
-    createTrip(input: $input) {
-      ok
-      error
-      tripId
-    }
-  }
-`;
 
 interface ICreateTripModal {
   userData: whoAmIQuery;
@@ -161,18 +148,10 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
     validateTripDates();
   }, [setEndDateAfterStartDate, validateTripDates]);
 
-  const onCompleted = (data: createTripMutation) => {
-    const {
-      createTrip: { ok, error, tripId },
-    } = data;
-    if (ok && tripId && !error) {
-      history.push(`/${userData.whoAmI.username}/${tripId}`);
-    }
-  };
-  const [createTripMutation, { loading: createLoading }] = useMutation<
-    createTripMutation,
-    createTripMutationVariables
-  >(CREATE_TRIP_MUTATION, { onCompleted });
+  const [createTripMutation, { loading: createLoading }] = useCreateTrip(
+    userData.whoAmI.username,
+  );
+
   const [updateTripMutation, { loading: updateLoading }] = useUpdateTrip(
     f,
     editingTrip,
@@ -183,7 +162,7 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
   const onSubmit = async () => {
     const { endDate, ...values } = getValues();
     if (editingTrip) {
-      updateTripMutation({
+      await updateTripMutation({
         variables: {
           input: {
             ...values,
@@ -194,7 +173,7 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
         },
       });
     } else {
-      createTripMutation({
+      await createTripMutation({
         variables: { input: { ...values, endDate: endDate ? endDate : null } },
       });
     }
