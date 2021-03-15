@@ -17,3 +17,12 @@ export const LIST_FOLLOWINGS_POLICY: { [fieldName: string]: FieldPolicy } = {
     },
   },
 };
+
+export const LIST_COMMENTS_POLICY: { [fieldName: string]: FieldPolicy } = {
+  listComments: {
+    keyArgs: ['input', ['stepId']],
+    merge(_, incoming) {
+      return incoming;
+    },
+  },
+};

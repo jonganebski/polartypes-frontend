@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { useEffect } from 'react';
 import { UseFormMethods } from 'react-hook-form';
 import { client } from '../../apollo/apollo';
@@ -32,9 +32,12 @@ export const useCreateStep = (
   setIsCreateStepModal: (value: React.SetStateAction<boolean>) => void,
 ) => {
   const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  const client = useApolloClient();
+
   useEffect(() => {
     lazyWhoAmIQuery();
   }, [lazyWhoAmIQuery]);
+
   const updateApolloCache = (stepId: number) => {
     const { lat, lon, ...values } = f.getValues();
     const imgUrls = images.reduce((acc, img) => {
@@ -44,41 +47,42 @@ export const useCreateStep = (
         return acc;
       }
     }, [] as string[]);
-    const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
-      query: READ_TRIP_QUERY,
-      variables: { input: { tripId: +tripId } },
-    });
-    prevQuery &&
-      userData &&
-      client.writeQuery<readTripQuery, readTripQueryVariables>({
-        query: READ_TRIP_QUERY,
-        variables: { input: { tripId: +tripId } },
-        data: {
-          readTrip: {
-            ...prevQuery.readTrip,
-            trip: {
-              ...prevQuery.readTrip.trip!,
-              steps: [
-                {
-                  ...values,
-                  __typename: 'Step',
-                  id: stepId,
-                  lat: +lat,
-                  lon: +lon,
-                  imgUrls,
-                  traveler: {
-                    __typename: 'Users',
-                    slug: userData.whoAmI.slug,
-                  },
-                  likes: [],
-                  comments: [],
-                },
-                ...prevQuery.readTrip.trip!.steps,
-              ],
-            },
-          },
-        },
-      });
+    // const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
+    //   query: READ_TRIP_QUERY,
+    //   variables: { input: { tripId: +tripId } },
+    // });
+    // prevQuery &&
+    //   userData &&
+    //   client.writeQuery<readTripQuery, readTripQueryVariables>({
+    //     query: READ_TRIP_QUERY,
+    //     variables: { input: { tripId: +tripId } },
+    //     data: {
+    //       readTrip: {
+    //         ...prevQuery.readTrip,
+    //         trip: {
+    //           ...prevQuery.readTrip.trip!,
+    //           steps: [
+    //             {
+    //               ...values,
+    //               __typename: 'Step',
+    //               id: stepId,
+    //               lat: +lat,
+    //               lon: +lon,
+    //               imgUrls,
+    //               traveler: {
+    //                 __typename: 'Users',
+    //                 isMe: true,
+    //                 slug: userData.whoAmI.slug,
+    //               },
+    //               likes: [],
+    //               countComments:
+    //             },
+    //             ...prevQuery.readTrip.trip!.steps,
+    //           ],
+    //         },
+    //       },
+    //     },
+    //   });
   };
   const onCreateStepCompleted = async (data: createStepMutation) => {
     const {

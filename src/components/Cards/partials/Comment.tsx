@@ -9,7 +9,7 @@ import {
   deleteCommentMutation,
   deleteCommentMutationVariables,
 } from '../../../__generated__/deleteCommentMutation';
-import { readTripQuery_readTrip_trip_steps_comments } from '../../../__generated__/readTripQuery';
+import { listCommentsQuery_listComments_step_comments } from '../../../__generated__/listCommentsQuery';
 import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
 import { Avatar } from '../../Avatar';
 
@@ -23,17 +23,28 @@ const DELETE_COMMENT_MUTATION = gql`
 `;
 
 interface ICommentProps {
+  stepId: number;
   userData: whoAmIQuery | undefined;
-  comment: readTripQuery_readTrip_trip_steps_comments;
+  comment: listCommentsQuery_listComments_step_comments;
 }
 
-export const Comment: React.FC<ICommentProps> = ({ userData, comment }) => {
+export const Comment: React.FC<ICommentProps> = ({
+  userData,
+  comment,
+  stepId,
+}) => {
   const onCompleted = (data: deleteCommentMutation) => {
     const {
       deleteComment: { ok, error },
     } = data;
     if (ok && !error) {
       client.cache.evict({ id: `Comment:${comment.id}` });
+      client.cache.modify({
+        id: `Step:${stepId}`,
+        fields: {
+          countComments: (prev) => Math.max(--prev, 0),
+        },
+      });
     }
   };
 
@@ -50,7 +61,7 @@ export const Comment: React.FC<ICommentProps> = ({ userData, comment }) => {
     }
   };
   return (
-    <li className="flex items-center">
+    <li className="flex items-start">
       <Avatar avatarUrl={comment.creator.avatarUrl} size={8} />
       <div className="w-full ml-3 text-sm">
         <Link to="#" className="mr-1 text-myGreen-darkest font-semibold">
@@ -66,7 +77,7 @@ export const Comment: React.FC<ICommentProps> = ({ userData, comment }) => {
       {userData?.whoAmI.slug === comment.creator.slug && (
         <FontAwesomeIcon
           icon={faTrashAlt}
-          className="text-myRed cursor-pointer opacity-60 hover:opacity-100"
+          className="mt-3 text-myRed cursor-pointer opacity-60 hover:opacity-100"
           onClick={() => onDeleteCommentIconClick(comment.id)}
         />
       )}

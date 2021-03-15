@@ -17,3 +17,15 @@ export const USER_TYPE_POLICIES: TypePolicies = {
     },
   },
 };
+
+export const STEP_TYPE_POCILIES: TypePolicies = {
+  Step: {
+    fields: {
+      comments: {
+        merge(existing = [], incoming = []) {
+          return [...existing, ...incoming];
+        },
+      },
+    },
+  },
+};

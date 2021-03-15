@@ -36,7 +36,6 @@ export const StepCard: React.FC<IStepProps> = ({
     step.id,
   );
   const isMe = step.traveler.isMe;
-  const commentsCount = step.comments.length;
 
   useEffect(() => {
     const buildThresholdList = () => {
@@ -147,11 +146,11 @@ export const StepCard: React.FC<IStepProps> = ({
           />
           <Button
             text={
-              commentsCount === 0
+              step.countComments === 0
                 ? 'Comment'
-                : commentsCount === 1
+                : step.countComments === 1
                 ? '1 Comment'
-                : `${commentsCount} Comments`
+                : `${step.countComments} Comments`
             }
             onClick={() => setIsCommentBox((prev) => !prev)}
             type="white-solid"

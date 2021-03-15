@@ -12,6 +12,7 @@ export const STEPS_FRAGMENTS = gql`
     lon
     story
     imgUrls
+    countComments
     traveler {
       slug
       isMe
@@ -23,15 +24,18 @@ export const STEPS_FRAGMENTS = gql`
         avatarUrl
       }
     }
-    comments {
-      id
-      createdAt
-      text
-      creator {
-        slug
-        username
-        avatarUrl
-      }
+  }
+`;
+
+export const COMMENT_FRAGMENT = gql`
+  fragment CommentParts on Comment {
+    id
+    createdAt
+    text
+    creator {
+      slug
+      username
+      avatarUrl
     }
   }
 `;

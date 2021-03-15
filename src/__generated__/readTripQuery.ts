@@ -40,21 +40,6 @@ export interface readTripQuery_readTrip_trip_steps_likes {
   user: readTripQuery_readTrip_trip_steps_likes_user;
 }
 
-export interface readTripQuery_readTrip_trip_steps_comments_creator {
-  __typename: "Users";
-  slug: string;
-  username: string;
-  avatarUrl: string | null;
-}
-
-export interface readTripQuery_readTrip_trip_steps_comments {
-  __typename: "Comment";
-  id: number;
-  createdAt: any;
-  text: string;
-  creator: readTripQuery_readTrip_trip_steps_comments_creator;
-}
-
 export interface readTripQuery_readTrip_trip_steps {
   __typename: "Step";
   id: number;
@@ -67,9 +52,9 @@ export interface readTripQuery_readTrip_trip_steps {
   lon: number;
   story: string | null;
   imgUrls: string[] | null;
+  countComments: number;
   traveler: readTripQuery_readTrip_trip_steps_traveler;
   likes: readTripQuery_readTrip_trip_steps_likes[];
-  comments: readTripQuery_readTrip_trip_steps_comments[];
 }
 
 export interface readTripQuery_readTrip_trip {

@@ -1,26 +1,11 @@
-import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { client } from '../../../apollo/apollo';
-import {
-  createCommentMutation,
-  createCommentMutationVariables,
-} from '../../../__generated__/createCommentMutation';
+import { useCreateComment } from '../../../hooks/useMutation/useCreateComment';
+import { useListComments } from '../../../hooks/useQuery/useListComments';
 import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
-import { stepComments } from '../../../__generated__/stepComments';
 import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
 import { Avatar } from '../../Avatar';
 import { Comment } from './Comment';
-
-const CREATE_COMMENT_MUTAION = gql`
-  mutation createCommentMutation($input: CreateCommentInput!) {
-    createComment(input: $input) {
-      ok
-      error
-      commentId
-    }
-  }
-`;
 
 interface ICommentProps {
   userData: whoAmIQuery | undefined;
@@ -31,80 +16,31 @@ export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
   const { register, getValues, handleSubmit, reset } = useForm<{
     text: string;
   }>();
-  const onCreateCommentCompleted = (data: createCommentMutation) => {
-    const {
-      createComment: { ok, error, commentId },
-    } = data;
-    if (ok && !error && commentId) {
+
+  const [createCommentMutation, { loading }] = useCreateComment(
+    getValues().text,
+    step.id,
+    userData,
+  );
+
+  const { data, loading: queryLoading, fetchMore } = useListComments(step.id);
+
+  const onSubmit = async () => {
+    if (!loading) {
       const { text } = getValues();
-      const prevStep = client.readFragment<stepComments>({
-        id: `Step:${step.id}`,
-        fragment: gql`
-          fragment stepComments on Step {
-            comments {
-              id
-              createdAt
-              text
-              creator {
-                slug
-                username
-                avatarUrl
-              }
-            }
-          }
-        `,
+      await createCommentMutation({
+        variables: { input: { text, stepId: step.id } },
       });
-      if (prevStep && userData) {
-        client.writeFragment<stepComments>({
-          id: `Step:${step.id}`,
-          fragment: gql`
-            fragment stepComments on Step {
-              comments {
-                id
-                createdAt
-                text
-                creator {
-                  slug
-                  username
-                  avatarUrl
-                }
-              }
-            }
-          `,
-          data: {
-            __typename: 'Step',
-            comments: [
-              {
-                __typename: 'Comment',
-                id: commentId,
-                createdAt: 'Just now',
-                text,
-                creator: {
-                  __typename: 'Users',
-                  slug: userData.whoAmI.slug,
-                  username: userData.whoAmI.username,
-                  avatarUrl: userData.whoAmI.avatarUrl,
-                },
-              },
-              ...prevStep.comments,
-            ],
-          },
-        });
-      }
       reset();
     }
   };
 
-  const [createCommentMutation, { loading }] = useMutation<
-    createCommentMutation,
-    createCommentMutationVariables
-  >(CREATE_COMMENT_MUTAION, { onCompleted: onCreateCommentCompleted });
-
-  const onSubmit = () => {
-    if (!loading) {
-      const { text } = getValues();
-      createCommentMutation({
-        variables: { input: { text, stepId: step.id } },
+  const onClickLoadMore = () => {
+    if (fetchMore && data?.listComments.hasMorePages) {
+      fetchMore({
+        variables: {
+          input: { stepId: step.id, cursorId: data?.listComments.endCursorId },
+        },
       });
     }
   };
@@ -112,28 +48,41 @@ export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
   return (
     <div className="py-4 border-t border-myGray-light">
       {userData && (
-        <form className="flex items-center" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="flex items-center mb-4"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={8} />
           <input
             ref={register({ required: true })}
-            name="text"
-            type="text"
-            className="input ml-3 w-full"
             placeholder="Write a comment..."
+            className="input ml-3 w-full"
+            autoComplete="off"
+            type="text"
+            name="text"
           />
         </form>
       )}
       <ul className="py-4 grid gap-y-4">
-        {step.comments
-          .slice()
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-          )
-          .map((comment, i) => (
-            <Comment key={i} userData={userData} comment={comment} />
-          ))}
+        {data?.listComments.step?.comments?.map((comment, i) => (
+          <Comment
+            key={i}
+            userData={userData}
+            comment={comment}
+            stepId={step.id}
+          />
+        ))}
       </ul>
+      {data?.listComments.hasMorePages && (
+        <div className="text-center">
+          <span
+            className="text-sm underline text-myBlue cursor-pointer hover:text-myBlue-light active:text-myBlue-dark"
+            onClick={onClickLoadMore}
+          >
+            Load more
+          </span>
+        </div>
+      )}
     </div>
   );
 };

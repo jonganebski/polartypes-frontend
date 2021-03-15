@@ -79,6 +79,11 @@ export interface LikeInputType {
   step: StepInputType;
 }
 
+export interface ListCommentsInput {
+  stepId: number;
+  cursorId?: number | null;
+}
+
 export interface ListFollowersInput {
   slug: string;
   cursorId?: number | null;

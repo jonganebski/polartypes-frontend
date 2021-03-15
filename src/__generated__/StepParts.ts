@@ -25,21 +25,6 @@ export interface StepParts_likes {
   user: StepParts_likes_user;
 }
 
-export interface StepParts_comments_creator {
-  __typename: "Users";
-  slug: string;
-  username: string;
-  avatarUrl: string | null;
-}
-
-export interface StepParts_comments {
-  __typename: "Comment";
-  id: number;
-  createdAt: any;
-  text: string;
-  creator: StepParts_comments_creator;
-}
-
 export interface StepParts {
   __typename: "Step";
   id: number;
@@ -52,7 +37,7 @@ export interface StepParts {
   lon: number;
   story: string | null;
   imgUrls: string[] | null;
+  countComments: number;
   traveler: StepParts_traveler;
   likes: StepParts_likes[];
-  comments: StepParts_comments[];
 }

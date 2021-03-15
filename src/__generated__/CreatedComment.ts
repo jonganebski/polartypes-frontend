@@ -4,25 +4,27 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: stepComments
+// GraphQL fragment: CreatedComment
 // ====================================================
 
-export interface stepComments_comments_creator {
+export interface CreatedComment_creator {
   __typename: "Users";
   slug: string;
   username: string;
+  firstName: string;
+  lastName: string | null;
   avatarUrl: string | null;
+  city: string | null;
+  timeZone: string | null;
+  isFollowing: boolean;
+  isMe: boolean;
+  about: string | null;
 }
 
-export interface stepComments_comments {
+export interface CreatedComment {
   __typename: "Comment";
-  id: number;
   createdAt: any;
+  creator: CreatedComment_creator;
   text: string;
-  creator: stepComments_comments_creator;
-}
-
-export interface stepComments {
-  __typename: "Step";
-  comments: stepComments_comments[];
+  id: number;
 }
