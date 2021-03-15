@@ -32,11 +32,9 @@ export const Trips = () => {
     null,
   );
 
-  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  const { data: userData } = useWhoAmI();
   const [lazyTripsQuery, { data, called, loading }] = useLazyTrips();
-  useEffect(() => {
-    lazyWhoAmIQuery();
-  }, [lazyWhoAmIQuery]);
+
   useEffect(() => {
     lazyTripsQuery({
       variables: { input: { slug: targetUsername.toLowerCase() } },

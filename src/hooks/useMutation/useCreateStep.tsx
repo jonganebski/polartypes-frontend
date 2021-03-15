@@ -31,12 +31,8 @@ export const useCreateStep = (
   images: TImage[],
   setIsCreateStepModal: (value: React.SetStateAction<boolean>) => void,
 ) => {
-  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
+  const { data: userData } = useWhoAmI();
   const client = useApolloClient();
-
-  useEffect(() => {
-    lazyWhoAmIQuery();
-  }, [lazyWhoAmIQuery]);
 
   const updateApolloCache = (stepId: number) => {
     const { lat, lon, ...values } = f.getValues();

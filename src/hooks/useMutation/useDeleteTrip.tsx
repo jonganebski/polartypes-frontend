@@ -18,11 +18,9 @@ const DELETE_TRIP_MUTATION = gql`
 `;
 
 export const useDeleteTrip = (tripId?: number) => {
-  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
-  useEffect(() => {
-    lazyWhoAmIQuery();
-  }, [lazyWhoAmIQuery]);
+  const { data: userData } = useWhoAmI();
   const history = useHistory();
+
   const onCompleted = (data: deleteTripMutation) => {
     const {
       deleteTrip: { ok, error },
@@ -32,6 +30,7 @@ export const useDeleteTrip = (tripId?: number) => {
       history.push(`/${userData.whoAmI.username}`);
     }
   };
+
   return useMutation<deleteTripMutation, deleteTripMutationVariables>(
     DELETE_TRIP_MUTATION,
     { onCompleted },

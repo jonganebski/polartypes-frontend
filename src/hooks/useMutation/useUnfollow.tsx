@@ -1,5 +1,4 @@
 import { ApolloCache, FetchResult, gql, useMutation } from '@apollo/client';
-import { useEffect } from 'react';
 import {
   unfollowMutation,
   unfollowMutationVariables,
@@ -17,11 +16,8 @@ const UNFOLLOW_MUTATION = gql`
 `;
 
 export const useUnfollow = () => {
-  const [whoAmIQuery, { data: userData }] = useWhoAmI();
+  const { data: userData } = useWhoAmI();
 
-  useEffect(() => {
-    whoAmIQuery();
-  }, []);
   const update = (
     cache: ApolloCache<unfollowMutation>,
     { data }: FetchResult<unfollowMutation>,

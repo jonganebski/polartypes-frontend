@@ -1,5 +1,5 @@
 import { useReactiveVar } from '@apollo/client';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo/reactive-variables';
 import { useWhoAmI } from '../hooks/useQuery/useWhoAmI';
@@ -9,10 +9,8 @@ import { Trips } from '../pages/Trips';
 
 export const Router = () => {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
-  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
-  useEffect(() => {
-    lazyWhoAmIQuery();
-  }, [lazyWhoAmIQuery]);
+  const { data: userData } = useWhoAmI();
+
   return (
     <BrowserRouter>
       <Switch>

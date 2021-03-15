@@ -1,5 +1,5 @@
 import { ApolloCache, FetchResult, gql, useMutation } from '@apollo/client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { UseFormMethods } from 'react-hook-form';
 import { ISettingsFormProps } from '../../components/Modals/Settings';
 import {
@@ -21,52 +21,9 @@ export const useUpdateAccount = (
   f: UseFormMethods<ISettingsFormProps>,
   avatarUrl: string | null,
 ) => {
-  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
-  useEffect(() => {
-    lazyWhoAmIQuery();
-  }, [lazyWhoAmIQuery]);
-  // const history = useHistory();
+  const { data: userData } = useWhoAmI();
+
   const [isLoading, setIsLoading] = useState(false);
-  // const onCompleted = async (data: updateAccountMutation) => {
-  //   const {
-  //     updateAccount: { ok, error },
-  //   } = data;
-  //   if (ok && !error && userData) {
-  //     const {
-  //       about,
-  //       city,
-  //       firstName,
-  //       lastName,
-  //       username,
-  //       timeZone,
-  //     } = f.getValues();
-  //     client.writeFragment<UserParts>({
-  //       id: `Users:${userData.whoAmI.id}`,
-  //       fragment: USER_FRAGMENT,
-  //       fragmentName: 'UserParts',
-  //       data: {
-  //         __typename: 'Users',
-  //         id: userData.whoAmI.id,
-  //         about,
-  //         avatarUrl,
-  //         city,
-  //         firstName,
-  //         lastName,
-  //         timeZone,
-  //         username,
-  //         slug: username.toLowerCase(),
-  //       },
-  //     });
-  //     await sleep(2000);
-  //     if (userData.whoAmI.username !== username) {
-  //       history.push(`/${username}`);
-  //     } else {
-  //       setIsLoading(false);
-  //     }
-  //   } else {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const update = (
     cache: ApolloCache<updateAccountMutation>,

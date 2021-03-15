@@ -19,10 +19,8 @@ const TOGGLE_LIKE_MUTATION = gql`
 `;
 
 export const useToggleLike = (stepId: number) => {
-  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
-  useEffect(() => {
-    lazyWhoAmIQuery();
-  }, [lazyWhoAmIQuery]);
+  const { data: userData } = useWhoAmI();
+
   const onCompleted = (data: toggleLikeMutation) => {
     const {
       toggleLike: { ok, error, toggle },

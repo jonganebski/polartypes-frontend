@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFollow } from '../../hooks/useMutation/useFollow';
 import { useUnfollow } from '../../hooks/useMutation/useUnfollow';
@@ -13,14 +13,9 @@ interface IUserBoxProps {
 }
 
 export const UserBox: React.FC<IUserBoxProps> = ({ user, onClick }) => {
-  const [whoAmIQuery, { data: userData }] = useWhoAmI();
+  const { data: userData } = useWhoAmI();
   const [followMutation] = useFollow();
   const [unfollowMutation] = useUnfollow();
-
-  useEffect(() => {
-    whoAmIQuery();
-    // eslint-disable-next-line
-  }, []);
 
   return (
     <li className="p-5 flex items-center bg-white cursor-pointer hover:bg-myGray-lightest">

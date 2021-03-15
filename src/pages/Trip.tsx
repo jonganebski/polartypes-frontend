@@ -63,10 +63,7 @@ export const Trip = () => {
     mode: 'onChange',
     defaultValues: {},
   });
-  const [
-    lazyWhoAmIQuery,
-    { data: userData, loading: isUserDataLoading },
-  ] = useWhoAmI();
+  const { data: userData, loading: isUserDataLoading } = useWhoAmI();
   const [
     lazyTripQuery,
     { data, called, loading: isTripLoading },
@@ -75,13 +72,14 @@ export const Trip = () => {
     lazyTripsQuery,
     { data: tripsData, loading: isTripsLoading },
   ] = useLazyTrips();
+
   useEffect(() => {
-    lazyWhoAmIQuery();
     lazyTripQuery({ variables: { input: { tripId: +tripId } } });
     lazyTripsQuery({
       variables: { input: { slug: targetUsername.toLowerCase() } },
     });
-  }, [lazyTripQuery, lazyTripsQuery, lazyWhoAmIQuery, targetUsername, tripId]);
+    // eslint-disable-next-line
+  }, [targetUsername, tripId]);
 
   const startDateData = data?.readTrip.trip?.startDate;
   const endDateData = data?.readTrip.trip?.endDate;

@@ -25,10 +25,8 @@ export const StepCard: React.FC<IStepProps> = ({
   setEditingStep,
   setIsSaveStepModal,
 }) => {
-  const [lazyWhoAmIQuery, { data: userData }] = useWhoAmI();
-  useEffect(() => {
-    lazyWhoAmIQuery();
-  }, [lazyWhoAmIQuery]);
+  const { data: userData } = useWhoAmI();
+
   const { setIdFromDrag } = useStepIdContext();
   const liRef = useRef<HTMLLIElement | null>(null);
   const [isCommentBox, setIsCommentBox] = useState(false);
