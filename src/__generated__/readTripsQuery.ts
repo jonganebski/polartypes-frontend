@@ -13,10 +13,13 @@ export interface readTripsQuery_readTrips_targetUser_trips_steps_likes_user {
   __typename: "Users";
   slug: string;
   username: string;
+  avatarUrl: string | null;
 }
 
 export interface readTripsQuery_readTrips_targetUser_trips_steps_likes {
   __typename: "Like";
+  userId: number;
+  stepId: number;
   user: readTripsQuery_readTrips_targetUser_trips_steps_likes_user;
 }
 
@@ -43,6 +46,7 @@ export interface readTripsQuery_readTrips_targetUser_trips {
 
 export interface readTripsQuery_readTrips_targetUser {
   __typename: "Users";
+  id: number;
   slug: string;
   username: string;
   firstName: string;

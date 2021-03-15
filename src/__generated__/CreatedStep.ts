@@ -4,30 +4,30 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: StepParts
+// GraphQL fragment: CreatedStep
 // ====================================================
 
-export interface StepParts_traveler {
+export interface CreatedStep_traveler {
   __typename: "Users";
   slug: string;
   isMe: boolean;
 }
 
-export interface StepParts_likes_user {
+export interface CreatedStep_likes_user {
   __typename: "Users";
   slug: string;
   username: string;
   avatarUrl: string | null;
 }
 
-export interface StepParts_likes {
+export interface CreatedStep_likes {
   __typename: "Like";
   userId: number;
   stepId: number;
-  user: StepParts_likes_user;
+  user: CreatedStep_likes_user;
 }
 
-export interface StepParts {
+export interface CreatedStep {
   __typename: "Step";
   id: number;
   name: string;
@@ -40,6 +40,6 @@ export interface StepParts {
   story: string | null;
   imgUrls: string[] | null;
   countComments: number;
-  traveler: StepParts_traveler;
-  likes: StepParts_likes[];
+  traveler: CreatedStep_traveler;
+  likes: CreatedStep_likes[];
 }

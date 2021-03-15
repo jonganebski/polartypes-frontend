@@ -57,7 +57,7 @@ export const Trips = () => {
       {isCreateTrip && userData?.whoAmI.timeZone && (
         <SaveTripModal
           userData={userData}
-          setIsCreateTrip={setIsCreateTrip}
+          setIsSaveTripModal={setIsCreateTrip}
           trips={data?.readTrips.targetUser?.trips}
         />
       )}

@@ -11,6 +11,7 @@ import { SearchInput } from "./globalTypes";
 
 export interface searchQuery_search_users {
   __typename: "Users";
+  id: number;
   slug: string;
   username: string;
   firstName: string;

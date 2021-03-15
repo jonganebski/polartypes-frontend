@@ -29,3 +29,9 @@ export const STEP_TYPE_POCILIES: TypePolicies = {
     },
   },
 };
+
+export const LIKE_TYPE_POLICIES: TypePolicies = {
+  Like: {
+    keyFields: (obj) => `Like:${obj.stepId}:${obj.userId}`,
+  },
+};

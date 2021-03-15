@@ -11,10 +11,13 @@ export interface TargetUserParts_trips_steps_likes_user {
   __typename: "Users";
   slug: string;
   username: string;
+  avatarUrl: string | null;
 }
 
 export interface TargetUserParts_trips_steps_likes {
   __typename: "Like";
+  userId: number;
+  stepId: number;
   user: TargetUserParts_trips_steps_likes_user;
 }
 
@@ -41,6 +44,7 @@ export interface TargetUserParts_trips {
 
 export interface TargetUserParts {
   __typename: "Users";
+  id: number;
   slug: string;
   username: string;
   firstName: string;

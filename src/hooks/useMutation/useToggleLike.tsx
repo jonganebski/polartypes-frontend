@@ -1,7 +1,6 @@
-import { gql, useMutation } from '@apollo/client';
-import { useEffect } from 'react';
-import { client } from '../../apollo/apollo';
-import { toggledLikeStep } from '../../__generated__/toggledLikeStep';
+import { gql, Reference, useApolloClient, useMutation } from '@apollo/client';
+import { LIKE_FRAGMENT } from '../../fragments';
+import { readTripQuery_readTrip_trip_steps_likes } from '../../__generated__/readTripQuery';
 import {
   toggleLikeMutation,
   toggleLikeMutationVariables,
@@ -20,51 +19,70 @@ const TOGGLE_LIKE_MUTATION = gql`
 
 export const useToggleLike = (stepId: number) => {
   const { data: userData } = useWhoAmI();
+  const client = useApolloClient();
+
+  const writeLikeCache = () => {
+    if (!userData) return;
+
+    const likeRef = client.cache.writeFragment<readTripQuery_readTrip_trip_steps_likes>(
+      {
+        id: `Like:${stepId}:${userData.whoAmI.id}`,
+        fragmentName: 'ToggleLike',
+        fragment: gql`
+          fragment ToggleLike on Like {
+            ...LikeParts
+          }
+          ${LIKE_FRAGMENT}
+        `,
+        data: {
+          __typename: 'Like',
+          stepId,
+          userId: userData.whoAmI.id,
+          user: {
+            username: userData.whoAmI.username,
+            avatarUrl: userData.whoAmI.avatarUrl,
+            slug: userData.whoAmI.slug,
+            __typename: 'Users',
+          },
+        },
+      },
+    );
+    if (likeRef) {
+      client.cache.modify({
+        id: `Step:${stepId}`,
+        fields: {
+          likes: (prev) => [likeRef, ...prev],
+        },
+      });
+    }
+  };
+
+  const eraseLikeCache = () => {
+    if (!userData) return;
+
+    client.cache.evict({ id: `Like:${stepId}:${userData.whoAmI.id}` });
+    client.cache.modify({
+      id: `Step:${stepId}`,
+      fields: {
+        likes: (prev) =>
+          prev.filter(
+            (like: Reference) =>
+              like.__ref !== `Like:${stepId}:${userData.whoAmI.id}`,
+          ),
+      },
+    });
+  };
 
   const onCompleted = (data: toggleLikeMutation) => {
     const {
       toggleLike: { ok, error, toggle },
     } = data;
-    if (ok && !error && toggle) {
-      const prevStep = client.readFragment<toggledLikeStep>({
-        id: `Step:${stepId}`,
-        fragment: gql`
-          fragment toggledLikeStep on Step {
-            likes {
-              user {
-                username
-              }
-            }
-          }
-        `,
-      });
-      if (prevStep && userData) {
-        const username = userData.whoAmI.username;
-        let likes = prevStep?.likes.slice();
-        if (0 < toggle) {
-          likes.unshift({
-            __typename: 'Like',
-            user: { __typename: 'Users', username },
-          });
-        } else {
-          likes = likes.filter((like) => like.user.username !== username);
-        }
-        client.writeFragment<toggledLikeStep>({
-          id: `Step:${stepId}`,
-          fragment: gql`
-            fragment toggledLikeStep on Step {
-              likes {
-                user {
-                  username
-                }
-              }
-            }
-          `,
-          data: {
-            __typename: 'Step',
-            likes,
-          },
-        });
+    if (ok && !error && toggle && userData) {
+      if (0 < toggle) {
+        writeLikeCache();
+      }
+      if (toggle < 0) {
+        eraseLikeCache();
       }
     }
   };

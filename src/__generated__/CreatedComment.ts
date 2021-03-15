@@ -9,6 +9,7 @@
 
 export interface CreatedComment_creator {
   __typename: "Users";
+  id: number;
   slug: string;
   username: string;
   firstName: string;

@@ -11,6 +11,7 @@ import { ReadTripInput, Availability } from "./globalTypes";
 
 export interface readTripQuery_readTrip_trip_traveler {
   __typename: "Users";
+  id: number;
   slug: string;
   username: string;
   firstName: string;
@@ -37,6 +38,8 @@ export interface readTripQuery_readTrip_trip_steps_likes_user {
 
 export interface readTripQuery_readTrip_trip_steps_likes {
   __typename: "Like";
+  userId: number;
+  stepId: number;
   user: readTripQuery_readTrip_trip_steps_likes_user;
 }
 

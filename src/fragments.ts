@@ -1,5 +1,17 @@
 import { gql } from '@apollo/client';
 
+export const LIKE_FRAGMENT = gql`
+  fragment LikeParts on Like {
+    userId
+    stepId
+    user {
+      slug
+      username
+      avatarUrl
+    }
+  }
+`;
+
 export const STEPS_FRAGMENTS = gql`
   fragment StepParts on Step {
     id
@@ -18,13 +30,10 @@ export const STEPS_FRAGMENTS = gql`
       isMe
     }
     likes {
-      user {
-        slug
-        username
-        avatarUrl
-      }
+      ...LikeParts
     }
   }
+  ${LIKE_FRAGMENT}
 `;
 
 export const COMMENT_FRAGMENT = gql`
@@ -56,6 +65,7 @@ export const UPDATED_STEP_FRAGMENT = gql`
 
 export const USER_CORE_FRAGMENT = gql`
   fragment UserCoreParts on Users {
+    id
     slug
     username
     firstName
@@ -101,13 +111,11 @@ export const TARGET_USER_FRAGMENT = gql`
         imgUrls
         country
         likes {
-          user {
-            slug
-            username
-          }
+          ...LikeParts
         }
       }
     }
   }
   ${USER_CORE_FRAGMENT}
+  ${LIKE_FRAGMENT}
 `;

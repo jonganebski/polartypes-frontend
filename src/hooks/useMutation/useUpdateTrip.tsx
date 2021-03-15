@@ -1,6 +1,5 @@
-import { gql, useMutation } from '@apollo/client';
+import { ApolloCache, FetchResult, gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
-import { client } from '../../apollo/apollo';
 import { ISaveTripFormProps } from '../../components/Modals/Save-trip';
 import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';
 import {
@@ -22,29 +21,38 @@ export const useUpdateTrip = (
   editingTrip: readTripQuery_readTrip_trip | null,
   coverUrl: string,
 ) => {
-  const onCompleted = (data: updateTripMutation) => {
+  const update = (
+    cache: ApolloCache<updateTripMutation>,
+    { data }: FetchResult<updateTripMutation>,
+  ) => {
+    if (!data || !editingTrip) return;
+
     const {
-      updateTrip: { ok, error },
+      updateTrip: { error, ok },
     } = data;
-    if (ok && !error && editingTrip) {
-      client.writeFragment({
-        id: `Trip:${editingTrip.id}`,
-        fragment: gql`
-          fragment UPDATED_TRIP_FRAGMENT on Trip {
-            name
-            startDate
-            endDate
-            availability
-            coverUrl
-            summary
-          }
-        `,
-        data: { ...f.getValues(), coverUrl },
-      });
+
+    if (!ok) {
+      console.log(error);
+      return;
     }
+
+    const values = f.getValues();
+
+    cache.modify({
+      id: `Trip:${editingTrip.id}`,
+      fields: {
+        availability: () => values.availability,
+        coverUrl: () => coverUrl,
+        endDate: () => values.endDate,
+        name: () => values.name,
+        startDate: () => values.startDate,
+        summary: () => values.summary,
+      },
+    });
   };
+
   return useMutation<updateTripMutation, updateTripMutationVariables>(
     UPDATE_TRIP_MUTATION,
-    { onCompleted },
+    { update },
   );
 };

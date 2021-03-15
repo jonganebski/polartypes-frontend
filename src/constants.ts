@@ -21,3 +21,5 @@ export const SERVER_URI =
   process.env.NODE_ENV === 'production'
     ? 'https://polartypes.herokuapp.com'
     : 'http://localhost:4000';
+
+export const DEFAULT_TRIP_COVER = '/topography.png';

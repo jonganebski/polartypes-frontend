@@ -1,4 +1,3 @@
-import { gql } from '@apollo/client';
 import { faCalendarAlt, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import {
   faGlobe,
@@ -9,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment-timezone';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
+import { DEFAULT_TRIP_COVER } from '../../constants';
 import { getBackgroundImage } from '../../helpers';
 import { useCreateTrip } from '../../hooks/useMutation/useCreateTrip';
 import { useDeleteTrip } from '../../hooks/useMutation/useDeleteTrip';
@@ -27,7 +26,7 @@ import { StepImages } from './StepImages';
 
 interface ICreateTripModal {
   userData: whoAmIQuery;
-  setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSaveTripModal: React.Dispatch<React.SetStateAction<boolean>>;
   editingTrip?: readTripQuery_readTrip_trip | null;
   trips?: readTripsQuery_readTrips_targetUser_trips[];
 }
@@ -42,11 +41,10 @@ export interface ISaveTripFormProps {
 
 export const SaveTripModal: React.FC<ICreateTripModal> = ({
   userData,
-  setIsCreateTrip,
+  setIsSaveTripModal,
   editingTrip = null,
   trips = [],
 }) => {
-  const history = useHistory();
   const timeZone = userData.whoAmI.timeZone!;
   const [isStartDateCalendar, setIsStartDateCalendar] = useState<
     boolean | null
@@ -152,7 +150,7 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
     userData.whoAmI.username,
   );
 
-  const [updateTripMutation, { loading: updateLoading }] = useUpdateTrip(
+  const [updateTripMutation, { loading: updateLoading, error }] = useUpdateTrip(
     f,
     editingTrip,
     coverUrl,
@@ -166,12 +164,13 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
         variables: {
           input: {
             ...values,
-            coverUrl,
+            ...(coverUrl !== DEFAULT_TRIP_COVER && { coverUrl }),
             endDate: endDate ? endDate : null,
             tripId: editingTrip.id,
           },
         },
       });
+      setIsSaveTripModal(false);
     } else {
       await createTripMutation({
         variables: { input: { ...values, endDate: endDate ? endDate : null } },
@@ -190,9 +189,9 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
   };
   return (
     <FormProvider {...f}>
-      <ModalBackground onClick={() => setIsCreateTrip(false)} />
+      <ModalBackground onClick={() => setIsSaveTripModal(false)} />
       <div className="modal overflow-hidden">
-        <ModalCloseIcon onClick={() => setIsCreateTrip(false)} />
+        <ModalCloseIcon onClick={() => setIsSaveTripModal(false)} />
         <div className="py-6 text-center text-2xl text-myGreen-darkest font-semibold border-b">
           {editingTrip ? 'Edit trip' : 'New trip'}
         </div>

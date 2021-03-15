@@ -7,7 +7,11 @@ import {
   LIST_FOLLOWINGS_POLICY,
 } from './field-policies';
 import { authTokenVar, isLoggedInVar } from './reactive-variables';
-import { STEP_TYPE_POCILIES, USER_TYPE_POLICIES } from './type-policies';
+import {
+  LIKE_TYPE_POLICIES,
+  STEP_TYPE_POCILIES,
+  USER_TYPE_POLICIES,
+} from './type-policies';
 
 const httpLink = createHttpLink({
   uri: `${SERVER_URI}/graphql`,
@@ -28,6 +32,7 @@ export const client = new ApolloClient({
     typePolicies: {
       ...USER_TYPE_POLICIES,
       ...STEP_TYPE_POCILIES,
+      ...LIKE_TYPE_POLICIES,
       Query: {
         fields: {
           ...LIST_FOLLOWERS_POLICY,

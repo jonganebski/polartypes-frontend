@@ -14,14 +14,14 @@ interface IStepsHeader {
   setEditingTrip: React.Dispatch<
     React.SetStateAction<readTripQuery_readTrip_trip | null>
   >;
-  setIsEditTripModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSaveTripModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const StepsHeader: React.FC<IStepsHeader> = ({
   trip,
   isMe,
   setEditingTrip,
-  setIsEditTripModal,
+  setIsSaveTripModal,
 }) => {
   const [followMutation] = useFollow();
   const [unfollowMutation] = useUnfollow();
@@ -97,7 +97,7 @@ export const StepsHeader: React.FC<IStepsHeader> = ({
             size="sm"
             onClick={() => {
               setEditingTrip(trip);
-              setIsEditTripModal(true);
+              setIsSaveTripModal(true);
             }}
             icon={
               <FontAwesomeIcon

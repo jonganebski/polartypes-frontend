@@ -47,7 +47,7 @@ export const Trip = () => {
   const { username: targetUsername, tripId } = useParams<IParams>();
   const ctx = useStepIdContext();
   const [isSignup, setIsSignup] = useState<boolean | null>(null);
-  const [isEditTripModal, setIsEditTripModal] = useState(false);
+  const [isSaveTripModal, setIsSaveTripModal] = useState(false);
   const [isSaveStepModal, setIsSaveStepModal] = useState(false);
   const [isOption, setIsOption] = useState(false);
   const [
@@ -142,10 +142,10 @@ export const Trip = () => {
                 editingStep={editingStep}
               />
             )}
-            {isEditTripModal && userData && isMe && (
+            {isSaveTripModal && userData && isMe && (
               <SaveTripModal
                 userData={userData}
-                setIsCreateTrip={setIsEditTripModal}
+                setIsSaveTripModal={setIsSaveTripModal}
                 editingTrip={editingTrip}
                 trips={tripsData?.readTrips.targetUser?.trips.filter(
                   (trip) => trip.id !== data.readTrip.trip?.id,
@@ -156,7 +156,7 @@ export const Trip = () => {
               isMe={isMe}
               trip={data.readTrip.trip}
               setEditingTrip={setEditingTrip}
-              setIsEditTripModal={setIsEditTripModal}
+              setIsSaveTripModal={setIsSaveTripModal}
             />
             <article ref={articleRef} className="h-tripBody overflow-y-scroll">
               <TripIntro trip={data.readTrip.trip} />

@@ -1,18 +1,13 @@
-import { gql, useApolloClient, useMutation } from '@apollo/client';
-import { useEffect } from 'react';
+import { gql, Reference, useApolloClient, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
-import { client } from '../../apollo/apollo';
 import { TImage } from '../../components/Modals/Save-step';
+import { STEPS_FRAGMENTS } from '../../fragments';
 import { ICreateStepFormProps } from '../../pages/Trip';
 import {
   createStepMutation,
   createStepMutationVariables,
 } from '../../__generated__/createStepMutation';
-import {
-  readTripQuery,
-  readTripQueryVariables,
-} from '../../__generated__/readTripQuery';
-import { READ_TRIP_QUERY } from '../useQuery/useTrip';
+import { readTripQuery_readTrip_trip_steps } from '../../__generated__/readTripQuery';
 import { useWhoAmI } from '../useQuery/useWhoAmI';
 
 const CREATE_STEP_MUTAION = gql`
@@ -35,6 +30,9 @@ export const useCreateStep = (
   const client = useApolloClient();
 
   const updateApolloCache = (stepId: number) => {
+    if (!userData) {
+      return;
+    }
     const { lat, lon, ...values } = f.getValues();
     const imgUrls = images.reduce((acc, img) => {
       if (img.url) {
@@ -43,6 +41,37 @@ export const useCreateStep = (
         return acc;
       }
     }, [] as string[]);
+    const stepRef = client.cache.writeFragment<readTripQuery_readTrip_trip_steps>(
+      {
+        id: `Step:${stepId}`,
+        fragmentName: 'CreatedStep',
+        fragment: gql`
+          fragment CreatedStep on Step {
+            ...StepParts
+          }
+          ${STEPS_FRAGMENTS}
+        `,
+        data: {
+          id: stepId,
+          __typename: 'Step',
+          lat: +lat,
+          lon: +lon,
+          imgUrls,
+          likes: [],
+          countComments: 0,
+          traveler: { ...userData.whoAmI },
+          ...values,
+        },
+      },
+    );
+    if (stepRef) {
+      client.cache.modify({
+        id: `Trip:${tripId}`,
+        fields: {
+          steps: (prev) => [stepRef, ...prev],
+        },
+      });
+    }
     // const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
     //   query: READ_TRIP_QUERY,
     //   variables: { input: { tripId: +tripId } },
@@ -84,7 +113,7 @@ export const useCreateStep = (
     const {
       createStep: { ok, error, createdStepId },
     } = data;
-    if (ok && !error && createdStepId) {
+    if (ok && !error && createdStepId && userData) {
       updateApolloCache(createdStepId);
       setIsCreateStepModal(false);
     } else {

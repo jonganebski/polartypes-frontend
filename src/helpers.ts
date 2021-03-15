@@ -1,6 +1,6 @@
 import Axios from 'axios';
 import moment from 'moment-timezone';
-import { SERVER_URI } from './constants';
+import { DEFAULT_TRIP_COVER, SERVER_URI } from './constants';
 import { readTripsQuery_readTrips_targetUser_trips } from './__generated__/readTripsQuery';
 
 interface IGetTimeZoneOutput {
@@ -58,7 +58,7 @@ export const getBackgroundImage = (
       }
     }
   }
-  return '/topography.png';
+  return DEFAULT_TRIP_COVER;
 };
 
 export const getTraveledDays = (startDate: string, endDate: string | null) => {

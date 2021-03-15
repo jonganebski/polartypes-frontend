@@ -11,6 +11,7 @@ import { ListFollowingsInput } from "./globalTypes";
 
 export interface listFollowingsQuery_listFollowings_user_followings {
   __typename: "Users";
+  id: number;
   slug: string;
   username: string;
   firstName: string;

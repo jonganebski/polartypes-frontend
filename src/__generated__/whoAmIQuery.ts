@@ -9,6 +9,7 @@
 
 export interface whoAmIQuery_whoAmI {
   __typename: "Users";
+  id: number;
   slug: string;
   username: string;
   firstName: string;

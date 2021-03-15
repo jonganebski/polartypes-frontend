@@ -4,20 +4,19 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: UserParts
+// GraphQL fragment: ToggleLike
 // ====================================================
 
-export interface UserParts {
+export interface ToggleLike_user {
   __typename: "Users";
-  id: number;
   slug: string;
   username: string;
-  firstName: string;
-  lastName: string | null;
   avatarUrl: string | null;
-  city: string | null;
-  timeZone: string | null;
-  isFollowing: boolean;
-  isMe: boolean;
-  about: string | null;
+}
+
+export interface ToggleLike {
+  __typename: "Like";
+  userId: number;
+  stepId: number;
+  user: ToggleLike_user;
 }

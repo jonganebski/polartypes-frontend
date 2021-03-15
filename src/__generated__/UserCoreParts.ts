@@ -9,6 +9,7 @@
 
 export interface UserCoreParts {
   __typename: "Users";
+  id: number;
   slug: string;
   username: string;
   firstName: string;

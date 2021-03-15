@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client';
+import { ApolloCache, FetchResult, gql, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
 import { client } from '../../apollo/apollo';
 import { TImage } from '../../components/Modals/Save-step';
@@ -25,41 +25,42 @@ export const useUpdateStep = (
   images: TImage[],
   setIsCreateStepModal: (value: React.SetStateAction<boolean>) => void,
 ) => {
-  const updateApolloCache = () => {
-    const { lat, lon, ...values } = f.getValues();
-    const imgUrls = images.reduce((acc, img) => {
-      if (img.url) {
-        return [...acc, img.url];
-      } else {
-        return acc;
-      }
-    }, [] as string[]);
-    editingStep &&
-      client.writeFragment({
-        id: `Step:${editingStep.id}`,
-        fragment: UPDATED_STEP_FRAGMENT,
-        data: {
-          ...values,
-          lat: +lat,
-          lon: +lon,
-          imgUrls,
-        },
-      });
-  };
+  const update = (
+    cache: ApolloCache<updateStepMutation>,
+    { data }: FetchResult<updateStepMutation>,
+  ) => {
+    if (!data || !editingStep) return;
 
-  const onUpdateStepCompleted = async (data: updateStepMutation) => {
     const {
-      updateStep: { ok, error },
+      updateStep: { error, ok },
     } = data;
-    if (!ok || error) {
+    if (!ok) {
+      console.log(error);
       return;
     }
-    updateApolloCache();
+    const { lat, lon, ...values } = f.getValues();
+
+    const success = cache.modify({
+      id: `Step:${editingStep.id}`,
+      fields: {
+        lat: () => +lat,
+        lon: () => +lon,
+        location: () => values.location,
+        name: () => values.name,
+        country: () => values.country,
+        story: () => values.story,
+        arrivedAt: () => values.arrivedAt,
+        timeZone: () => values.timeZone,
+      },
+    });
+
+    if (!success) return;
+
     setIsCreateStepModal(false);
   };
 
   return useMutation<updateStepMutation, updateStepMutationVariables>(
     UPDATE_STEP_MUTATION,
-    { onCompleted: onUpdateStepCompleted },
+    { update },
   );
 };
