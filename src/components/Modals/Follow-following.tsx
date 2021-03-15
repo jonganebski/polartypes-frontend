@@ -17,6 +17,7 @@ export const FollowFollowing: React.FC<IFollowFollowingProps> = ({
   slug,
   setIsFollowersModal,
 }) => {
+  console.log(slug);
   const [
     listFollowings,
     {
