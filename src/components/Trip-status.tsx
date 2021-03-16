@@ -35,7 +35,7 @@ export const TripStatus: React.FC<ITripStatusProps> = ({ trip }) => {
     const countries = new Set<string>();
     trip.steps.forEach((step) => {
       step.imgUrls && (imgCount += step.imgUrls.length);
-      likeCount += step.likes.length;
+      likeCount += step.likesInfo.totalCount;
       countries.add(step.country);
     });
     const traveledDays = getTraveledDays(trip.startDate, trip.endDate);

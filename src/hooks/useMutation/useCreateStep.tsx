@@ -1,4 +1,4 @@
-import { gql, Reference, useApolloClient, useMutation } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { UseFormMethods } from 'react-hook-form';
 import { TImage } from '../../components/Modals/Save-step';
 import { STEPS_FRAGMENTS } from '../../fragments';
@@ -57,9 +57,13 @@ export const useCreateStep = (
           lat: +lat,
           lon: +lon,
           imgUrls,
-          likes: [],
+          didILiked: false,
+          likesInfo: {
+            __typename: 'LikesInfoOutput',
+            samples: [],
+            totalCount: 0,
+          },
           countComments: 0,
-          traveler: { ...userData.whoAmI },
           ...values,
         },
       },

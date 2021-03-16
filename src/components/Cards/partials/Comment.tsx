@@ -64,7 +64,10 @@ export const Comment: React.FC<ICommentProps> = ({
     <li className="flex items-start">
       <Avatar avatarUrl={comment.creator.avatarUrl} size={8} />
       <div className="w-full ml-3 text-sm">
-        <Link to="#" className="mr-1 text-myGreen-darkest font-semibold">
+        <Link
+          to={`/${comment.creator.username}`}
+          className="mr-1 text-myGreen-darkest font-semibold"
+        >
           {comment.creator.username}
         </Link>
         <p className="inline text-myGray-darkest">{comment.text}</p>

@@ -25,12 +25,12 @@ export const STEPS_FRAGMENTS = gql`
     story
     imgUrls
     countComments
-    traveler {
-      slug
-      isMe
-    }
-    likes {
-      ...LikeParts
+    didILiked
+    likesInfo {
+      totalCount
+      samples {
+        ...LikeParts
+      }
     }
   }
   ${LIKE_FRAGMENT}
@@ -110,12 +110,11 @@ export const TARGET_USER_FRAGMENT = gql`
         arrivedAt
         imgUrls
         country
-        likes {
-          ...LikeParts
+        likesInfo {
+          totalCount
         }
       }
     }
   }
   ${USER_CORE_FRAGMENT}
-  ${LIKE_FRAGMENT}
 `;

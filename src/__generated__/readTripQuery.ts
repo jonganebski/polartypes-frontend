@@ -23,24 +23,24 @@ export interface readTripQuery_readTrip_trip_traveler {
   isMe: boolean;
 }
 
-export interface readTripQuery_readTrip_trip_steps_traveler {
-  __typename: "Users";
-  slug: string;
-  isMe: boolean;
-}
-
-export interface readTripQuery_readTrip_trip_steps_likes_user {
+export interface readTripQuery_readTrip_trip_steps_likesInfo_samples_user {
   __typename: "Users";
   slug: string;
   username: string;
   avatarUrl: string | null;
 }
 
-export interface readTripQuery_readTrip_trip_steps_likes {
+export interface readTripQuery_readTrip_trip_steps_likesInfo_samples {
   __typename: "Like";
   userId: number;
   stepId: number;
-  user: readTripQuery_readTrip_trip_steps_likes_user;
+  user: readTripQuery_readTrip_trip_steps_likesInfo_samples_user;
+}
+
+export interface readTripQuery_readTrip_trip_steps_likesInfo {
+  __typename: "LikesInfoOutput";
+  totalCount: number;
+  samples: readTripQuery_readTrip_trip_steps_likesInfo_samples[];
 }
 
 export interface readTripQuery_readTrip_trip_steps {
@@ -56,8 +56,8 @@ export interface readTripQuery_readTrip_trip_steps {
   story: string | null;
   imgUrls: string[] | null;
   countComments: number;
-  traveler: readTripQuery_readTrip_trip_steps_traveler;
-  likes: readTripQuery_readTrip_trip_steps_likes[];
+  didILiked: boolean;
+  likesInfo: readTripQuery_readTrip_trip_steps_likesInfo;
 }
 
 export interface readTripQuery_readTrip_trip {

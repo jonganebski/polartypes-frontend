@@ -7,24 +7,24 @@
 // GraphQL fragment: StepParts
 // ====================================================
 
-export interface StepParts_traveler {
-  __typename: "Users";
-  slug: string;
-  isMe: boolean;
-}
-
-export interface StepParts_likes_user {
+export interface StepParts_likesInfo_samples_user {
   __typename: "Users";
   slug: string;
   username: string;
   avatarUrl: string | null;
 }
 
-export interface StepParts_likes {
+export interface StepParts_likesInfo_samples {
   __typename: "Like";
   userId: number;
   stepId: number;
-  user: StepParts_likes_user;
+  user: StepParts_likesInfo_samples_user;
+}
+
+export interface StepParts_likesInfo {
+  __typename: "LikesInfoOutput";
+  totalCount: number;
+  samples: StepParts_likesInfo_samples[];
 }
 
 export interface StepParts {
@@ -40,6 +40,6 @@ export interface StepParts {
   story: string | null;
   imgUrls: string[] | null;
   countComments: number;
-  traveler: StepParts_traveler;
-  likes: StepParts_likes[];
+  didILiked: boolean;
+  likesInfo: StepParts_likesInfo;
 }

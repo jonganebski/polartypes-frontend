@@ -102,13 +102,13 @@ export const Trip = () => {
   const isLoading = isUserDataLoading || isTripLoading || isTripsLoading;
 
   if (isLoading) {
-    <Loading />;
+    return <Loading />;
   }
   if (!isLoading && called && !data?.readTrip.trip) {
     return <Redirect to="/" />;
   }
   if (!data?.readTrip.trip) {
-    return null;
+    return <Loading />;
   }
   return (
     <FormProvider {...f}>
@@ -184,6 +184,7 @@ export const Trip = () => {
                           }}
                         />
                         <StepCard
+                          isMe={data.readTrip.trip?.traveler.isMe ?? false}
                           step={step}
                           setEditingStep={setEditingStep}
                           setIsSaveStepModal={setIsSaveStepModal}

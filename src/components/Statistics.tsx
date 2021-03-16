@@ -42,7 +42,7 @@ export const Statistics: React.FC<IStatisticsProps> = ({
       totalStepsCount += trip.steps.length;
       trip.steps.forEach((step) => {
         countries.add(step.country);
-        totlaLikesCount += step.likes.length;
+        totlaLikesCount += step.likesInfo.totalCount;
       });
       if (trip.steps.length !== 0) {
         trip.steps.reduce((prev, curr) => {

@@ -9,18 +9,9 @@ import { ReadTripsInput } from "./globalTypes";
 // GraphQL query operation: readTripsQuery
 // ====================================================
 
-export interface readTripsQuery_readTrips_targetUser_trips_steps_likes_user {
-  __typename: "Users";
-  slug: string;
-  username: string;
-  avatarUrl: string | null;
-}
-
-export interface readTripsQuery_readTrips_targetUser_trips_steps_likes {
-  __typename: "Like";
-  userId: number;
-  stepId: number;
-  user: readTripsQuery_readTrips_targetUser_trips_steps_likes_user;
+export interface readTripsQuery_readTrips_targetUser_trips_steps_likesInfo {
+  __typename: "LikesInfoOutput";
+  totalCount: number;
 }
 
 export interface readTripsQuery_readTrips_targetUser_trips_steps {
@@ -31,7 +22,7 @@ export interface readTripsQuery_readTrips_targetUser_trips_steps {
   arrivedAt: string;
   imgUrls: string[] | null;
   country: string;
-  likes: readTripsQuery_readTrips_targetUser_trips_steps_likes[];
+  likesInfo: readTripsQuery_readTrips_targetUser_trips_steps_likesInfo;
 }
 
 export interface readTripsQuery_readTrips_targetUser_trips {

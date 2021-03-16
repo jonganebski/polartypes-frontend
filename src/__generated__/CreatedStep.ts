@@ -7,24 +7,24 @@
 // GraphQL fragment: CreatedStep
 // ====================================================
 
-export interface CreatedStep_traveler {
-  __typename: "Users";
-  slug: string;
-  isMe: boolean;
-}
-
-export interface CreatedStep_likes_user {
+export interface CreatedStep_likesInfo_samples_user {
   __typename: "Users";
   slug: string;
   username: string;
   avatarUrl: string | null;
 }
 
-export interface CreatedStep_likes {
+export interface CreatedStep_likesInfo_samples {
   __typename: "Like";
   userId: number;
   stepId: number;
-  user: CreatedStep_likes_user;
+  user: CreatedStep_likesInfo_samples_user;
+}
+
+export interface CreatedStep_likesInfo {
+  __typename: "LikesInfoOutput";
+  totalCount: number;
+  samples: CreatedStep_likesInfo_samples[];
 }
 
 export interface CreatedStep {
@@ -40,6 +40,6 @@ export interface CreatedStep {
   story: string | null;
   imgUrls: string[] | null;
   countComments: number;
-  traveler: CreatedStep_traveler;
-  likes: CreatedStep_likes[];
+  didILiked: boolean;
+  likesInfo: CreatedStep_likesInfo;
 }

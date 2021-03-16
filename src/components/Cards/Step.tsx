@@ -13,6 +13,7 @@ import { Button } from '../Button';
 import { Comments } from './partials/Comments';
 
 interface IStepProps {
+  isMe: boolean;
   step: readTripQuery_readTrip_trip_steps;
   setEditingStep: React.Dispatch<
     React.SetStateAction<readTripQuery_readTrip_trip_steps | null>
@@ -21,6 +22,7 @@ interface IStepProps {
 }
 
 export const StepCard: React.FC<IStepProps> = ({
+  isMe,
   step,
   setEditingStep,
   setIsSaveStepModal,
@@ -33,7 +35,6 @@ export const StepCard: React.FC<IStepProps> = ({
   const [toggleLikeMutation, { loading: toggleLikeLoading }] = useToggleLike(
     step.id,
   );
-  const isMe = step.traveler.isMe;
 
   useEffect(() => {
     const buildThresholdList = () => {
@@ -90,29 +91,39 @@ export const StepCard: React.FC<IStepProps> = ({
       </p>
       <div className="mb-4 grid gap-y-3">
         {step.imgUrls?.map((url, i) => (
-          <div
+          <img
+            className="w-full bg-cover bg-center"
+            alt={`${step.name}-${i + 1}`}
+            src={url}
             key={i}
-            style={{
-              backgroundImage: `url(${url})`,
-            }}
-            className="pt-imageRatio bg-cover bg-center"
-          ></div>
+          />
         ))}
       </div>
-      {step.likes.length !== 0 && (
+      {step.likesInfo.samples.length !== 0 && (
         <div className="p-3 flex items-center border-t border-b border-myGray-light">
-          <Avatar avatarUrl={step.likes[0].user.avatarUrl} size={8} />
+          <Avatar
+            avatarUrl={step.likesInfo.samples[0].user.avatarUrl}
+            size={8}
+          />
           <span className="ml-3 text-sm text-myGray-darkest">
-            {step.likes.slice(0, 5).map((like, i) => (
-              <Link key={i} to="#" className="text-myGreen-darkest">
-                {i === step.likes.slice(0, 5).length - 1
+            {step.likesInfo.samples.map((like, i) => (
+              <Link
+                key={i}
+                to={`/${like.user.username}`}
+                className="text-myGreen-darkest"
+              >
+                {i === step.likesInfo.samples.length - 1
                   ? like.user.username + ' '
                   : like.user.username + ', '}
               </Link>
             ))}
-            {step.likes.length - 5 < 0
+            {step.likesInfo.samples.length === 1
+              ? 'likes this trip'
+              : step.likesInfo.samples.length > 1
               ? 'like this trip'
-              : `and ${step.likes.length - 5} others like this step.`}
+              : `and ${
+                  step.likesInfo.totalCount - step.likesInfo.samples.length
+                } others like this step.`}
           </span>
         </div>
       )}
@@ -128,11 +139,7 @@ export const StepCard: React.FC<IStepProps> = ({
               <FontAwesomeIcon
                 icon={faHeart}
                 className={`mr-2 ${
-                  step.likes.some(
-                    (like) => like.user.username === userData?.whoAmI.username,
-                  )
-                    ? 'text-myRed'
-                    : 'text-myBlue'
+                  step.didILiked ? 'text-myRed' : 'text-myBlue'
                 }`}
               />
             }

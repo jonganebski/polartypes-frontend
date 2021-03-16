@@ -1,6 +1,6 @@
 import { gql, Reference, useApolloClient, useMutation } from '@apollo/client';
 import { LIKE_FRAGMENT } from '../../fragments';
-import { readTripQuery_readTrip_trip_steps_likes } from '../../__generated__/readTripQuery';
+import { readTripQuery_readTrip_trip_steps_likesInfo_samples } from '../../__generated__/readTripQuery';
 import {
   toggleLikeMutation,
   toggleLikeMutationVariables,
@@ -24,7 +24,7 @@ export const useToggleLike = (stepId: number) => {
   const writeLikeCache = () => {
     if (!userData) return;
 
-    const likeRef = client.cache.writeFragment<readTripQuery_readTrip_trip_steps_likes>(
+    const likeRef = client.cache.writeFragment<readTripQuery_readTrip_trip_steps_likesInfo_samples>(
       {
         id: `Like:${stepId}:${userData.whoAmI.id}`,
         fragmentName: 'ToggleLike',
@@ -51,7 +51,10 @@ export const useToggleLike = (stepId: number) => {
       client.cache.modify({
         id: `Step:${stepId}`,
         fields: {
-          likes: (prev) => [likeRef, ...prev],
+          likesInfo: ({ totalCount: prevTotalCount }) => ({
+            totalCount: ++prevTotalCount,
+          }),
+          didILiked: () => true,
         },
       });
     }
@@ -64,11 +67,10 @@ export const useToggleLike = (stepId: number) => {
     client.cache.modify({
       id: `Step:${stepId}`,
       fields: {
-        likes: (prev) =>
-          prev.filter(
-            (like: Reference) =>
-              like.__ref !== `Like:${stepId}:${userData.whoAmI.id}`,
-          ),
+        likesInfo: ({ totalCount: prevTotalCount }) => ({
+          totalCount: --prevTotalCount,
+        }),
+        didILiked: () => false,
       },
     });
   };

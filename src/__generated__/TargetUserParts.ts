@@ -7,18 +7,9 @@
 // GraphQL fragment: TargetUserParts
 // ====================================================
 
-export interface TargetUserParts_trips_steps_likes_user {
-  __typename: "Users";
-  slug: string;
-  username: string;
-  avatarUrl: string | null;
-}
-
-export interface TargetUserParts_trips_steps_likes {
-  __typename: "Like";
-  userId: number;
-  stepId: number;
-  user: TargetUserParts_trips_steps_likes_user;
+export interface TargetUserParts_trips_steps_likesInfo {
+  __typename: "LikesInfoOutput";
+  totalCount: number;
 }
 
 export interface TargetUserParts_trips_steps {
@@ -29,7 +20,7 @@ export interface TargetUserParts_trips_steps {
   arrivedAt: string;
   imgUrls: string[] | null;
   country: string;
-  likes: TargetUserParts_trips_steps_likes[];
+  likesInfo: TargetUserParts_trips_steps_likesInfo;
 }
 
 export interface TargetUserParts_trips {
