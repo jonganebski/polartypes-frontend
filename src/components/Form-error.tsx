@@ -1,9 +1,8 @@
 import React from 'react';
 
 interface IFormError {
-  err?: string;
+  err: string | null | undefined;
 }
 
-export const FormError: React.FC<IFormError> = ({ err }) => {
-  return <span className="text-xs text-myRed">{err}</span>;
-};
+export const FormError: React.FC<IFormError> = ({ err }) =>
+  err ? <span className="text-xs text-myRed">{err}</span> : null;

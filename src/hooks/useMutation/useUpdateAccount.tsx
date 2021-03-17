@@ -55,9 +55,6 @@ export const useUpdateAccount = (
           },
         });
       }
-      if (error) {
-        console.log(error);
-      }
     }
   };
 

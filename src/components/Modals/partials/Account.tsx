@@ -62,9 +62,10 @@ export const Account: React.FC<IAccountProps> = ({ hidden, slug }) => {
           </span>
         </div>
         <div className="py-6 grid gap-6 grid-cols-oneToThree">
-          <h6 className="pt-1.5 whitespace-pre text-myGreen-dark font-semibold">
-            Personal link
-          </h6>
+          <div className="pt-1.5 whitespace-pre text-myGreen-dark">
+            <h6 className="font-semibold">Personal link</h6>
+            <span className="text-sm">(username)</span>
+          </div>
           <div className="grid">
             <div className="grid grid-cols-2">
               <div className="flex items-center justify-center bg-myGray-light text-myGray-dark border-t border-b border-l border-myGray rounded-l-sm">

@@ -8,6 +8,7 @@ import { deleteFiles } from '../../helpers';
 import { useUpdateAccount } from '../../hooks/useMutation/useUpdateAccount';
 import { whoAmIQuery_whoAmI_user } from '../../__generated__/whoAmIQuery';
 import { Button } from '../Button';
+import { FormError } from '../Form-error';
 import { Account } from './partials/Account';
 import { ModalBackground } from './partials/Background';
 import { ModalCloseIcon } from './partials/CloseIcon';
@@ -39,6 +40,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
   setIsSettingModal,
 }) => {
   const history = useHistory();
+  const [serverErr, setServerErr] = useState<string | null>(null);
   const [avatarSrc, setAvatarSrc] = useState(
     me?.avatarUrl ?? '/blank-profile.webp',
   );
@@ -89,7 +91,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
           throw new Error();
         }
       }
-      updateAccountMutation({
+      const { data, errors } = await updateAccountMutation({
         variables: {
           input: {
             ...values,
@@ -99,15 +101,21 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
             newPassword: newPasswords[0] ? newPasswords[0] : null,
           },
         },
-      })
-        .then(
-          async () =>
-            uploadingNewAvatar && oldUrl && (await deleteFiles([oldUrl])),
-        )
-        .finally(() => history.push(`/${f.getValues().username}`));
+      });
+      if (uploadingNewAvatar && oldUrl) {
+        await deleteFiles([oldUrl]);
+      }
+      if (data?.updateAccount.error) {
+        setServerErr(data.updateAccount.error);
+        setIsLoading(false);
+        return;
+      }
+      if (errors) {
+        throw new Error();
+      }
+      history.push(`/${f.getValues().username}`);
     } catch (error) {
       setIsLoading(false);
-      console.log(error);
     }
   };
 
@@ -158,6 +166,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
                 setAvatarSrc={setAvatarSrc}
               />
               <Account hidden={isProfile} slug={me.slug} />
+              <FormError err={serverErr} />
               <div className="pt-6">
                 <Button
                   text="Save Changes"

@@ -66,7 +66,7 @@ export const Comments: React.FC<ICommentProps> = ({ me, step }) => {
       )}
       {queryLoading ? (
         <div className="relative w-full h-14">
-          <Spinner color="black" />
+          <Spinner color="myGreen-dark" />
         </div>
       ) : (
         <ul className="py-4 grid gap-y-4">
