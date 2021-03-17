@@ -4,7 +4,7 @@ import { Avatar } from '../../Avatar';
 import { Button } from '../../Button';
 import { useFormContext } from 'react-hook-form';
 import { ISettingsFormProps } from '../Settings';
-import { ACCEPTED_IMAGE_TYPES, AZ_NUM_PATTERN } from '../../../constants';
+import { ACCEPTED_IMAGE_TYPES, NAME_PATTERN } from '../../../constants';
 import { FormError } from '../../Form-error';
 
 interface IProfileProps {
@@ -80,7 +80,7 @@ export const Profile: React.FC<IProfileProps> = ({
             className="input"
             ref={register({
               required: 'Your first name is required.',
-              pattern: AZ_NUM_PATTERN,
+              pattern: NAME_PATTERN,
             })}
             name="firstName"
             type="text"
@@ -99,7 +99,7 @@ export const Profile: React.FC<IProfileProps> = ({
             className="input"
             ref={register({
               required: 'Your last name is required.',
-              pattern: AZ_NUM_PATTERN,
+              pattern: NAME_PATTERN,
             })}
             name="lastName"
             type="text"

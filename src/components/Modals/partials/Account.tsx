@@ -3,7 +3,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { isLoggedInVar } from '../../../apollo/reactive-variables';
-import { AZ_NUM_PATTERN, PW_MIN_LENGTH, TOKEN } from '../../../constants';
+import { NAME_PATTERN, PW_MIN_LENGTH, TOKEN } from '../../../constants';
 import {
   deleteAccountMutation,
   deleteAccountMutationVariables,
@@ -68,18 +68,14 @@ export const Account: React.FC<IAccountProps> = ({ hidden, slug }) => {
           </div>
           <div className="grid">
             <div className="grid grid-cols-2">
-              <div className="flex items-center justify-center bg-myGray-light text-myGray-dark border-t border-b border-l border-myGray rounded-l-sm">
-                xxx.netlyfy.com/
+              <div className="flex items-center justify-center text-xs bg-myGray-light text-myGray-dark border-t border-b border-l border-myGray rounded-l-sm">
+                polartypes.netlify.app/
               </div>
-
               <input
                 className="px-4 py-3 border border-solid border-myGray rounded-r-sm focus:border-myBlue focus:outline-none"
                 ref={register({
                   required: 'Enter a profile link',
-                  pattern: {
-                    value: AZ_NUM_PATTERN,
-                    message: 'Only english characters and numbers are allowed.',
-                  },
+                  pattern: NAME_PATTERN,
                 })}
                 name="username"
                 type="text"

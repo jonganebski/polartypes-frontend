@@ -2,7 +2,7 @@ import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { logUserIn } from '../../apollo/reactive-variables';
-import { AZ_NUM_PATTERN, EMAIL_PATTERN, PW_MIN_LENGTH } from '../../constants';
+import { NAME_PATTERN, EMAIL_PATTERN, PW_MIN_LENGTH } from '../../constants';
 import {
   createAccountMutation,
   createAccountMutationVariables,
@@ -74,7 +74,7 @@ export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
               <input
                 ref={register({
                   required: 'Your first name is required.',
-                  pattern: AZ_NUM_PATTERN,
+                  pattern: NAME_PATTERN,
                 })}
                 name="firstName"
                 type="text"
@@ -84,7 +84,7 @@ export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
               <input
                 ref={register({
                   required: 'Your last name is required.',
-                  pattern: AZ_NUM_PATTERN,
+                  pattern: NAME_PATTERN,
                 })}
                 name="lastName"
                 type="text"

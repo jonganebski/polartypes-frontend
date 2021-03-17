@@ -1,6 +1,15 @@
-export const EMAIL_PATTERN = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+import { ValidationRule } from 'react-hook-form';
 
-export const AZ_NUM_PATTERN = /^[a-zA-Z0-9]*$/;
+export const EMAIL_PATTERN: ValidationRule<RegExp> = {
+  value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+  message: 'Invalid email',
+};
+
+export const NAME_PATTERN: ValidationRule<RegExp> = {
+  message:
+    'Only english alphabets, commas, single quotes and dashs are allowed',
+  value: /^[a-z ,'-]+$/i,
+};
 
 export const PW_MIN_LENGTH = 6;
 
