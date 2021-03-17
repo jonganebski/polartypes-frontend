@@ -119,7 +119,7 @@ export const StepCard: React.FC<IStepProps> = ({
             ))}
             {step.likesInfo.samples.length === 1
               ? 'likes this trip'
-              : step.likesInfo.samples.length > 1
+              : step.likesInfo.totalCount <= step.likesInfo.samples.length
               ? 'like this trip'
               : `and ${
                   step.likesInfo.totalCount - step.likesInfo.samples.length

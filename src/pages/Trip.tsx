@@ -1,19 +1,16 @@
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Redirect, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AddStepButton } from '../components/Button-add-step';
 import { StepCard } from '../components/Cards/Step';
-import { CommonHeader } from '../components/Headers/CommonHeader';
 import { StepsHeader } from '../components/Headers/StepsHeader';
+import { Layout } from '../components/Layout';
 import { Loading } from '../components/Loading';
 import { Map } from '../components/Map/Map';
 import { SaveStepModal } from '../components/Modals/Save-step';
 import { SaveTripModal } from '../components/Modals/Save-trip';
-import { SigninModal } from '../components/Modals/Signin';
-import { SignupModal } from '../components/Modals/Signup';
-import { Options } from '../components/Options';
+import { NotFound } from '../components/NotFound404';
 import { TimeStamp } from '../components/TimeStamp';
 import { TripIntro } from '../components/Trip-intro';
 import { useStepIdContext } from '../context';
@@ -46,10 +43,8 @@ export const Trip = () => {
   const articleRef = useRef<HTMLElement | null>(null);
   const { username: targetUsername, tripId } = useParams<IParams>();
   const ctx = useStepIdContext();
-  const [isSignup, setIsSignup] = useState<boolean | null>(null);
   const [isSaveTripModal, setIsSaveTripModal] = useState(false);
   const [isSaveStepModal, setIsSaveStepModal] = useState(false);
-  const [isOption, setIsOption] = useState(false);
   const [
     editingTrip,
     setEditingTrip,
@@ -101,130 +96,108 @@ export const Trip = () => {
   }, [element, readingStepId]);
   const isLoading = isUserDataLoading || isTripLoading || isTripsLoading;
 
-  if (isLoading) {
+  if (isLoading || !called) {
     return <Loading />;
-  }
-  if (!isLoading && called && !data?.readTrip.trip) {
-    return <Redirect to="/" />;
   }
   if (!data?.readTrip.trip) {
-    return <Loading />;
+    return <NotFound />;
   }
   return (
     <FormProvider {...f}>
-      <Options
-        userData={userData}
-        isOption={isOption}
-        setIsOption={setIsOption}
-      />
-      <Helmet>
-        <title>{data.readTrip.trip.name} | Polartypes</title>
-      </Helmet>
-      <CommonHeader
-        userData={userData}
-        setIsSignup={setIsSignup}
-        setIsOption={setIsOption}
-      />
-      {isSignup === false && <SigninModal setIsSignup={setIsSignup} />}
-      {isSignup === true && <SignupModal setIsSignup={setIsSignup} />}
-      {data.readTrip.error ? (
-        <div>{data.readTrip.error}</div>
-      ) : (
-        <main className="h-screenExceptHeader flex">
-          <section className="relative w-1/2 h-full min-w-px600">
-            {isSaveStepModal && data.readTrip.trip.traveler.isMe && (
-              <SaveStepModal
-                tripId={tripId}
-                tripStartDate={data.readTrip.trip.startDate}
-                tripEndDate={data.readTrip.trip.endDate}
-                belowStepDate={belowStepDate}
-                setIsSaveStepModal={setIsSaveStepModal}
-                editingStep={editingStep}
-              />
-            )}
-            {isSaveTripModal && userData && isMe && (
-              <SaveTripModal
-                userData={userData}
-                setIsSaveTripModal={setIsSaveTripModal}
-                editingTrip={editingTrip}
-                trips={tripsData?.readTrips.targetUser?.trips.filter(
-                  (trip) => trip.id !== data.readTrip.trip?.id,
-                )}
-              />
-            )}
-            <StepsHeader
-              isMe={isMe}
-              trip={data.readTrip.trip}
-              setEditingTrip={setEditingTrip}
-              setIsSaveTripModal={setIsSaveTripModal}
+      <Layout className="flex" title={data.readTrip.trip.name}>
+        <section className="relative w-1/2 h-full min-w-px600">
+          {isSaveStepModal && data.readTrip.trip.traveler.isMe && (
+            <SaveStepModal
+              tripId={tripId}
+              tripStartDate={data.readTrip.trip.startDate}
+              tripEndDate={data.readTrip.trip.endDate}
+              belowStepDate={belowStepDate}
+              setIsSaveStepModal={setIsSaveStepModal}
+              editingStep={editingStep}
             />
-            <article ref={articleRef} className="h-tripBody overflow-y-scroll">
-              <TripIntro trip={data.readTrip.trip} />
-              <ul className="relative px-4 py-7 bg-myGray-lightest">
-                {startDateData && timeZoneData && (
+          )}
+          {isSaveTripModal && userData && isMe && (
+            <SaveTripModal
+              userData={userData}
+              setIsSaveTripModal={setIsSaveTripModal}
+              editingTrip={editingTrip}
+              trips={tripsData?.readTrips.targetUser?.trips.filter(
+                (trip) => trip.id !== data.readTrip.trip?.id,
+              )}
+            />
+          )}
+          <StepsHeader
+            isMe={isMe}
+            trip={data.readTrip.trip}
+            setEditingTrip={setEditingTrip}
+            setIsSaveTripModal={setIsSaveTripModal}
+          />
+          <article ref={articleRef} className="h-tripBody overflow-y-scroll">
+            <TripIntro trip={data.readTrip.trip} />
+            <ul className="relative px-4 py-7 bg-myGray-lightest">
+              {startDateData && timeZoneData && (
+                <TimeStamp
+                  text="Trip started"
+                  dateString={startDateData}
+                  timeZone={timeZoneData}
+                />
+              )}
+              {data?.readTrip.trip?.steps
+                .slice()
+                .sort(sortSteps)
+                .map((step) => {
+                  return (
+                    <React.Fragment key={step.id}>
+                      <AddStepButton
+                        isMe={isMe}
+                        onClick={() => {
+                          if (isMe) {
+                            setBelowStepDate(step.arrivedAt);
+                            setIsSaveStepModal(true);
+                          }
+                        }}
+                      />
+                      <StepCard
+                        isMe={data.readTrip.trip?.traveler.isMe ?? false}
+                        step={step}
+                        setEditingStep={setEditingStep}
+                        setIsSaveStepModal={setIsSaveStepModal}
+                      />
+                    </React.Fragment>
+                  );
+                })}
+              <AddStepButton
+                isMe={isMe}
+                onClick={() => {
+                  if (isMe) {
+                    setBelowStepDate(
+                      data?.readTrip.trip?.endDate ?? moment().format(),
+                    );
+                    setIsSaveStepModal(true);
+                  }
+                }}
+              />
+              {timeZoneData &&
+                (endDateData ? (
                   <TimeStamp
-                    text="Trip started"
-                    dateString={startDateData}
+                    text="Trip Finished"
+                    dateString={endDateData}
                     timeZone={timeZoneData}
                   />
-                )}
-                {data?.readTrip.trip?.steps
-                  .slice()
-                  .sort(sortSteps)
-                  .map((step) => {
-                    return (
-                      <React.Fragment key={step.id}>
-                        <AddStepButton
-                          isMe={isMe}
-                          onClick={() => {
-                            if (isMe) {
-                              setBelowStepDate(step.arrivedAt);
-                              setIsSaveStepModal(true);
-                            }
-                          }}
-                        />
-                        <StepCard
-                          isMe={data.readTrip.trip?.traveler.isMe ?? false}
-                          step={step}
-                          setEditingStep={setEditingStep}
-                          setIsSaveStepModal={setIsSaveStepModal}
-                        />
-                      </React.Fragment>
-                    );
-                  })}
-                <AddStepButton
-                  isMe={isMe}
-                  onClick={() => {
-                    if (isMe) {
-                      setBelowStepDate(
-                        data?.readTrip.trip?.endDate ?? moment().format(),
-                      );
-                      setIsSaveStepModal(true);
-                    }
-                  }}
-                />
-                {timeZoneData &&
-                  (endDateData ? (
-                    <TimeStamp
-                      text="Trip Finished"
-                      dateString={endDateData}
-                      timeZone={timeZoneData}
-                    />
-                  ) : (
-                    <TimeStamp
-                      text="Now traveling"
-                      dateString={endDateData}
-                      timeZone={timeZoneData}
-                    />
-                  ))}
-              </ul>
-            </article>
-          </section>
-          <section className="relative z-0 w-1/2 h-screenExceptHeader">
-            <Map isSaveStepModal={isSaveStepModal} />
-          </section>
-        </main>
-      )}
+                ) : (
+                  <TimeStamp
+                    text="Now traveling"
+                    dateString={endDateData}
+                    timeZone={timeZoneData}
+                  />
+                ))}
+            </ul>
+          </article>
+        </section>
+        <section className="relative z-0 w-1/2 h-screenExceptHeader">
+          <Map isSaveStepModal={isSaveStepModal} />
+        </section>
+      </Layout>
     </FormProvider>
   );
 };

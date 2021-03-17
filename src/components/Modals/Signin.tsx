@@ -1,18 +1,16 @@
 import { gql, useMutation } from '@apollo/client';
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
-import { authTokenVar, isLoggedInVar } from '../../apollo/reactive-variables';
-import { PW_MIN_LENGTH, TOKEN } from '../../constants';
+import { logUserIn } from '../../apollo/reactive-variables';
+import { PW_MIN_LENGTH } from '../../constants';
 import {
   signInMutation,
   signInMutationVariables,
 } from '../../__generated__/signInMutation';
 import { Button } from '../Button';
 import { FormError } from '../Form-error';
-import { ModalCloseIcon } from './partials/CloseIcon';
 import { ModalBackground } from './partials/Background';
+import { ModalCloseIcon } from './partials/CloseIcon';
 
 const SIGN_IN_MUTATION = gql`
   mutation signInMutation($input: LoginInput!) {
@@ -36,7 +34,6 @@ interface ISigninModalProps {
 }
 
 export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
-  const history = useHistory();
   const {
     register,
     getValues,
@@ -49,10 +46,7 @@ export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
       login: { ok, error, token, username },
     } = data;
     if (ok && token && username && !error) {
-      localStorage.setItem(TOKEN, token);
-      authTokenVar(token);
-      isLoggedInVar(true);
-      history.go(0);
+      logUserIn(token);
     }
   };
   const [signInMutation, { loading, data: MutationResult }] = useMutation<

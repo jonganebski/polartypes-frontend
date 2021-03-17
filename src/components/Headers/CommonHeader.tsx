@@ -40,7 +40,7 @@ const SEARCH_QUERY = gql`
 `;
 
 interface IPrams {
-  username: string;
+  username?: string;
 }
 
 interface ICommonHeaderProps {
@@ -56,7 +56,7 @@ export const CommonHeader: React.FC<ICommonHeaderProps> = ({
 }) => {
   const { username: usernameParam } = useParams<IPrams>();
   const timeoutIdRef = useRef<any>(0);
-  const isMe = usernameParam.toLowerCase() === userData?.whoAmI.slug;
+  const isMe = usernameParam?.toLowerCase() === userData?.whoAmI.slug;
   const [isSearchTooltip, setIsSearchTooltip] = useState(false);
   const [isDelay, setIsDelay] = useState(false);
 

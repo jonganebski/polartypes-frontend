@@ -155,6 +155,7 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
     editingTrip,
     coverUrl,
   );
+  console.log(error);
   const [deleteTripMutation] = useDeleteTrip(editingTrip?.id);
 
   const onSubmit = async () => {

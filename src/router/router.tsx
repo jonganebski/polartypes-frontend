@@ -2,6 +2,7 @@ import { useReactiveVar } from '@apollo/client';
 import React from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo/reactive-variables';
+import { NotFound } from '../components/NotFound404';
 import { useWhoAmI } from '../hooks/useQuery/useWhoAmI';
 import { Home } from '../pages/Home';
 import { Trip } from '../pages/Trip';
@@ -28,6 +29,7 @@ export const Router = () => {
         <Route path="/:username/:tripId" exact>
           <Trip />
         </Route>
+        <NotFound />
       </Switch>
     </BrowserRouter>
   );

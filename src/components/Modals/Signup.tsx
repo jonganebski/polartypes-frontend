@@ -1,14 +1,8 @@
 import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
-import { authTokenVar, isLoggedInVar } from '../../apollo/reactive-variables';
-import {
-  AZ_NUM_PATTERN,
-  EMAIL_PATTERN,
-  PW_MIN_LENGTH,
-  TOKEN,
-} from '../../constants';
+import { logUserIn } from '../../apollo/reactive-variables';
+import { AZ_NUM_PATTERN, EMAIL_PATTERN, PW_MIN_LENGTH } from '../../constants';
 import {
   createAccountMutation,
   createAccountMutationVariables,
@@ -41,7 +35,6 @@ interface IFormProps {
 }
 
 export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
-  const history = useHistory();
   const {
     register,
     getValues,
@@ -54,10 +47,7 @@ export const SignupModal: React.FC<ISignupModalProps> = ({ setIsSignup }) => {
       createAccount: { ok, error, token, slug },
     } = data;
     if (ok && token && slug && !error) {
-      localStorage.setItem(TOKEN, token);
-      authTokenVar(token);
-      isLoggedInVar(true);
-      history.go(0);
+      logUserIn(token);
     }
   };
   const [

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { isLoggedInVar } from '../apollo/reactive-variables';
-import { TOKEN } from '../constants';
+import { isLoggedInVar, logUserOut } from '../apollo/reactive-variables';
 import { whoAmIQuery } from '../__generated__/whoAmIQuery';
 import { Button } from './Button';
 import { ModalCloseIcon } from './Modals/partials/CloseIcon';
@@ -111,11 +110,7 @@ export const Options: React.FC<IOptionProps> = ({
                 type="red-regular"
                 size="sm"
                 className="w-full"
-                onClick={() => {
-                  localStorage.removeItem(TOKEN);
-                  isLoggedInVar(false);
-                  history.go(0);
-                }}
+                onClick={logUserOut}
               />
             )}
           </li>

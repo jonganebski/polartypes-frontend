@@ -1,7 +1,9 @@
+import { useReactiveVar } from '@apollo/client';
 import { faBook, faShareAlt, faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { isLoggedInVar } from '../../apollo/reactive-variables';
 import { useFollow } from '../../hooks/useMutation/useFollow';
 import { useUnfollow } from '../../hooks/useMutation/useUnfollow';
 import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';
@@ -25,6 +27,7 @@ export const StepsHeader: React.FC<IStepsHeader> = ({
 }) => {
   const [followMutation] = useFollow();
   const [unfollowMutation] = useUnfollow();
+  const isLoggedIn = useReactiveVar(isLoggedInVar);
   return (
     <div className="h-tripHeader px-2 flex items-center justify-between">
       <Link to={`/${trip.traveler.username}`} className="flex items-center">
@@ -60,7 +63,7 @@ export const StepsHeader: React.FC<IStepsHeader> = ({
             />
           }
         />
-        {!trip.traveler.isFollowing && !trip.traveler.isMe && (
+        {!trip.traveler.isFollowing && !trip.traveler.isMe && isLoggedIn && (
           <Button
             text="Follow"
             type="blue-regular"
