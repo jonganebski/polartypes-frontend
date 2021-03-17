@@ -75,8 +75,11 @@ export const Statistics: React.FC<IStatisticsProps> = ({
         <h4 className="my-5 mx-2 text-xl text-myGreen-dark font-semibold">
           {isMe ? "You've seen" : 'has seen'}
         </h4>
-        <div className="p-4 grid grid-cols-2 gap-2 bg-white rounded-lg border border-myGray-light">
-          <div className="p-5 border border-myGray-light rounded-lg">
+        <div className="h-44 p-4 grid grid-cols-2 gap-2 bg-white rounded-lg border border-myGray-light">
+          <div
+            className="p-5 flex flex-col justify-center border border-myGray-light rounded-lg bg-cover text-white"
+            style={{ backgroundImage: 'url(/countries.jpg)' }}
+          >
             <span className="block mb-2 text-3xl font-semibold">
               {countriesCount}
             </span>
@@ -84,7 +87,10 @@ export const Statistics: React.FC<IStatisticsProps> = ({
               {countriesCount === 1 ? ' country' : ' countries'}
             </span>
           </div>
-          <div className="p-5 border border-myGray-light rounded-lg">
+          <div
+            className="p-5 flex flex-col justify-center border border-myGray-light rounded-lg bg-cover text-white"
+            style={{ backgroundImage: 'url(/percentage.jpg)' }}
+          >
             <span className="block mb-2 text-3xl font-semibold">
               {Math.round(
                 (countriesCount / TOTAL_COUNTRIES_IN_THE_WORLD) * 100,
