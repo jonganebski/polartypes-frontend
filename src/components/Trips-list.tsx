@@ -1,23 +1,23 @@
 import React from 'react';
 import { readTripsQuery_readTrips_targetUser } from '../__generated__/readTripsQuery';
-import { whoAmIQuery } from '../__generated__/whoAmIQuery';
+import { whoAmIQuery_whoAmI_user } from '../__generated__/whoAmIQuery';
 import { Button } from './Button';
 import { TripCard } from './Cards/Trip';
 
 interface ITripsListProps {
-  isTabTrips: boolean;
-  targetUser: readTripsQuery_readTrips_targetUser;
-  isMe: boolean;
-  userData?: whoAmIQuery;
-  setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
   setIsAskTimeZone: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsCreateTrip: React.Dispatch<React.SetStateAction<boolean>>;
+  targetUser: readTripsQuery_readTrips_targetUser;
+  me: whoAmIQuery_whoAmI_user | null | undefined;
+  isTabTrips: boolean;
+  isMe: boolean;
 }
 
 export const TripsList: React.FC<ITripsListProps> = ({
   isTabTrips,
   targetUser,
   isMe,
-  userData,
+  me,
   setIsCreateTrip,
   setIsAskTimeZone,
 }) => {
@@ -30,9 +30,7 @@ export const TripsList: React.FC<ITripsListProps> = ({
             type="blue-regular"
             size="sm"
             onClick={() => {
-              userData?.whoAmI.timeZone
-                ? setIsCreateTrip(true)
-                : setIsAskTimeZone(true);
+              me?.timeZone ? setIsCreateTrip(true) : setIsAskTimeZone(true);
             }}
           />
         )}

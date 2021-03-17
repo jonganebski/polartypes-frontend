@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { isLoggedInVar, logUserOut } from '../apollo/reactive-variables';
-import { whoAmIQuery } from '../__generated__/whoAmIQuery';
+import { whoAmIQuery_whoAmI_user } from '../__generated__/whoAmIQuery';
 import { Button } from './Button';
 import { ModalCloseIcon } from './Modals/partials/CloseIcon';
 import { SettingsModal } from './Modals/Settings';
 
 interface IOptionProps {
-  userData: whoAmIQuery | undefined;
-  isOption: boolean;
   setIsOption: React.Dispatch<React.SetStateAction<boolean>>;
+  me: whoAmIQuery_whoAmI_user | null | undefined;
+  isOption: boolean;
 }
 
 export const Options: React.FC<IOptionProps> = ({
-  userData,
+  me,
   isOption,
   setIsOption,
 }) => {
-  const history = useHistory();
   const [isSettingsModal, setIsSettingModal] = useState(false);
   const [isProfile, setIsProfile] = useState(false);
 
@@ -25,10 +24,10 @@ export const Options: React.FC<IOptionProps> = ({
     <>
       {isLoggedInVar() && isSettingsModal && (
         <SettingsModal
-          userData={userData}
-          isProfile={isProfile}
-          setIsProfile={setIsProfile}
           setIsSettingModal={setIsSettingModal}
+          setIsProfile={setIsProfile}
+          isProfile={isProfile}
+          me={me}
         />
       )}
       <div

@@ -10,7 +10,7 @@ import {
   deleteCommentMutationVariables,
 } from '../../../__generated__/deleteCommentMutation';
 import { listCommentsQuery_listComments_step_comments } from '../../../__generated__/listCommentsQuery';
-import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
+import { whoAmIQuery_whoAmI_user } from '../../../__generated__/whoAmIQuery';
 import { Avatar } from '../../Avatar';
 
 const DELETE_COMMENT_MUTATION = gql`
@@ -23,16 +23,12 @@ const DELETE_COMMENT_MUTATION = gql`
 `;
 
 interface ICommentProps {
-  stepId: number;
-  userData: whoAmIQuery | undefined;
   comment: listCommentsQuery_listComments_step_comments;
+  me: whoAmIQuery_whoAmI_user | null | undefined;
+  stepId: number;
 }
 
-export const Comment: React.FC<ICommentProps> = ({
-  userData,
-  comment,
-  stepId,
-}) => {
+export const Comment: React.FC<ICommentProps> = ({ comment, stepId, me }) => {
   const onCompleted = (data: deleteCommentMutation) => {
     const {
       deleteComment: { ok, error },
@@ -77,7 +73,7 @@ export const Comment: React.FC<ICommentProps> = ({
             : moment(comment.createdAt).format('D MMMM YYYY')}
         </span>
       </div>
-      {userData?.whoAmI.slug === comment.creator.slug && (
+      {me?.slug === comment.creator.slug && (
         <FontAwesomeIcon
           icon={faTrashAlt}
           className="mt-3 text-myRed cursor-pointer opacity-60 hover:opacity-100"

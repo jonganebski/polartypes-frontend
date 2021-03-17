@@ -13,7 +13,7 @@ interface IUserBoxProps {
 }
 
 export const UserBox: React.FC<IUserBoxProps> = ({ user, onClick }) => {
-  const { data: userData } = useWhoAmI();
+  const { me } = useWhoAmI();
   const [followMutation] = useFollow();
   const [unfollowMutation] = useUnfollow();
 
@@ -32,32 +32,36 @@ export const UserBox: React.FC<IUserBoxProps> = ({ user, onClick }) => {
           <span className="text-xs text-myGray-dark">{user.city}</span>
         </div>
       </Link>
-      {!(userData?.whoAmI.slug === user.slug) ? (
-        user.isFollowing ? (
-          <Button
-            text="following"
-            size="sm"
-            type="blue-solid"
-            isSubmitBtn={false}
-            onClick={() => {
-              if (userData?.whoAmI.slug) {
-                unfollowMutation({ variables: { input: { slug: user.slug } } });
-              }
-            }}
-          />
-        ) : (
-          <Button
-            text="follow"
-            size="sm"
-            type="blue-regular"
-            onClick={() => {
-              if (userData?.whoAmI.slug) {
-                followMutation({ variables: { input: { slug: user.slug } } });
-              }
-            }}
-          />
-        )
-      ) : null}
+      <div className="w-32 flex justify-center">
+        {!(me?.slug === user.slug) ? (
+          user.isFollowing ? (
+            <Button
+              text="following"
+              size="sm"
+              type="blue-solid"
+              isSubmitBtn={false}
+              onClick={() => {
+                if (me?.slug) {
+                  unfollowMutation({
+                    variables: { input: { slug: user.slug } },
+                  });
+                }
+              }}
+            />
+          ) : (
+            <Button
+              text="follow"
+              size="sm"
+              type="blue-regular"
+              onClick={() => {
+                if (me?.slug) {
+                  followMutation({ variables: { input: { slug: user.slug } } });
+                }
+              }}
+            />
+          )
+        ) : null}
+      </div>
     </li>
   );
 };

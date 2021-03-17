@@ -3,6 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { logUserIn } from '../../apollo/reactive-variables';
 import { PW_MIN_LENGTH } from '../../constants';
+import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';
 import {
   signInMutation,
   signInMutationVariables,
@@ -41,12 +42,16 @@ export const SigninModal: React.FC<ISigninModalProps> = ({ setIsSignup }) => {
     handleSubmit,
     errors,
   } = useForm<IFormProps>({ mode: 'onChange' });
+  const { whoAmIQuery, loading: meLoading } = useWhoAmI();
   const onCompleted = (data: signInMutation) => {
     const {
       login: { ok, error, token, username },
     } = data;
     if (ok && token && username && !error) {
-      logUserIn(token);
+      whoAmIQuery();
+      if (!meLoading) {
+        logUserIn(token);
+      }
     }
   };
   const [signInMutation, { loading, data: MutationResult }] = useMutation<

@@ -21,7 +21,7 @@ export const useUpdateAccount = (
   f: UseFormMethods<ISettingsFormProps>,
   avatarUrl: string | null,
 ) => {
-  const { data: userData } = useWhoAmI();
+  const { me } = useWhoAmI();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export const useUpdateAccount = (
     cache: ApolloCache<updateAccountMutation>,
     { data }: FetchResult<updateAccountMutation>,
   ) => {
-    if (data) {
+    if (data && me) {
       const {
         updateAccount: { error, ok },
       } = data;
@@ -43,7 +43,7 @@ export const useUpdateAccount = (
           timeZone,
         } = f.getValues();
         cache.modify({
-          id: `User:${userData?.whoAmI.slug}`,
+          id: `User:${me.slug}`,
           fields: {
             about: () => about,
             city: () => city,

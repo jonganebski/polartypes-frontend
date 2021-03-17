@@ -6,7 +6,7 @@ import { useHistory } from 'react-router';
 import { SERVER_URI } from '../../constants';
 import { deleteFiles } from '../../helpers';
 import { useUpdateAccount } from '../../hooks/useMutation/useUpdateAccount';
-import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
+import { whoAmIQuery_whoAmI_user } from '../../__generated__/whoAmIQuery';
 import { Button } from '../Button';
 import { Account } from './partials/Account';
 import { ModalBackground } from './partials/Background';
@@ -14,10 +14,10 @@ import { ModalCloseIcon } from './partials/CloseIcon';
 import { Profile } from './partials/Profile';
 
 interface ISettingsModal {
-  userData: whoAmIQuery | undefined;
-  isProfile: boolean;
-  setIsProfile: React.Dispatch<React.SetStateAction<boolean>>;
   setIsSettingModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsProfile: React.Dispatch<React.SetStateAction<boolean>>;
+  me: whoAmIQuery_whoAmI_user | null | undefined;
+  isProfile: boolean;
 }
 
 export interface ISettingsFormProps {
@@ -33,27 +33,25 @@ export interface ISettingsFormProps {
 }
 
 export const SettingsModal: React.FC<ISettingsModal> = ({
-  userData,
+  me,
   isProfile,
   setIsProfile,
   setIsSettingModal,
 }) => {
   const history = useHistory();
   const [avatarSrc, setAvatarSrc] = useState(
-    userData?.whoAmI.avatarUrl ?? '/blank-profile.webp',
+    me?.avatarUrl ?? '/blank-profile.webp',
   );
-  const [avatarUrl, setAvatarUrl] = useState(
-    userData?.whoAmI.avatarUrl ?? null,
-  );
+  const [avatarUrl, setAvatarUrl] = useState(me?.avatarUrl ?? null);
   const f = useForm<ISettingsFormProps>({
     mode: 'onChange',
     defaultValues: {
-      firstName: userData?.whoAmI.firstName,
-      lastName: userData?.whoAmI.lastName ?? '',
-      username: userData?.whoAmI.username,
-      about: userData?.whoAmI.about ?? '',
-      city: userData?.whoAmI.city ?? '',
-      timeZone: userData?.whoAmI.timeZone ?? '',
+      firstName: me?.firstName,
+      lastName: me?.lastName ?? '',
+      username: me?.username,
+      about: me?.about ?? '',
+      city: me?.city ?? '',
+      timeZone: me?.timeZone ?? '',
     },
   });
   const { updateAccountMutation, isLoading, setIsLoading } = useUpdateAccount(
@@ -74,7 +72,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
     }
     try {
       let newUrl: string | null = null;
-      const oldUrl = userData?.whoAmI.avatarUrl;
+      const oldUrl = me?.avatarUrl;
       const uploadingNewAvatar = files.length !== 0;
       if (uploadingNewAvatar) {
         const body = new FormData();
@@ -113,7 +111,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
     }
   };
 
-  if (!userData) {
+  if (!me) {
     return null;
   }
   return (
@@ -159,7 +157,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
                 avatarSrc={avatarSrc}
                 setAvatarSrc={setAvatarSrc}
               />
-              <Account hidden={isProfile} slug={userData.whoAmI.slug} />
+              <Account hidden={isProfile} slug={me.slug} />
               <div className="pt-6">
                 <Button
                   text="Save Changes"

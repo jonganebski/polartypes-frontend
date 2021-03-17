@@ -16,7 +16,7 @@ const FOLLOW_MUTAION = gql`
 `;
 
 export const useFollow = () => {
-  const { data: userData } = useWhoAmI();
+  const { me } = useWhoAmI();
 
   const update = (
     cache: ApolloCache<followMutation>,
@@ -26,7 +26,7 @@ export const useFollow = () => {
       const {
         follow: { slug, error, ok },
       } = data;
-      if (ok && userData?.whoAmI.slug) {
+      if (ok && me?.slug) {
         cache.modify({
           id: `User:${slug}`,
           fields: {

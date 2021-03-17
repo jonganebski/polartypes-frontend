@@ -2,6 +2,7 @@ import { useReactiveVar } from '@apollo/client';
 import React from 'react';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { isLoggedInVar } from '../apollo/reactive-variables';
+import { Loading } from '../components/Loading';
 import { NotFound } from '../components/NotFound404';
 import { useWhoAmI } from '../hooks/useQuery/useWhoAmI';
 import { Home } from '../pages/Home';
@@ -10,14 +11,12 @@ import { Trips } from '../pages/Trips';
 
 export const Router = () => {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
-  const { data: userData } = useWhoAmI();
-
+  const { me } = useWhoAmI();
   return (
     <BrowserRouter>
       <Switch>
-        {isLoggedIn && userData && (
-          <Redirect from="/" to={`/${userData.whoAmI.username}`} exact />
-        )}
+        {isLoggedIn && !me && <Loading />}
+        {isLoggedIn && me && <Redirect from="/" to={`/${me.username}`} exact />}
         {!isLoggedIn && (
           <Route path="/" exact>
             <Home />
@@ -29,7 +28,9 @@ export const Router = () => {
         <Route path="/:username/:tripId" exact>
           <Trip />
         </Route>
-        <NotFound />
+        <Route>
+          <NotFound />
+        </Route>
       </Switch>
     </BrowserRouter>
   );

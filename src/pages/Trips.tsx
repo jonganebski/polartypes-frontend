@@ -27,7 +27,7 @@ export const Trips = () => {
     null,
   );
 
-  const { data: userData } = useWhoAmI();
+  const { me } = useWhoAmI();
   const [lazyTripsQuery, { data, called, loading }] = useLazyTrips();
 
   useEffect(() => {
@@ -46,11 +46,11 @@ export const Trips = () => {
   }
   return (
     <>
-      {isCreateTrip && userData?.whoAmI.timeZone && (
+      {isCreateTrip && me?.timeZone && (
         <SaveTripModal
-          userData={userData}
-          setIsSaveTripModal={setIsCreateTrip}
           trips={data?.readTrips.targetUser?.trips}
+          setIsSaveTripModal={setIsCreateTrip}
+          me={me}
         />
       )}
       {isAskTimeZone && (
@@ -59,14 +59,14 @@ export const Trips = () => {
           setIsCreateTrip={setIsCreateTrip}
         />
       )}
-      {userData && isFollowersModal === false && (
+      {me && isFollowersModal === false && (
         <FollowFollowing
           isFollowers={false}
           slug={targetUsername.toLocaleLowerCase()}
           setIsFollowersModal={setIsFollowersModal}
         />
       )}
-      {userData && isFollowersModal === true && (
+      {me && isFollowersModal === true && (
         <FollowFollowing
           isFollowers={true}
           slug={targetUsername.toLocaleLowerCase()}
@@ -86,12 +86,12 @@ export const Trips = () => {
             />
             <TabButtons isTabTrips={isTabTrips} setIsTabTrips={setIsTabTrips} />
             <TripsList
-              isMe={isMe}
-              isTabTrips={isTabTrips}
               targetUser={data.readTrips.targetUser}
-              userData={userData}
-              setIsCreateTrip={setIsCreateTrip}
               setIsAskTimeZone={setIsAskTimeZone}
+              setIsCreateTrip={setIsCreateTrip}
+              isTabTrips={isTabTrips}
+              isMe={isMe}
+              me={me}
             />
             <Statistics
               isMe={isMe}

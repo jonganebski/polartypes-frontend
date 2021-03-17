@@ -16,7 +16,7 @@ import { useUpdateTrip } from '../../hooks/useMutation/useUpdateTrip';
 import { Availability } from '../../__generated__/globalTypes';
 import { readTripQuery_readTrip_trip } from '../../__generated__/readTripQuery';
 import { readTripsQuery_readTrips_targetUser_trips } from '../../__generated__/readTripsQuery';
-import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
+import { whoAmIQuery_whoAmI_user } from '../../__generated__/whoAmIQuery';
 import { Button } from '../Button';
 import { FormError } from '../Form-error';
 import { NewCalendar } from '../Tooltips/Calendar';
@@ -25,7 +25,7 @@ import { ModalCloseIcon } from './partials/CloseIcon';
 import { StepImages } from './StepImages';
 
 interface ICreateTripModal {
-  userData: whoAmIQuery;
+  me: whoAmIQuery_whoAmI_user;
   setIsSaveTripModal: React.Dispatch<React.SetStateAction<boolean>>;
   editingTrip?: readTripQuery_readTrip_trip | null;
   trips?: readTripsQuery_readTrips_targetUser_trips[];
@@ -40,12 +40,12 @@ export interface ISaveTripFormProps {
 }
 
 export const SaveTripModal: React.FC<ICreateTripModal> = ({
-  userData,
+  me,
   setIsSaveTripModal,
   editingTrip = null,
   trips = [],
 }) => {
-  const timeZone = userData.whoAmI.timeZone!;
+  const timeZone = me.timeZone!;
   const [isStartDateCalendar, setIsStartDateCalendar] = useState<
     boolean | null
   >(null);
@@ -147,15 +147,14 @@ export const SaveTripModal: React.FC<ICreateTripModal> = ({
   }, [setEndDateAfterStartDate, validateTripDates]);
 
   const [createTripMutation, { loading: createLoading }] = useCreateTrip(
-    userData.whoAmI.username,
+    me.username,
   );
 
-  const [updateTripMutation, { loading: updateLoading, error }] = useUpdateTrip(
+  const [updateTripMutation, { loading: updateLoading }] = useUpdateTrip(
     f,
     editingTrip,
     coverUrl,
   );
-  console.log(error);
   const [deleteTripMutation] = useDeleteTrip(editingTrip?.id);
 
   const onSubmit = async () => {

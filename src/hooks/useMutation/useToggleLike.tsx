@@ -1,4 +1,4 @@
-import { gql, Reference, useApolloClient, useMutation } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { LIKE_FRAGMENT } from '../../fragments';
 import { readTripQuery_readTrip_trip_steps_likesInfo_samples } from '../../__generated__/readTripQuery';
 import {
@@ -18,15 +18,15 @@ const TOGGLE_LIKE_MUTATION = gql`
 `;
 
 export const useToggleLike = (stepId: number) => {
-  const { data: userData } = useWhoAmI();
+  const { me } = useWhoAmI();
   const client = useApolloClient();
 
   const writeLikeCache = () => {
-    if (!userData) return;
+    if (!me) return;
 
     const likeRef = client.cache.writeFragment<readTripQuery_readTrip_trip_steps_likesInfo_samples>(
       {
-        id: `Like:${stepId}:${userData.whoAmI.id}`,
+        id: `Like:${stepId}:${me.id}`,
         fragmentName: 'ToggleLike',
         fragment: gql`
           fragment ToggleLike on Like {
@@ -37,11 +37,11 @@ export const useToggleLike = (stepId: number) => {
         data: {
           __typename: 'Like',
           stepId,
-          userId: userData.whoAmI.id,
+          userId: me.id,
           user: {
-            username: userData.whoAmI.username,
-            avatarUrl: userData.whoAmI.avatarUrl,
-            slug: userData.whoAmI.slug,
+            username: me.username,
+            avatarUrl: me.avatarUrl,
+            slug: me.slug,
             __typename: 'Users',
           },
         },
@@ -61,9 +61,9 @@ export const useToggleLike = (stepId: number) => {
   };
 
   const eraseLikeCache = () => {
-    if (!userData) return;
+    if (!me) return;
 
-    client.cache.evict({ id: `Like:${stepId}:${userData.whoAmI.id}` });
+    client.cache.evict({ id: `Like:${stepId}:${me.id}` });
     client.cache.modify({
       id: `Step:${stepId}`,
       fields: {
@@ -79,7 +79,7 @@ export const useToggleLike = (stepId: number) => {
     const {
       toggleLike: { ok, error, toggle },
     } = data;
-    if (ok && !error && toggle && userData) {
+    if (ok && !error && toggle && me) {
       if (0 < toggle) {
         writeLikeCache();
       }

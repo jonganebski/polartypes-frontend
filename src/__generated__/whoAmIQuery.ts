@@ -7,7 +7,7 @@
 // GraphQL query operation: whoAmIQuery
 // ====================================================
 
-export interface whoAmIQuery_whoAmI {
+export interface whoAmIQuery_whoAmI_user {
   __typename: "Users";
   id: number;
   slug: string;
@@ -20,6 +20,13 @@ export interface whoAmIQuery_whoAmI {
   isFollowing: boolean;
   isMe: boolean;
   about: string | null;
+}
+
+export interface whoAmIQuery_whoAmI {
+  __typename: "WhoAmIOutput";
+  ok: boolean;
+  error: string | null;
+  user: whoAmIQuery_whoAmI_user | null;
 }
 
 export interface whoAmIQuery {

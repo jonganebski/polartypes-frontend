@@ -58,7 +58,7 @@ export const Trip = () => {
     mode: 'onChange',
     defaultValues: {},
   });
-  const { data: userData, loading: isUserDataLoading } = useWhoAmI();
+  const { me } = useWhoAmI();
   const [
     lazyTripQuery,
     { data, called, loading: isTripLoading },
@@ -94,7 +94,7 @@ export const Trip = () => {
       element?.scrollIntoView();
     }
   }, [element, readingStepId]);
-  const isLoading = isUserDataLoading || isTripLoading || isTripsLoading;
+  const isLoading = isTripLoading || isTripsLoading;
 
   if (isLoading || !called) {
     return <Loading />;
@@ -116,9 +116,9 @@ export const Trip = () => {
               editingStep={editingStep}
             />
           )}
-          {isSaveTripModal && userData && isMe && (
+          {isSaveTripModal && me && isMe && (
             <SaveTripModal
-              userData={userData}
+              me={me}
               setIsSaveTripModal={setIsSaveTripModal}
               editingTrip={editingTrip}
               trips={tripsData?.readTrips.targetUser?.trips.filter(

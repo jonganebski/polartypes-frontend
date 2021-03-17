@@ -16,7 +16,7 @@ const UNFOLLOW_MUTATION = gql`
 `;
 
 export const useUnfollow = () => {
-  const { data: userData } = useWhoAmI();
+  const { me } = useWhoAmI();
 
   const update = (
     cache: ApolloCache<unfollowMutation>,
@@ -26,16 +26,14 @@ export const useUnfollow = () => {
       const {
         unfollow: { slug, error, ok },
       } = data;
-      if (ok && userData?.whoAmI.slug) {
+      if (ok && me?.slug) {
         cache.modify({
           id: `User:${slug}`,
           fields: {
             countFollowers: (prev) => Math.max(prev - 1, 0),
             isFollowing: () => false,
             followers: (prev) =>
-              prev.filter(
-                (user: any) => user['__ref'] !== `User:${userData.whoAmI.slug}`,
-              ),
+              prev.filter((user: any) => user['__ref'] !== `User:${me.slug}`),
           },
         });
       }

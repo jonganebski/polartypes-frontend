@@ -9,7 +9,6 @@ import {
   searchQuery,
   searchQueryVariables,
 } from '../../__generated__/searchQuery';
-import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { Logo } from '../Logo';
@@ -49,9 +48,9 @@ interface IPrams {
 
 export const CommonHeader = () => {
   const { username: usernameParam } = useParams<IPrams>();
-  const { data: userData } = useWhoAmI();
+  const { me } = useWhoAmI();
   const timeoutIdRef = useRef<any>(0);
-  const isMe = usernameParam?.toLowerCase() === userData?.whoAmI.slug;
+  const isMe = usernameParam?.toLowerCase() === me?.slug;
   const [isSearchTooltip, setIsSearchTooltip] = useState(false);
   const [isDelay, setIsDelay] = useState(false);
   const [isSignup, setIsSignup] = useState<boolean | null>(null);
@@ -81,11 +80,7 @@ export const CommonHeader = () => {
     <>
       {isSignup === false && <SigninModal setIsSignup={setIsSignup} />}
       {isSignup === true && <SignupModal setIsSignup={setIsSignup} />}
-      <Options
-        userData={userData}
-        isOption={isOption}
-        setIsOption={setIsOption}
-      />
+      <Options setIsOption={setIsOption} isOption={isOption} me={me} />
       <header className="h-commonHeader flex justify-between bg-myGreen-darkest">
         <div className="px-3 flex items-center">
           <Logo usage="common" />
@@ -117,15 +112,15 @@ export const CommonHeader = () => {
             gridTemplateColumns: 'repeat(3, auto)',
           }}
         >
-          {userData && (
+          {me && (
             <Link
-              to={`/${userData.whoAmI.username}`}
+              to={`/${me.username}`}
               className={`h-full px-5 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 ${
                 isMe ? 'border-b-4 border-myRed text-center' : ''
               }`}
             >
-              <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={8} />
-              <span className="ml-3">{userData.whoAmI.firstName}</span>
+              <Avatar avatarUrl={me.avatarUrl} size={8} />
+              <span className="ml-3">{me.firstName}</span>
             </Link>
           )}
           <div className="h-full px-5 flex items-center justify-center bg-myGreen-darkest hover:bg-opacity-60 cursor-pointer">
@@ -138,7 +133,7 @@ export const CommonHeader = () => {
             <span className="mr-3">Options</span>
             <FontAwesomeIcon icon={faBars} />
           </div>
-          {!userData && (
+          {!me && (
             <div className="h-full px-5 flex items-center justify-center bg-myGreen-darkest">
               <Button
                 text="Sign in"

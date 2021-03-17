@@ -3,16 +3,17 @@ import { useForm } from 'react-hook-form';
 import { useCreateComment } from '../../../hooks/useMutation/useCreateComment';
 import { useListComments } from '../../../hooks/useQuery/useListComments';
 import { readTripQuery_readTrip_trip_steps } from '../../../__generated__/readTripQuery';
-import { whoAmIQuery } from '../../../__generated__/whoAmIQuery';
+import { whoAmIQuery_whoAmI_user } from '../../../__generated__/whoAmIQuery';
 import { Avatar } from '../../Avatar';
+import { Spinner } from '../../Loading-spinner';
 import { Comment } from './Comment';
 
 interface ICommentProps {
-  userData: whoAmIQuery | undefined;
+  me: whoAmIQuery_whoAmI_user | null | undefined;
   step: readTripQuery_readTrip_trip_steps;
 }
 
-export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
+export const Comments: React.FC<ICommentProps> = ({ me, step }) => {
   const { register, getValues, handleSubmit, reset } = useForm<{
     text: string;
   }>();
@@ -20,7 +21,7 @@ export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
   const [createCommentMutation, { loading }] = useCreateComment(
     getValues().text,
     step.id,
-    userData,
+    me,
   );
 
   const { data, loading: queryLoading, fetchMore } = useListComments(step.id);
@@ -47,12 +48,12 @@ export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
 
   return (
     <div className="py-4 border-t border-myGray-light">
-      {userData && (
+      {me && (
         <form
           className="flex items-center mb-4"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Avatar avatarUrl={userData.whoAmI.avatarUrl} size={8} />
+          <Avatar avatarUrl={me.avatarUrl} size={8} />
           <input
             ref={register({ required: true })}
             placeholder="Write a comment..."
@@ -63,16 +64,17 @@ export const Comments: React.FC<ICommentProps> = ({ userData, step }) => {
           />
         </form>
       )}
-      <ul className="py-4 grid gap-y-4">
-        {data?.listComments.step?.comments?.map((comment, i) => (
-          <Comment
-            key={i}
-            userData={userData}
-            comment={comment}
-            stepId={step.id}
-          />
-        ))}
-      </ul>
+      {queryLoading ? (
+        <div className="relative w-full h-14">
+          <Spinner color="black" />
+        </div>
+      ) : (
+        <ul className="py-4 grid gap-y-4">
+          {data?.listComments.step?.comments?.map((comment, i) => (
+            <Comment comment={comment} stepId={step.id} me={me} key={i} />
+          ))}
+        </ul>
+      )}
       {data?.listComments.hasMorePages && (
         <div className="text-center">
           <span

@@ -81,10 +81,12 @@ export const Home = () => {
               >
                 Polarsteps
               </a>
-              . Your password is going to be encrypted properly with argon 2 and
+              . Your password is going to be encrypted properly with argon2 and
               your information is not going to be shared with any other
               services. Unfortunately, there are no means to help you in case
-              you forget your password right now. Keep this in mind.
+              you forget your password right now. Also as this site was built
+              for learning purpose, your data can be removed at anytime without
+              any notice. Please keep this in mind.
             </p>
             <p className="mb-6">
               I named this project Polartypes becase it is writen in Typescript.
@@ -95,26 +97,35 @@ export const Home = () => {
             </p>
             <div className="mb-10 grid">
               <a
+                className="underline hover:text-gray-700 active:text-black"
                 href="https://github.com/jonganebski/polartypes-frontend"
                 target="_blank"
                 rel="noreferrer"
-                className="underline"
               >
                 Frontend code
               </a>
               <a
+                className="underline mb-5 hover:text-gray-700 active:text-black"
                 href="https://github.com/jonganebski/polartypes-backend"
                 target="_blank"
                 rel="noreferrer"
-                className="underline mb-5"
               >
                 Backend code
               </a>
-              <Link to="/JinseokBang" className="underline">
-                Example trip
-              </Link>
+              <div>
+                <span>&rarr;</span>
+                <Link
+                  className="underline mx-3 hover:text-gray-700 active:text-black"
+                  to="/JinseokBang"
+                >
+                  Example trip
+                </Link>
+                <span>&larr;</span>
+              </div>
             </div>
-            <span>&copy; polartypes {new Date().getFullYear()}</span>
+            <span className="text-sm">
+              Copyright &copy; polartypes {new Date().getFullYear()}
+            </span>
           </div>
         </div>
       </main>

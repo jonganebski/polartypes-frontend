@@ -26,11 +26,11 @@ export const useCreateStep = (
   images: TImage[],
   setIsCreateStepModal: (value: React.SetStateAction<boolean>) => void,
 ) => {
-  const { data: userData } = useWhoAmI();
+  const me = useWhoAmI();
   const client = useApolloClient();
 
   const updateApolloCache = (stepId: number) => {
-    if (!userData) {
+    if (!me) {
       return;
     }
     const { lat, lon, ...values } = f.getValues();
@@ -76,48 +76,12 @@ export const useCreateStep = (
         },
       });
     }
-    // const prevQuery = client.readQuery<readTripQuery, readTripQueryVariables>({
-    //   query: READ_TRIP_QUERY,
-    //   variables: { input: { tripId: +tripId } },
-    // });
-    // prevQuery &&
-    //   userData &&
-    //   client.writeQuery<readTripQuery, readTripQueryVariables>({
-    //     query: READ_TRIP_QUERY,
-    //     variables: { input: { tripId: +tripId } },
-    //     data: {
-    //       readTrip: {
-    //         ...prevQuery.readTrip,
-    //         trip: {
-    //           ...prevQuery.readTrip.trip!,
-    //           steps: [
-    //             {
-    //               ...values,
-    //               __typename: 'Step',
-    //               id: stepId,
-    //               lat: +lat,
-    //               lon: +lon,
-    //               imgUrls,
-    //               traveler: {
-    //                 __typename: 'Users',
-    //                 isMe: true,
-    //                 slug: userData.whoAmI.slug,
-    //               },
-    //               likes: [],
-    //               countComments:
-    //             },
-    //             ...prevQuery.readTrip.trip!.steps,
-    //           ],
-    //         },
-    //       },
-    //     },
-    //   });
   };
   const onCreateStepCompleted = async (data: createStepMutation) => {
     const {
       createStep: { ok, error, createdStepId },
     } = data;
-    if (ok && !error && createdStepId && userData) {
+    if (ok && !error && createdStepId && me) {
       updateApolloCache(createdStepId);
       setIsCreateStepModal(false);
     } else {

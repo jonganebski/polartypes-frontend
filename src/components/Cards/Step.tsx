@@ -27,7 +27,7 @@ export const StepCard: React.FC<IStepProps> = ({
   setEditingStep,
   setIsSaveStepModal,
 }) => {
-  const { data: userData } = useWhoAmI();
+  const { me } = useWhoAmI();
 
   const { setIdFromDrag } = useStepIdContext();
   const liRef = useRef<HTMLLIElement | null>(null);
@@ -177,7 +177,7 @@ export const StepCard: React.FC<IStepProps> = ({
           />
         )}
       </div>
-      {isCommentBox && <Comments userData={userData} step={step} />}
+      {isCommentBox && <Comments me={me} step={step} />}
     </li>
   );
 };

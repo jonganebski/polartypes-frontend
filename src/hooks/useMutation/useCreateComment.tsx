@@ -6,7 +6,7 @@ import {
 import { listCommentsQuery_listComments_step_comments } from '../../__generated__/listCommentsQuery';
 
 import { USER_FRAGMENT } from '../../fragments';
-import { whoAmIQuery } from '../../__generated__/whoAmIQuery';
+import { whoAmIQuery_whoAmI_user } from '../../__generated__/whoAmIQuery';
 
 const CREATE_COMMENT_MUTAION = gql`
   mutation createCommentMutation($input: CreateCommentInput!) {
@@ -21,7 +21,7 @@ const CREATE_COMMENT_MUTAION = gql`
 export const useCreateComment = (
   text: string,
   stepId: number,
-  userData: whoAmIQuery | undefined,
+  me: whoAmIQuery_whoAmI_user | null | undefined,
 ) => {
   const client = useApolloClient();
 
@@ -29,7 +29,7 @@ export const useCreateComment = (
     const {
       createComment: { ok, error, commentId },
     } = data;
-    if (ok && !error && commentId && userData) {
+    if (ok && !error && commentId && me) {
       const commentRef = client.cache.writeFragment<listCommentsQuery_listComments_step_comments>(
         {
           id: `Comment:${commentId}`,
@@ -46,7 +46,7 @@ export const useCreateComment = (
             ${USER_FRAGMENT}
           `,
           data: {
-            creator: { ...userData.whoAmI },
+            creator: { ...me },
             createdAt: 'Just now',
             __typename: 'Comment',
             id: commentId,
