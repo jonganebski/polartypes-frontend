@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 const GRAPHHOPER_API_KEY = process.env.REACT_APP_GRAPHHOPPER_API_KEY;
 
 export const useGeocoder = (searchTerm: string, lat?: string, lon?: string) => {
-  const [geocodeData, setGeocodeData] = useState<any>();
   const [prevSearchTerm, setPrevSearchTerm] = useState('');
+  const [geocodeData, setGeocodeData] = useState<any>();
+  const [geocodeErr, setGeocodeErr] = useState(false);
   const timeoutId = useRef<any>();
   clearTimeout(timeoutId.current);
   useEffect(() => {
@@ -19,11 +20,16 @@ export const useGeocoder = (searchTerm: string, lat?: string, lon?: string) => {
         2 < searchTerm.length &&
         searchTerm !== prevSearchTerm
       ) {
-        const response = await Axios.get(GEOCODER_END_POINT);
-        setGeocodeData(response.data.hits);
-        setPrevSearchTerm(searchTerm);
+        const { data, status } = await Axios.get(GEOCODER_END_POINT);
+        if (400 <= status) {
+          setGeocodeErr(true);
+        } else {
+          setGeocodeErr(false);
+          setGeocodeData(data.hits);
+          setPrevSearchTerm(searchTerm);
+        }
       }
     }, 2000);
   }, [lat, lon, prevSearchTerm, searchTerm]);
-  return { geocodeData, setGeocodeData };
+  return { geocodeData, setGeocodeData, geocodeErr };
 };

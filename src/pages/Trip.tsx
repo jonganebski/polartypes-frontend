@@ -195,7 +195,7 @@ export const Trip = () => {
           </article>
         </section>
         <section className="relative z-0 w-1/2 h-screenExceptHeader">
-          <Map isSaveStepModal={isSaveStepModal} />
+          {/* <Map isSaveStepModal={isSaveStepModal} /> */}
         </section>
       </Layout>
     </FormProvider>

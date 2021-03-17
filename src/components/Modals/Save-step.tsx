@@ -20,6 +20,7 @@ import { NewCalendar } from '../Tooltips/Calendar';
 import { ModalCloseIcon } from './partials/CloseIcon';
 import { FilesArea } from './partials/FilesArea';
 import { ICreateStepFormProps } from '../../pages/Trip';
+import { FormError } from '../Form-error';
 
 interface ISaveStepModalProps {
   tripId: string;
@@ -63,7 +64,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
 
   const [deleteStepMutation] = useDeleteStep(images, setIsSaveStepModal);
 
-  const { geocodeData, setGeocodeData } = useGeocoder(searchTerm);
+  const { geocodeData, setGeocodeData, geocodeErr } = useGeocoder(searchTerm);
 
   const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.currentTarget.value);
@@ -273,6 +274,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                   </div>
                 </div>
               </div>
+
               {isLocationBlock && (
                 <div
                   onClick={() => {
@@ -287,6 +289,11 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                 </div>
               )}
             </section>
+            {geocodeErr && (
+              <div className="mb-4 text-center">
+                <FormError err="Geocode API error. Please fill country name manually." />
+              </div>
+            )}
             <section className="relative p-6 mb-6 grid grid-cols-oneToTwo gap-y-4 rounded-2xl shadow-surround">
               <h3 className="flex items-center text-myGreen-darkest font-semibold">
                 Step name
@@ -301,11 +308,14 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                 <input
                   ref={register({ required: true })}
                   name="country"
-                  readOnly
+                  readOnly={!geocodeErr}
+                  placeholder={geocodeErr ? 'Country' : ''}
                   style={{
-                    width: watch('country')?.length + 2 + 'ch',
+                    width: geocodeErr
+                      ? '120px'
+                      : watch('country')?.length + 2 + 'ch',
                   }}
-                  className="px-2 py-3 w-0 text-myGray-dark border border-l-0 border-myGray bg-myGray-light rounded-r-md rounded-l-none focus:outline-none"
+                  className={`px-2 py-3 text-myGray-dark border border-l-0 border-myGray bg-myGray-light rounded-r-md rounded-l-none focus:outline-none`}
                 />
               </div>
               <h3 className="flex items-center text-myGreen-darkest font-semibold">
@@ -428,7 +438,9 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                       country,
                       timeZone,
                     } = getValues();
-                    if (location && lat && lon && country && timeZone) {
+                    const isFormFullfilled =
+                      location && lat && lon && country && timeZone;
+                    if (isFormFullfilled || geocodeErr) {
                       setIsLocationBlock((prev) => !prev);
                     }
                   }}
