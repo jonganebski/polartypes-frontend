@@ -1,35 +1,51 @@
 import Axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 const GRAPHHOPER_API_KEY = process.env.REACT_APP_GRAPHHOPPER_API_KEY;
 
-export const useGeocoder = (searchTerm: string, lat?: string, lon?: string) => {
-  const [prevSearchTerm, setPrevSearchTerm] = useState('');
+export const useGeocoder = (lat?: string, lon?: string) => {
+  const [isGeocodeLoading, setIsGeocodeLoading] = useState(false);
+  const [isGeocodeErr, setIsGeocodeErr] = useState(false);
   const [geocodeData, setGeocodeData] = useState<any>();
-  const [geocodeErr, setGeocodeErr] = useState(false);
   const timeoutId = useRef<any>();
-  clearTimeout(timeoutId.current);
-  useEffect(() => {
+
+  const onLocationInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.currentTarget;
     const GEOCODER_END_POINT =
       lat && lon
         ? `https://graphhopper.com/api/1/geocode?reverse=true&point=${lat},${lon}&locale=en&debug=true&key=${GRAPHHOPER_API_KEY}`
-        : `https://graphhopper.com/api/1/geocode?q=${searchTerm}&locale=en&debug=true&key=${GRAPHHOPER_API_KEY}`;
+        : `https://graphhopper.com/api/1/geocode?q=${value}&locale=en&debug=true&key=${GRAPHHOPER_API_KEY}`;
+
+    clearTimeout(timeoutId.current);
+
+    if (value.length <= 2) {
+      setGeocodeData(undefined);
+      setIsGeocodeLoading(false);
+      return;
+    }
+
+    setIsGeocodeLoading(true);
     timeoutId.current = setTimeout(async () => {
-      if (
-        searchTerm &&
-        2 < searchTerm.length &&
-        searchTerm !== prevSearchTerm
-      ) {
+      try {
         const { data, status } = await Axios.get(GEOCODER_END_POINT);
         if (400 <= status) {
-          setGeocodeErr(true);
+          setIsGeocodeErr(true);
         } else {
-          setGeocodeErr(false);
+          setIsGeocodeErr(false);
           setGeocodeData(data.hits);
-          setPrevSearchTerm(searchTerm);
         }
+      } catch {
+        setIsGeocodeErr(true);
       }
+      setIsGeocodeLoading(false);
     }, 2000);
-  }, [lat, lon, prevSearchTerm, searchTerm]);
-  return { geocodeData, setGeocodeData, geocodeErr };
+  };
+
+  return {
+    geocodeData,
+    setGeocodeData,
+    isGeocodeErr,
+    isGeocodeLoading,
+    onLocationInputChange,
+  };
 };

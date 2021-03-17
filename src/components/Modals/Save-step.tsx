@@ -21,6 +21,7 @@ import { ModalCloseIcon } from './partials/CloseIcon';
 import { FilesArea } from './partials/FilesArea';
 import { ICreateStepFormProps } from '../../pages/Trip';
 import { FormError } from '../Form-error';
+import { Spinner } from '../Loading-spinner';
 
 interface ISaveStepModalProps {
   tripId: string;
@@ -41,7 +42,6 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
   setIsSaveStepModal,
   editingStep,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isLocationBlock, setIsLocationBlock] = useState(false);
   const [uploadErr, setUploadErr] = useState('');
@@ -64,11 +64,13 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
 
   const [deleteStepMutation] = useDeleteStep(images, setIsSaveStepModal);
 
-  const { geocodeData, setGeocodeData, geocodeErr } = useGeocoder(searchTerm);
-
-  const onLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.currentTarget.value);
-  };
+  const {
+    onLocationInputChange,
+    isGeocodeLoading,
+    setGeocodeData,
+    isGeocodeErr,
+    geocodeData,
+  } = useGeocoder();
 
   const cleanupUnusedImageFilesOnCancel = useCallback(() => {
     if (imagesRecord.length === 0 || !imagesRecord.some((image) => image.url)) {
@@ -201,13 +203,18 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
               <div className="rounded-sm">
                 <div className="relative">
                   <input
-                    onChange={onLocationChange}
+                    onChange={onLocationInputChange}
                     ref={register({ required: true })}
                     name="location"
                     placeholder="Enter a location"
                     autoComplete="off"
                     className="input w-full border-transparent rounded-b-none"
                   />
+                  {isGeocodeLoading && (
+                    <div className="absolute right-5 top-6">
+                      <Spinner color="my-green-dark" />
+                    </div>
+                  )}
                   <div className="absolute z-10 w-full flex flex-col bg-white">
                     {geocodeData?.map((d: any, i: number) => {
                       return (
@@ -289,7 +296,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                 </div>
               )}
             </section>
-            {geocodeErr && (
+            {isGeocodeErr && (
               <div className="mb-4 text-center">
                 <FormError err="Geocode API error. Please fill country name manually." />
               </div>
@@ -308,10 +315,10 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                 <input
                   ref={register({ required: true })}
                   name="country"
-                  readOnly={!geocodeErr}
-                  placeholder={geocodeErr ? 'Country' : ''}
+                  readOnly={!isGeocodeErr}
+                  placeholder={isGeocodeErr ? 'Country' : ''}
                   style={{
-                    width: geocodeErr
+                    width: isGeocodeErr
                       ? '120px'
                       : watch('country')?.length + 2 + 'ch',
                   }}
@@ -440,7 +447,7 @@ export const SaveStepModal: React.FC<ISaveStepModalProps> = ({
                     } = getValues();
                     const isFormFullfilled =
                       location && lat && lon && country && timeZone;
-                    if (isFormFullfilled || geocodeErr) {
+                    if (isFormFullfilled || isGeocodeErr) {
                       setIsLocationBlock((prev) => !prev);
                     }
                   }}

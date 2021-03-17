@@ -31,7 +31,7 @@ export const useUpdateAccount = (
   ) => {
     if (data && me) {
       const {
-        updateAccount: { error, ok },
+        updateAccount: { ok },
       } = data;
       if (ok) {
         const {
