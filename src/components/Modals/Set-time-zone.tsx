@@ -1,12 +1,11 @@
-import { useMutation } from '@apollo/client';
+import { ApolloCache, FetchResult, useMutation } from '@apollo/client';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment-timezone';
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { client } from '../../apollo/apollo';
 import { UPDATE_ACCOUNT_MUTATION } from '../../hooks/useMutation/useUpdateAccount';
-import { WHO_AM_I_QUERY } from '../../hooks/useQuery/useWhoAmI';
+import { useWhoAmI } from '../../hooks/useQuery/useWhoAmI';
 import {
   updateAccountMutation,
   updateAccountMutationVariables,
@@ -30,42 +29,44 @@ export const SetTimeZoneModal: React.FC<ISetTimeZoneModalProps> = ({
   setIsAskTimeZone,
   setIsCreateTrip,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { me } = useWhoAmI();
   const f = useForm<ISetTimeZoneFormProps>({
     mode: 'onChange',
   });
   const { getValues, formState, register, handleSubmit, errors } = f;
-  const onCompleted = (data: updateAccountMutation) => {
+
+  const update = (
+    cache: ApolloCache<updateAccountMutation>,
+    { data }: FetchResult<updateAccountMutation>,
+  ) => {
+    if (!data || !me) return;
     const {
-      updateAccount: { ok, error },
+      updateAccount: { error },
     } = data;
-    if (ok && !error) {
-      const { timeZone } = getValues();
-      const prevQuery = client.readQuery({ query: WHO_AM_I_QUERY });
-      client.writeQuery({
-        query: WHO_AM_I_QUERY,
-        data: {
-          whoAmI: {
-            ...prevQuery.whoAmI,
-            timeZone,
-          },
-        },
-      });
-      setIsLoading(false);
-      setIsAskTimeZone(false);
-      setIsCreateTrip(true);
-    }
+    if (error) return;
+    const success = cache.modify({
+      id: `User:${me.id}`,
+      fields: {
+        timeZone: () => getValues().timeZone,
+      },
+    });
+    if (!success) return;
+    setIsAskTimeZone(false);
+    setIsCreateTrip(true);
   };
-  const [updateAccountMutation] = useMutation<
+
+  const [updateAccountMutation, { loading }] = useMutation<
     updateAccountMutation,
     updateAccountMutationVariables
-  >(UPDATE_ACCOUNT_MUTATION, { onCompleted });
+  >(UPDATE_ACCOUNT_MUTATION, { update });
 
-  const onSubmit = () => {
-    setIsLoading(true);
-    updateAccountMutation({ variables: { input: { ...getValues() } } });
+  const onSubmit = async () => {
+    if (loading) return;
+    await updateAccountMutation({ variables: { input: { ...getValues() } } });
   };
+
   const clientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   return (
     <>
       <ModalBackground onClick={() => setIsAskTimeZone(false)} />
@@ -112,7 +113,7 @@ export const SetTimeZoneModal: React.FC<ISetTimeZoneModalProps> = ({
             <Button
               text="Create trip"
               disabled={!formState.isValid}
-              loading={isLoading}
+              loading={loading}
               type="red-solid"
               className="mx-auto"
             />
