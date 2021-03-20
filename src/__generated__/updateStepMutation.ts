@@ -13,6 +13,7 @@ export interface updateStepMutation_updateStep {
   __typename: "UpdateStepOutput";
   ok: boolean;
   error: string | null;
+  imgUrls: string[] | null;
 }
 
 export interface updateStepMutation {

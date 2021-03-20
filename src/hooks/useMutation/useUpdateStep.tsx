@@ -13,6 +13,7 @@ const UPDATE_STEP_MUTATION = gql`
     updateStep(input: $input) {
       ok
       error
+      imgUrls
     }
   }
 `;
@@ -30,9 +31,9 @@ export const useUpdateStep = (
     if (!data || !editingStep) return;
 
     const {
-      updateStep: { error, ok },
+      updateStep: { error, ok, imgUrls },
     } = data;
-    if (!ok) {
+    if (!imgUrls || !ok || error) {
       console.log(error);
       return;
     }
@@ -41,6 +42,7 @@ export const useUpdateStep = (
     const success = cache.modify({
       id: `Step:${editingStep.id}`,
       fields: {
+        imgUrls: () => imgUrls,
         lat: () => +lat,
         lon: () => +lon,
         location: () => values.location,

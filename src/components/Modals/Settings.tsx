@@ -114,6 +114,7 @@ export const SettingsModal: React.FC<ISettingsModal> = ({
         throw new Error();
       }
       history.push(`/${f.getValues().username}`);
+      setIsSettingModal(false);
     } catch (error) {
       setIsLoading(false);
     }
