@@ -1,6 +1,7 @@
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useHistory } from 'react-router';
 import { logUserOut } from '../../../apollo/reactive-variables';
 import { NAME_PATTERN, PW_MIN_LENGTH } from '../../../constants';
 import {
@@ -26,6 +27,7 @@ interface IAccountProps {
 
 export const Account: React.FC<IAccountProps> = ({ hidden, slug }) => {
   const client = useApolloClient();
+  const history = useHistory();
   const { register, errors } = useFormContext<ISettingsFormProps>();
 
   const onCompleted = async (data: deleteAccountMutation) => {
@@ -35,6 +37,7 @@ export const Account: React.FC<IAccountProps> = ({ hidden, slug }) => {
     if (ok && !error) {
       client.cache.evict({ id: `User:${slug}` });
       logUserOut();
+      history.push('/');
     }
   };
   const [deleteAccountMutation, { loading }] = useMutation<
