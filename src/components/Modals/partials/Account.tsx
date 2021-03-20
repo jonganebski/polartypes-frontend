@@ -1,9 +1,8 @@
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
-import { isLoggedInVar } from '../../../apollo/reactive-variables';
-import { NAME_PATTERN, PW_MIN_LENGTH, TOKEN } from '../../../constants';
+import { logUserOut } from '../../../apollo/reactive-variables';
+import { NAME_PATTERN, PW_MIN_LENGTH } from '../../../constants';
 import {
   deleteAccountMutation,
   deleteAccountMutationVariables,
@@ -26,27 +25,32 @@ interface IAccountProps {
 }
 
 export const Account: React.FC<IAccountProps> = ({ hidden, slug }) => {
-  const history = useHistory();
   const client = useApolloClient();
   const { register, errors } = useFormContext<ISettingsFormProps>();
+
   const onCompleted = async (data: deleteAccountMutation) => {
     const {
       deleteAccount: { ok, error },
     } = data;
     if (ok && !error) {
       client.cache.evict({ id: `User:${slug}` });
-      localStorage.removeItem(TOKEN);
-      isLoggedInVar(false);
-      history.push('/');
+      logUserOut();
     }
   };
-  const [deleteAccountMutation] = useMutation<
+  const [deleteAccountMutation, { loading }] = useMutation<
     deleteAccountMutation,
     deleteAccountMutationVariables
   >(DELETE_ACCOUNT_MUTAION, { onCompleted });
+
   const onDeleteAccountClick = () => {
+    if (loading) return;
+    const isConfirmed = window.confirm(
+      'Your account will be removed permanently. Are you sure?',
+    );
+    if (!isConfirmed) return;
     deleteAccountMutation({ variables: { input: { password: null } } });
   };
+
   return (
     <div className={`${hidden ? 'hidden' : 'block'}`}>
       <div className="px-6 mb-6 rounded-lg border border-myGray-light bg-white overflow-hidden">
