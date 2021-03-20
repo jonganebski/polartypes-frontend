@@ -45,7 +45,7 @@ export const SetTimeZoneModal: React.FC<ISetTimeZoneModalProps> = ({
     } = data;
     if (error) return;
     const success = cache.modify({
-      id: `User:${me.id}`,
+      id: `Users:${me.id}`,
       fields: {
         timeZone: () => getValues().timeZone,
       },
