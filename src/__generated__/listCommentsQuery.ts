@@ -32,8 +32,8 @@ export interface listCommentsQuery_listComments_step {
 
 export interface listCommentsQuery_listComments {
   __typename: "ListCommentsOutput";
-  hasMorePages: boolean | null;
-  endCursorId: number | null;
+  hasNextPage: boolean | null;
+  endCursorDate: any | null;
   error: string | null;
   ok: boolean;
   step: listCommentsQuery_listComments_step | null;

@@ -37,10 +37,13 @@ export const Comments: React.FC<ICommentProps> = ({ me, step }) => {
   };
 
   const onClickLoadMore = () => {
-    if (fetchMore && data?.listComments.hasMorePages) {
+    if (fetchMore && data?.listComments.hasNextPage) {
       fetchMore({
         variables: {
-          input: { stepId: step.id, cursorId: data?.listComments.endCursorId },
+          input: {
+            stepId: step.id,
+            cursorDate: data.listComments.endCursorDate,
+          },
         },
       });
     }
@@ -75,7 +78,7 @@ export const Comments: React.FC<ICommentProps> = ({ me, step }) => {
           ))}
         </ul>
       )}
-      {data?.listComments.hasMorePages && (
+      {data?.listComments.hasNextPage && (
         <div className="text-center">
           <span
             className="text-sm underline text-myBlue cursor-pointer hover:text-myBlue-light active:text-myBlue-dark"

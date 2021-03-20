@@ -9,8 +9,8 @@ import {
 const LIST_COMMENTS_QUERY = gql`
   query listCommentsQuery($input: ListCommentsInput!) {
     listComments(input: $input) {
-      hasMorePages
-      endCursorId
+      hasNextPage
+      endCursorDate
       error
       ok
       step {
