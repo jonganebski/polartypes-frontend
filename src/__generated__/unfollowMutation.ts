@@ -13,7 +13,7 @@ export interface unfollowMutation_unfollow {
   __typename: "UnfollowOutput";
   ok: boolean;
   error: string | null;
-  slug: string | null;
+  id: number | null;
 }
 
 export interface unfollowMutation {

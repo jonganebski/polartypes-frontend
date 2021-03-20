@@ -10,7 +10,7 @@ const UNFOLLOW_MUTATION = gql`
     unfollow(input: $input) {
       ok
       error
-      slug
+      id
     }
   }
 `;
@@ -24,16 +24,16 @@ export const useUnfollow = () => {
   ) => {
     if (data) {
       const {
-        unfollow: { slug, error, ok },
+        unfollow: { id, error, ok },
       } = data;
-      if (ok && me?.slug) {
+      if (ok && me?.id) {
         cache.modify({
-          id: `User:${slug}`,
+          id: `Users:${id}`,
           fields: {
             countFollowers: (prev) => Math.max(prev - 1, 0),
             isFollowing: () => false,
             followers: (prev) =>
-              prev.filter((user: any) => user['__ref'] !== `User:${me.slug}`),
+              prev.filter((user: any) => user['__ref'] !== `Users:${me.id}`),
           },
         });
       }

@@ -13,7 +13,7 @@ export interface followMutation_follow {
   __typename: "FollowOutput";
   ok: boolean;
   error: string | null;
-  slug: string | null;
+  id: number | null;
 }
 
 export interface followMutation {

@@ -43,13 +43,24 @@ export const useUpdateAccount = (
           timeZone,
         } = f.getValues();
         cache.modify({
-          id: `User:${me.slug}`,
+          id: `Users:${me.id}`,
           fields: {
             about: () => about,
             city: () => city,
             firstName: () => firstName,
             lastName: () => lastName,
             username: () => username,
+            slug: (prevSlug) => {
+              const newSlug = username.toLowerCase();
+              if (prevSlug !== newSlug) {
+                cache.evict({
+                  id: 'ROOT_QUERY',
+                  fieldName: 'readTrips',
+                  args: { input: { slug: prevSlug } },
+                });
+              }
+              return newSlug;
+            },
             timeZone: () => timeZone,
             avatarUrl: () => avatarUrl,
           },

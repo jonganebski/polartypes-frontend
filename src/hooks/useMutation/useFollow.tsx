@@ -3,32 +3,29 @@ import {
   followMutation,
   followMutationVariables,
 } from '../../__generated__/followMutation';
-import { useWhoAmI } from '../useQuery/useWhoAmI';
 
 const FOLLOW_MUTAION = gql`
   mutation followMutation($input: FollowInput!) {
     follow(input: $input) {
       ok
       error
-      slug
+      id
     }
   }
 `;
 
 export const useFollow = () => {
-  const { me } = useWhoAmI();
-
   const update = (
     cache: ApolloCache<followMutation>,
     { data }: FetchResult<followMutation>,
   ) => {
     if (data) {
       const {
-        follow: { slug, error, ok },
+        follow: { id, error, ok },
       } = data;
-      if (ok && me?.slug) {
+      if (ok) {
         cache.modify({
-          id: `User:${slug}`,
+          id: `Users:${id}`,
           fields: {
             countFollowers: (prev) => prev + 1,
             isFollowing: () => true,
